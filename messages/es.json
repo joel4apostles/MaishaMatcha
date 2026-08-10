@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "aria": "Principal",
+    "menu": "Carta",
+    "story": "Historia",
+    "events": "Eventos",
+    "home": "Inicio",
+    "skip": "Saltar al contenido"
+  },
+  "cta": {
+    "joinWaitlist": "Unirse a la lista",
+    "toMenu": "Ver la carta completa",
+    "toWaitlist": "Reservar un lugar"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Murcia · Primer salón de matcha",
+      "wordmark": "maisha matcha",
+      "line": "Hoja molida en piedra, agua a su punto, una pausa larga."
+    },
+    "manifesto": {
+      "eyebrow": "Manifiesto",
+      "title": "Lujo silencioso",
+      "p1": "El lujo no está en el precio ni en quién puede pagarlo. Está en la experiencia: cómo se siente algo al tocarlo, al sostenerlo.",
+      "p2": "Es materia y es luz. Piedra fría, madera con vetas, el vapor que sube. La mañana que se posa sobre el verde.",
+      "p3": "Es el equilibrio entre la materia y la luz. Confort, calma, un té bebido sin prisa.",
+      "quote": "Lo que no es piedra es luz.",
+      "quoteAuthor": "Octavio Paz"
+    },
+    "menuPreview": {
+      "eyebrow": "La carta",
+      "title": "Cuatro preparaciones"
+    },
+    "space": {
+      "eyebrow": "El espacio",
+      "title": "Una sala de té en Murcia",
+      "body": "Tatami y madera cálida. Cerámica hecha a mano: chawan, chasen, chashaku. En la pared, una obra tejida. En el centro, un árbol. Nada más.",
+      "caption1": "chashitsu",
+      "caption2": "chawan",
+      "caption3": "el árbol",
+      "alt1": "La sala de té, con tatami y madera cálida.",
+      "alt2": "Un chawan de cerámica hecho a mano.",
+      "alt3": "El árbol en el centro de la sala."
+    },
+    "founding": {
+      "eyebrow": "Socios fundadores",
+      "title": "Los primeros cincuenta",
+      "body": "Los primeros cincuenta socios conservan los privilegios de apertura.",
+      "privilege1": "Primera invitación a cata",
+      "privilege2": "Acceso anticipado a los eventos",
+      "privilege3": "Precio fundador en la futura membresía"
+    }
+  },
+  "waitlist": {
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "emailLabel": "Correo",
+    "emailPlaceholder": "tu@correo.es",
+    "consent": "Acepto recibir noticias de maisha matcha. Sin ruido.",
+    "submit": "Unirse",
+    "submitting": "Enviando…",
+    "successTitle": "Gracias.",
+    "successLine": "Te escribiremos una sola vez, antes de la apertura.",
+    "errorName": "Escribe tu nombre.",
+    "errorEmail": "Revisa el correo.",
+    "errorConsent": "Marca la casilla para continuar.",
+    "errorRate": "Demasiados intentos. Prueba en un minuto.",
+    "errorGeneric": "Algo no ha ido bien. Inténtalo de nuevo."
+  },
+  "menu": {
+    "eyebrow": "La carta",
+    "title": "Carta",
+    "intro": "Matcha ceremonial, lattes y algunos dulces. Leche de avena por defecto.",
+    "originPrefix": "Origen"
+  },
+  "story": {
+    "eyebrow": "Historia",
+    "title": "Del monte Tang a Murcia",
+    "intro": "Ocho momentos en el camino del matcha."
+  },
+  "events": {
+    "eyebrow": "Eventos",
+    "title": "Un programa por venir",
+    "intro": "Catas, tardes de ceremonia y colaboraciones con artistas.",
+    "memberBadge": "Reservado a socios fundadores",
+    "invite": "El programa se abre primero a los socios fundadores."
+  },
+  "legal": {
+    "provisional": "Texto provisional, pendiente de revisión legal.",
+    "notice": {
+      "title": "Aviso legal",
+      "p1": "maisha matcha es un proyecto en fase de apertura en Murcia, España. Este sitio informa sobre el salón y recoge una lista de espera.",
+      "p2": "Los datos de titularidad, domicilio social y registro mercantil se publicarán antes de la apertura.",
+      "p3": "Para cualquier consulta, escribe a hola@maishamatcha.es."
+    },
+    "privacy": {
+      "title": "Privacidad",
+      "p1": "Guardamos tu nombre y tu correo con un único fin: avisarte antes de la apertura y, si lo aceptas, enviarte noticias ocasionales.",
+      "p2": "No compartimos tus datos con terceros ajenos al envío del correo. Puedes darte de baja cuando quieras escribiendo a hola@maishamatcha.es.",
+      "p3": "La analítica del sitio es anónima y no usa cookies."
+    }
+  },
+  "footer": {
+    "tagline": "Matcha, luz y calma. Murcia.",
+    "visitLabel": "Visita",
+    "hoursLabel": "Horario",
+    "followLabel": "Seguir",
+    "legalNotice": "Aviso legal",
+    "privacy": "Privacidad",
+    "switcherAria": "Cambiar idioma",
+    "rights": "maisha matcha · Murcia"
+  },
+  "meta": {
+    "home": {
+      "title": "maisha matcha · salón de matcha en Murcia",
+      "description": "El primer salón de matcha de Murcia. Matcha ceremonial, calma y una sala de té. Únete a los socios fundadores."
+    },
+    "menu": {
+      "title": "Carta · maisha matcha",
+      "description": "Matcha ceremonial, lattes y dulces. La carta del salón de matcha en Murcia."
+    },
+    "story": {
+      "title": "Historia · maisha matcha",
+      "description": "Del monte Tang a Murcia: ocho momentos en el camino del matcha."
+    },
+    "events": {
+      "title": "Eventos · maisha matcha",
+      "description": "Catas, tardes de ceremonia y colaboraciones. Reservado a los socios fundadores."
+    },
+    "notice": {
+      "title": "Aviso legal · maisha matcha",
+      "description": "Aviso legal de maisha matcha, Murcia."
+    },
+    "privacy": {
+      "title": "Privacidad · maisha matcha",
+      "description": "Cómo tratamos tus datos en maisha matcha."
+    }
+  },
+  "notFound": {
+    "title": "Aquí no hay nada.",
+    "line": "La página que buscas no existe.",
+    "home": "Volver al inicio"
+  }
+}
