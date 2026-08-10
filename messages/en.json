@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "aria": "Primary",
+    "menu": "Menu",
+    "story": "Story",
+    "events": "Events",
+    "home": "Home",
+    "skip": "Skip to content"
+  },
+  "cta": {
+    "joinWaitlist": "Join the list",
+    "toMenu": "See the full menu",
+    "toWaitlist": "Keep a place"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Murcia · The first matcha salon",
+      "wordmark": "maisha matcha",
+      "line": "Leaf ground on stone, water at its point, a long pause."
+    },
+    "manifesto": {
+      "eyebrow": "Manifesto",
+      "title": "Quiet luxury",
+      "p1": "Luxury is not in the price, nor in who can pay it. It is in the experience: how something feels to the touch, to the hand.",
+      "p2": "It is matter and it is light. Cool stone, grained wood, the rising steam. Morning settling on green.",
+      "p3": "It is the balance between matter and light. Comfort, calm, tea drunk without hurry.",
+      "quote": "Lo que no es piedra es luz.",
+      "quoteAuthor": "Octavio Paz"
+    },
+    "menuPreview": {
+      "eyebrow": "The menu",
+      "title": "Four preparations"
+    },
+    "space": {
+      "eyebrow": "The space",
+      "title": "A tea room in Murcia",
+      "body": "Tatami and warm wood. Handmade ceramics: chawan, chasen, chashaku. On the wall, a woven work. At the centre, a tree. Nothing more.",
+      "caption1": "chashitsu",
+      "caption2": "chawan",
+      "caption3": "the tree",
+      "alt1": "The tea room, with tatami and warm wood.",
+      "alt2": "A handmade ceramic chawan.",
+      "alt3": "The tree at the centre of the room."
+    },
+    "founding": {
+      "eyebrow": "Founding members",
+      "title": "The first fifty",
+      "body": "The first fifty members keep the opening privileges.",
+      "privilege1": "First tasting invitation",
+      "privilege2": "Early access to events",
+      "privilege3": "Founding price on the future membership"
+    }
+  },
+  "waitlist": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@email.com",
+    "consent": "I agree to receive news from maisha matcha. No noise.",
+    "submit": "Join",
+    "submitting": "Sending…",
+    "successTitle": "Thank you.",
+    "successLine": "We will write once, before the opening.",
+    "errorName": "Please enter your name.",
+    "errorEmail": "Please check the email.",
+    "errorConsent": "Tick the box to continue.",
+    "errorRate": "Too many attempts. Try again in a minute.",
+    "errorGeneric": "Something went wrong. Please try again."
+  },
+  "menu": {
+    "eyebrow": "The menu",
+    "title": "Menu",
+    "intro": "Ceremonial matcha, lattes and a few sweets. Oat milk by default.",
+    "originPrefix": "Origin"
+  },
+  "story": {
+    "eyebrow": "Story",
+    "title": "From the Tang hills to Murcia",
+    "intro": "Eight moments on the path of matcha."
+  },
+  "events": {
+    "eyebrow": "Events",
+    "title": "A programme to come",
+    "intro": "Tastings, ceremony evenings and collaborations with artists.",
+    "memberBadge": "For founding members",
+    "invite": "The programme opens first to founding members."
+  },
+  "legal": {
+    "provisional": "Provisional text, pending legal review.",
+    "notice": {
+      "title": "Legal notice",
+      "p1": "maisha matcha is a project opening in Murcia, Spain. This site describes the salon and collects a waiting list.",
+      "p2": "Ownership, registered address and company registry details will be published before the opening.",
+      "p3": "For any question, write to hola@maishamatcha.es."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "p1": "We keep your name and email for one purpose: to let you know before the opening and, if you agree, to send occasional news.",
+      "p2": "We do not share your data with third parties beyond sending the email. You can unsubscribe at any time by writing to hola@maishamatcha.es.",
+      "p3": "Site analytics are anonymous and use no cookies."
+    }
+  },
+  "footer": {
+    "tagline": "Matcha, light and calm. Murcia.",
+    "visitLabel": "Visit",
+    "hoursLabel": "Hours",
+    "followLabel": "Follow",
+    "legalNotice": "Legal notice",
+    "privacy": "Privacy",
+    "switcherAria": "Change language",
+    "rights": "maisha matcha · Murcia"
+  },
+  "meta": {
+    "home": {
+      "title": "maisha matcha · matcha salon in Murcia",
+      "description": "The first matcha salon in Murcia. Ceremonial matcha, calm, and a tea room. Join the founding members."
+    },
+    "menu": {
+      "title": "Menu · maisha matcha",
+      "description": "Ceremonial matcha, lattes and sweets. The menu of the matcha salon in Murcia."
+    },
+    "story": {
+      "title": "Story · maisha matcha",
+      "description": "From the Tang hills to Murcia: eight moments on the path of matcha."
+    },
+    "events": {
+      "title": "Events · maisha matcha",
+      "description": "Tastings, ceremony evenings and collaborations. For founding members."
+    },
+    "notice": {
+      "title": "Legal notice · maisha matcha",
+      "description": "Legal notice for maisha matcha, Murcia."
+    },
+    "privacy": {
+      "title": "Privacy · maisha matcha",
+      "description": "How we handle your data at maisha matcha."
+    }
+  },
+  "notFound": {
+    "title": "Nothing here.",
+    "line": "The page you are looking for does not exist.",
+    "home": "Back to home"
+  }
+}

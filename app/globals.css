@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/*
+ * maisha matcha — design tokens (brand law: .claude/skills/maisha-brand)
+ * Never introduce colors or fonts outside this palette.
+ */
+@theme {
+  /* Palette (from the founder's design deck: paper, ink, olive-gold, timber) */
+  --color-washi: #f5f1e8; /* warm paper background */
+  --color-sumi: #1c1b18; /* ink, primary text */
+  --color-gold: #786000; /* the signature accent: wordmark, one CTA, focus */
+  --color-wood: #b08d57; /* timber hairlines and borders */
+
+  /* Type families (wired to next/font variables in the locale layout) */
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+
+  /* Small-caps eyebrow */
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.1;
+  --text-eyebrow--letter-spacing: 0.15em;
+
+  /* Display headline: clamp 2.5 -> 4.5rem */
+  --text-display: clamp(2.5rem, 5.5vw + 0.5rem, 4.5rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.01em;
+
+  /* Section title */
+  --text-title: clamp(1.75rem, 3vw + 0.5rem, 2.75rem);
+  --text-title--line-height: 1.1;
+  --text-title--letter-spacing: -0.005em;
+
+  /* Content rhythm */
+  --spacing-measure: 65ch;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-size: 1rem;
+    line-height: 1.7;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-gold) 18%, transparent);
+    color: var(--color-sumi);
+  }
+
+  /* Single, quiet focus ring — olive-gold, the one routine accent. */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Text measure cap — whitespace is the primary material. */
+  .measure {
+    max-width: var(--spacing-measure);
+  }
+}
