@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { Fragment, type CSSProperties } from "react";
 
 /**
  * Per-word markup for a StageReveal title: words carry staggered delays but
@@ -20,13 +20,17 @@ export function StageWords({
   return (
     <span className={`stage-words ${className}`.trim()}>
       {words.map((word, i) => (
-        <span
-          key={`${word}-${i}`}
-          style={{ "--wr-delay": `${baseDelay + i * step}ms` } as CSSProperties}
-        >
-          {word}
+        <Fragment key={`${word}-${i}`}>
+          <span
+            style={
+              { "--wr-delay": `${baseDelay + i * step}ms` } as CSSProperties
+            }
+          >
+            {word}
+          </span>
+          {/* Space OUTSIDE the inline-block span — inside it gets trimmed. */}
           {i < words.length - 1 ? " " : null}
-        </span>
+        </Fragment>
       ))}
     </span>
   );
