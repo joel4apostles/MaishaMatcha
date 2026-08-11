@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Section } from "@/components/Section";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
-import { buttonClass } from "@/components/Button";
+import { buttonClass, QuietLink } from "@/components/Button";
 import { menu } from "@/content/menu";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -43,6 +43,9 @@ function MenuContent() {
       <Reveal>
         <Headline as="h1" className="text-display">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
+        <div className="mt-6">
+          <QuietLink href="/crea">{cta("create")}</QuietLink>
+        </div>
       </Reveal>
 
       <div className="mt-16 max-w-3xl space-y-16">
