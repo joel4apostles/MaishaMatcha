@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const toneStyles = {
   light: {
     field:
-      "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/55 transition-colors focus:border-gold",
+      "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/55 transition-colors duration-300 focus:border-gold",
     label: "text-eyebrow uppercase text-sumi/70",
     error: "mt-2 text-sm text-sumi/70",
     formError: "text-sm text-sumi/70",
@@ -23,7 +23,7 @@ const toneStyles = {
   },
   dark: {
     field:
-      "w-full border-b border-washi/30 bg-transparent py-2.5 text-washi placeholder:text-washi/45 transition-colors focus:border-washi",
+      "w-full border-b border-washi/30 bg-transparent py-2.5 text-washi placeholder:text-washi/45 transition-colors duration-300 focus:border-washi",
     label: "text-eyebrow uppercase text-washi/70",
     error: "mt-2 text-sm text-washi/75",
     formError: "text-sm text-washi/75",
@@ -94,7 +94,7 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
 
   if (status === "success") {
     return (
-      <div className="min-h-[220px]">
+      <div className="anim-rise min-h-[220px]">
         <p
           ref={successRef}
           tabIndex={-1}

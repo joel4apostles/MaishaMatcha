@@ -50,7 +50,7 @@ export function TimelineRail({ className = "" }: { className?: string }) {
       className={`pointer-events-none absolute bottom-0 left-0 top-0 w-px ${className}`.trim()}
     >
       {/* static faint rail */}
-      <div className="absolute inset-0 bg-wood/25" />
+      <div className="absolute inset-0 bg-wood/35" />
       {/* drawn line */}
       <div
         ref={lineRef}

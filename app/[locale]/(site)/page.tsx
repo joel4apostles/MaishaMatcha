@@ -155,7 +155,7 @@ function Manifesto() {
   const inkClass =
     "measure font-serif text-2xl font-light leading-relaxed text-sumi sm:text-[1.75rem]";
   return (
-    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
         <Reveal>
           <Eyebrow>{t("eyebrow")}</Eyebrow>
@@ -190,7 +190,7 @@ function StoryTeaser() {
   const locale = useLocale();
   const chapters = story.filter((c) => TEASER_CHAPTERS.includes(c.id));
   return (
-    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
@@ -239,7 +239,7 @@ function MenuPreview() {
   const locale = useLocale();
   const items = signatureItems();
   return (
-    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
@@ -251,7 +251,7 @@ function MenuPreview() {
               {/* Whole cell is a real link — the hover affordance is honest. */}
               <Link
                 href="/menu"
-                className="flex min-h-[200px] w-full flex-col justify-between rounded-[2px] border border-wood/30 p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9"
+                className="flex min-h-[200px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9"
               >
                 <div>
                   <p className="text-eyebrow uppercase text-sumi/70">
@@ -264,7 +264,7 @@ function MenuPreview() {
                     {item.description[locale]}
                   </p>
                 </div>
-                <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-wood/15 pt-4">
+                <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-wood/25 pt-4">
                   <p className="font-serif text-xl text-sumi/85">{item.price}</p>
                   {item.origin ? (
                     <p className="text-eyebrow uppercase text-sumi/70">
@@ -292,30 +292,35 @@ function TheSpace() {
     { src: salonArbol, alt: t("alt3"), caption: t("caption3") },
   ];
   return (
-    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("body")}</p>
       </Reveal>
 
-      <Reveal className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
-        {details.map((image) => (
-          <figure key={image.caption} className="group">
-            <div className="overflow-hidden rounded-[2px]">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                sizes="(min-width: 640px) 33vw, 100vw"
-                placeholder="blur"
-                className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-              />
-            </div>
-            <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">
-              {image.caption}
-            </figcaption>
-          </figure>
-        ))}
+      {/* Full-bleed triptych — the crops read large. */}
+      <Reveal className="mt-14">
+        <div className="bleed px-4 sm:px-6">
+          <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
+            {details.map((image) => (
+              <figure key={image.caption} className="group">
+                <div className="overflow-hidden rounded-[2px]">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    sizes="(min-width: 640px) 33vw, 100vw"
+                    placeholder="blur"
+                    className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  />
+                </div>
+                <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">
+                  {image.caption}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
       </Reveal>
     </Section>
   );

@@ -38,7 +38,7 @@ export function ScrollInk({
       );
       const revealed = Math.floor(progress * words.length);
       words.forEach((w, i) => {
-        w.style.opacity = i < revealed ? "1" : "0.18";
+        w.style.opacity = i < revealed ? "1" : "0.35";
       });
     };
 

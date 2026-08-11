@@ -7,7 +7,7 @@ import type { AppPathname } from "@/i18n/routing";
  * law allows one primary CTA per view. Min 44px touch target.
  */
 export const buttonClass =
-  "inline-flex min-h-[44px] items-center justify-center rounded-[2px] bg-gold px-7 py-3 text-sm font-medium tracking-wide text-washi transition-opacity duration-200 hover:opacity-90 disabled:opacity-50";
+  "inline-flex min-h-[44px] items-center justify-center rounded-[2px] bg-gold px-7 py-3 text-sm font-medium tracking-wide text-washi transition-opacity duration-200 hover:opacity-90 active:opacity-75 disabled:opacity-50";
 
 /** Quiet inline link — underline in wood, gold only on hover. */
 export const quietLinkClass =
