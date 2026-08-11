@@ -66,6 +66,14 @@ export function SiteFooter() {
         </div>
       </div>
 
+      {/* Monumental closing wordmark — quiet wood tone, decorative only. */}
+      <p
+        aria-hidden="true"
+        className="select-none overflow-hidden whitespace-nowrap px-4 pb-1 text-center font-sans text-[clamp(3rem,11vw,9.5rem)] font-medium lowercase leading-none tracking-tight text-wood/20"
+      >
+        maisha matcha
+      </p>
+
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-wood/15 px-6 py-6 sm:px-8">
         <p className="text-sm text-sumi/70">{t("rights")}</p>
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">

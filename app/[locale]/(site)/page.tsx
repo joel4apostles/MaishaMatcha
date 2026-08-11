@@ -99,8 +99,8 @@ function Hero() {
   const space = useTranslations("home.space");
   const cta = useTranslations("cta");
   return (
-    <section className="relative flex min-h-[calc(100svh-9rem)] flex-col overflow-hidden px-6 sm:min-h-[calc(100svh-5.5rem)] sm:px-8">
-      {/* The salon render as the opening image. */}
+    <section className="dark-band relative -mt-16 flex min-h-[100svh] flex-col overflow-hidden px-6 pt-16 sm:px-8">
+      {/* The salon render at near-full warmth. */}
       <Image
         src={salonRender}
         alt={space("altMain")}
@@ -110,44 +110,39 @@ function Hero() {
         sizes="100vw"
         className="object-cover object-[60%_center]"
       />
-      {/* Flat ink scrim for text legibility — solid color, not a gradient. */}
-      <div aria-hidden="true" className="absolute inset-0 bg-sumi/60" />
+      {/* Light unifying scrim; legibility comes from the ink panel below. */}
+      <div aria-hidden="true" className="absolute inset-0 bg-sumi/25" />
 
-      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col items-center justify-center py-16 text-center">
-        <p
-          className="anim-rise text-eyebrow uppercase text-washi/80"
+      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-24 pt-20">
+        {/* Editorial ink panel: flat sumi, AA-safe on any crop or device. */}
+        <div
+          className="anim-rise max-w-2xl rounded-[2px] bg-sumi/70 p-7 sm:p-10"
           style={riseDelay(100)}
         >
-          {t("eyebrow")}
-        </p>
-        <h1
-          className="anim-rise mt-8 font-sans text-hero font-medium lowercase tracking-tight text-washi"
-          style={riseDelay(280)}
-        >
-          maisha matcha
-        </h1>
-        <p className="mt-9 max-w-2xl font-serif text-poem font-light text-washi/90">
-          <WordReveal text={t("line")} baseDelay={500} step={70} />
-        </p>
-        <div className="anim-rise mt-12" style={riseDelay(1100)}>
-          <a href="#socios" className={buttonClass}>
-            {cta("joinWaitlist")}
-          </a>
+          <p className="text-eyebrow uppercase text-washi/80">{t("eyebrow")}</p>
+          <h1 className="mt-5 font-sans text-display font-medium lowercase tracking-tight text-washi">
+            maisha matcha
+          </h1>
+          <p className="mt-6 max-w-xl font-serif text-poem font-light text-washi/90">
+            <WordReveal text={t("line")} baseDelay={400} step={70} />
+          </p>
+          <div className="mt-9">
+            <a href="#socios" className={buttonClass}>
+              {cta("joinWaitlist")}
+            </a>
+          </div>
         </div>
       </div>
 
-      <div
-        className="anim-rise relative mx-auto mb-8 flex flex-col items-center gap-3"
-        style={riseDelay(1500)}
-      >
-        <span className="text-eyebrow uppercase text-washi/80">
-          {t("scrollCue")}
-        </span>
-        <span aria-hidden="true" className="h-10 w-px bg-washi/50" />
-      </div>
+      {/* Quiet non-text scroll cue. */}
+      <span
+        aria-hidden="true"
+        className="anim-rise absolute bottom-6 left-1/2 h-10 w-px -translate-x-1/2 bg-washi/60"
+        style={riseDelay(1200)}
+      />
 
       {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-3 right-4 text-eyebrow uppercase text-washi/60">
+      <span className="absolute bottom-4 right-4 rounded-[2px] bg-sumi/60 px-2.5 py-1 text-eyebrow uppercase text-washi/80">
         {space("renderNote")}
       </span>
     </section>
@@ -253,7 +248,7 @@ function MenuPreview() {
           {items.map((item, i) => (
             <li
               key={item.id}
-              className={`${bentoSpans[i]} flex min-h-[200px] flex-col justify-between rounded-[2px] border border-wood/25 bg-wood/[0.05] p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9`}
+              className={`${bentoSpans[i]} flex min-h-[200px] flex-col justify-between rounded-[2px] border border-wood/30 p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9`}
             >
               <div>
                 {item.origin ? (
@@ -323,21 +318,26 @@ function Founding() {
   const t = useTranslations("home.founding");
   const privileges = [t("privilege1"), t("privilege2"), t("privilege3")];
   return (
-    <Section id="socios" className="border-t border-wood/15" as="section">
+    // Inverted closing band: the page opens dark and closes dark.
+    <Section id="socios" className="dark-band bg-sumi" as="section">
       <Reveal className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         <div>
-          <Eyebrow>{t("eyebrow")}</Eyebrow>
-          <Headline className="mt-5">{t("title")}</Headline>
-          <p className="mt-6 font-serif text-2xl font-light text-sumi sm:text-3xl">
+          <p className="text-eyebrow font-medium uppercase text-washi/70">
+            {t("eyebrow")}
+          </p>
+          <h2 className="mt-5 text-balance font-serif text-title font-light text-washi">
+            {t("title")}
+          </h2>
+          <p className="mt-6 font-serif text-2xl font-light text-washi sm:text-3xl">
             {t("scarcity")}
           </p>
-          <p className="measure mt-4 text-lg text-sumi/80">{t("body")}</p>
+          <p className="measure mt-4 text-lg text-washi/80">{t("body")}</p>
           <ul className="mt-8 space-y-3">
             {privileges.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-sumi/80">
+              <li key={p} className="flex items-start gap-3 text-washi/80">
                 <span
                   aria-hidden="true"
-                  className="mt-3 h-px w-5 shrink-0 bg-wood/60"
+                  className="mt-3 h-px w-5 shrink-0 bg-wood/70"
                 />
                 <span>{p}</span>
               </li>
@@ -345,7 +345,7 @@ function Founding() {
           </ul>
         </div>
         <div>
-          <WaitlistForm />
+          <WaitlistForm dark />
         </div>
       </Reveal>
     </Section>

@@ -8,10 +8,35 @@ type Status = "idle" | "submitting" | "success" | "error";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const fieldClass =
-  "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/55 transition-colors focus:border-gold";
+const toneStyles = {
+  light: {
+    field:
+      "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/55 transition-colors focus:border-gold",
+    label: "text-eyebrow uppercase text-sumi/70",
+    error: "mt-2 text-sm text-sumi/70",
+    formError: "text-sm text-sumi/70",
+    successTitle: "font-serif text-3xl font-light text-sumi outline-none",
+    successLine: "measure mt-3 text-sumi/75",
+    consent: "text-sm text-sumi/75",
+    checkbox: "mt-1 size-4 shrink-0 accent-sumi",
+    button: buttonClass,
+  },
+  dark: {
+    field:
+      "w-full border-b border-washi/30 bg-transparent py-2.5 text-washi placeholder:text-washi/45 transition-colors focus:border-washi",
+    label: "text-eyebrow uppercase text-washi/70",
+    error: "mt-2 text-sm text-washi/75",
+    formError: "text-sm text-washi/75",
+    successTitle: "font-serif text-3xl font-light text-washi outline-none",
+    successLine: "measure mt-3 text-washi/75",
+    consent: "text-sm text-washi/75",
+    checkbox: "mt-1 size-4 shrink-0 accent-washi",
+    button: `${buttonClass} ring-1 ring-washi/30`,
+  },
+} as const;
 
-export function WaitlistForm() {
+export function WaitlistForm({ dark = false }: { dark?: boolean }) {
+  const s = toneStyles[dark ? "dark" : "light"];
   const t = useTranslations("waitlist");
   const locale = useLocale();
   const ids = useId();
@@ -73,11 +98,11 @@ export function WaitlistForm() {
         <p
           ref={successRef}
           tabIndex={-1}
-          className="font-serif text-3xl font-light text-sumi outline-none"
+          className={s.successTitle}
         >
           {t("successTitle")}
         </p>
-        <p className="measure mt-3 text-sumi/75">{t("successLine")}</p>
+        <p className={s.successLine}>{t("successLine")}</p>
       </div>
     );
   }
@@ -86,7 +111,7 @@ export function WaitlistForm() {
     <form onSubmit={onSubmit} noValidate className="min-h-[220px] max-w-md">
       <div className="grid gap-6">
         <div>
-          <label htmlFor={nameId} className="text-eyebrow uppercase text-sumi/70">
+          <label htmlFor={nameId} className={s.label}>
             {t("nameLabel")}
           </label>
           <input
@@ -97,17 +122,17 @@ export function WaitlistForm() {
             placeholder={t("namePlaceholder")}
             aria-invalid={errors.name ? "true" : undefined}
             aria-describedby={errors.name ? `${nameId}-error` : undefined}
-            className={fieldClass}
+            className={s.field}
           />
           {errors.name ? (
-            <p id={`${nameId}-error`} role="alert" className="mt-2 text-sm text-sumi/70">
+            <p id={`${nameId}-error`} role="alert" className={s.error}>
               {errors.name}
             </p>
           ) : null}
         </div>
 
         <div>
-          <label htmlFor={emailId} className="text-eyebrow uppercase text-sumi/70">
+          <label htmlFor={emailId} className={s.label}>
             {t("emailLabel")}
           </label>
           <input
@@ -119,10 +144,10 @@ export function WaitlistForm() {
             placeholder={t("emailPlaceholder")}
             aria-invalid={errors.email ? "true" : undefined}
             aria-describedby={errors.email ? `${emailId}-error` : undefined}
-            className={fieldClass}
+            className={s.field}
           />
           {errors.email ? (
-            <p id={`${emailId}-error`} role="alert" className="mt-2 text-sm text-sumi/70">
+            <p id={`${emailId}-error`} role="alert" className={s.error}>
               {errors.email}
             </p>
           ) : null}
@@ -134,16 +159,16 @@ export function WaitlistForm() {
               id={consentId}
               name="consent"
               type="checkbox"
-              className="mt-1 size-4 shrink-0 accent-sumi"
+              className={s.checkbox}
               aria-invalid={errors.consent ? "true" : undefined}
               aria-describedby={errors.consent ? `${consentId}-error` : undefined}
             />
-            <label htmlFor={consentId} className="text-sm text-sumi/75">
+            <label htmlFor={consentId} className={s.consent}>
               {t("consent")}
             </label>
           </div>
           {errors.consent ? (
-            <p id={`${consentId}-error`} role="alert" className="mt-2 text-sm text-sumi/70">
+            <p id={`${consentId}-error`} role="alert" className={s.error}>
               {errors.consent}
             </p>
           ) : null}
@@ -153,12 +178,12 @@ export function WaitlistForm() {
           <button
             type="submit"
             disabled={status === "submitting"}
-            className={buttonClass}
+            className={s.button}
           >
             {status === "submitting" ? t("submitting") : t("submit")}
           </button>
           {errors.form ? (
-            <p role="alert" className="text-sm text-sumi/70">
+            <p role="alert" className={s.formError}>
               {errors.form}
             </p>
           ) : null}
