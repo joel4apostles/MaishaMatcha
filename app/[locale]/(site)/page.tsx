@@ -119,7 +119,7 @@ function Hero() {
       <div aria-hidden="true" className="absolute inset-0 bg-sumi/25" />
 
       <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24">
-        {/* Editorial ink panel: flat sumi, AA-safe on any crop or device. */}
+        {/* Editorial ink panel: flat matcha-ink, AA-safe on any crop or device. */}
         <div
           className="anim-rise max-w-2xl rounded-[2px] bg-matcha-ink/80 p-6 sm:p-10"
           style={riseDelay(100)}
@@ -147,7 +147,7 @@ function Hero() {
       />
 
       {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-4 right-4 rounded-[2px] bg-matcha-ink/70 px-2.5 py-1 text-eyebrow uppercase text-washi/80">
+      <span className="absolute bottom-4 right-4 rounded-[2px] bg-matcha-ink/80 px-2.5 py-1 text-eyebrow uppercase text-washi/80">
         {space("renderNote")}
       </span>
     </section>
@@ -265,7 +265,7 @@ function MenuPreview() {
               <Link
                 href="/menu"
                 style={{ "--drink": item.color } as CSSProperties}
-                className="flex min-h-[160px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-75 hover:border-[color-mix(in_srgb,var(--drink)_55%,transparent)] hover:bg-[color-mix(in_srgb,var(--drink)_10%,transparent)] hover:opacity-100! sm:min-h-[200px] sm:p-9"
+                className="flex min-h-[160px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-[color-mix(in_srgb,var(--drink)_55%,transparent)] hover:bg-[color-mix(in_srgb,var(--drink)_10%,transparent)] hover:opacity-100! sm:min-h-[200px] sm:p-9"
               >
                 <div>
                   <div className="flex items-center justify-between gap-4">
@@ -290,7 +290,7 @@ function MenuPreview() {
                   <p className="font-serif text-xl text-sumi/85">{item.price}</p>
                   {item.origin ? (
                     <p className="text-eyebrow uppercase text-sumi/70">
-                      {item.origin}
+                      {item.origin[locale]}
                     </p>
                   ) : null}
                 </div>
@@ -301,7 +301,7 @@ function MenuPreview() {
           <li className="flex sm:col-span-12">
             <Link
               href="/crea"
-              className="flex w-full flex-wrap items-center justify-between gap-4 rounded-[2px] border border-matcha-ink/40 bg-matcha-ink/[0.05] p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-75 hover:border-matcha-ink/70 hover:bg-matcha-ink/[0.09] hover:opacity-100! sm:p-9"
+              className="flex w-full flex-wrap items-center justify-between gap-4 rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-matcha-ink/50 hover:bg-matcha-ink/[0.06] hover:opacity-100! sm:p-9"
             >
               <div>
                 <p className="text-eyebrow uppercase text-sumi/70">
@@ -311,10 +311,6 @@ function MenuPreview() {
                   {cta("create")}
                 </p>
               </div>
-              <span
-                aria-hidden="true"
-                className="hidden h-10 w-10 rounded-full bg-matcha-ink/80 sm:block"
-              />
             </Link>
           </li>
         </ul>
@@ -344,7 +340,7 @@ function TheSpace() {
       {/* Full-bleed triptych: swipeable snap gallery on mobile, grid on desktop. */}
       <Reveal className="mt-14">
         <div className="bleed px-4 sm:px-6">
-          <div className="mx-auto flex max-w-[1600px] snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:snap-none sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:pb-0">
+          <div tabIndex={0} role="region" aria-label={t("eyebrow")} className="mx-auto flex max-w-[1600px] snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:snap-none sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:pb-0">
             {details.map((image) => (
               <figure
                 key={image.caption}
@@ -376,10 +372,10 @@ function Founding() {
   const privileges = [t("privilege1"), t("privilege2"), t("privilege3")];
   return (
     // Inverted closing band: the page opens dark and closes dark.
-    <Section id="socios" className="dark-band bg-matcha-ink" as="section">
+    <Section id="socios" className="dark-band scroll-mt-16 bg-matcha-ink" as="section">
       <Reveal className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         <div>
-          <p className="text-eyebrow font-medium uppercase text-washi/70">
+          <p className="text-eyebrow font-medium uppercase text-washi/85">
             {t("eyebrow")}
           </p>
           <h2 className="mt-5 text-balance font-serif text-title font-light text-washi">

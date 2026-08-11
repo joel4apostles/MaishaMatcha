@@ -11,14 +11,14 @@
     "joinWaitlist": "Join the list",
     "toMenu": "See the full menu",
     "toStory": "Read the full story",
-    "toWaitlist": "Keep a place",
+    "toWaitlist": "Reserve a place",
     "create": "Create your drink"
   },
   "home": {
     "hero": {
       "eyebrow": "Murcia · The first matcha salon",
       "wordmark": "maisha matcha",
-      "line": "Leaf ground on stone, water at its point, a long pause.",
+      "line": "Leaf ground on stone, water at the right heat, a long pause.",
       "scrollCue": "Scroll"
     },
     "manifesto": {
@@ -52,7 +52,7 @@
       "eyebrow": "Founding members",
       "title": "The first fifty",
       "scarcity": "Fifty places. Not one more.",
-      "body": "The first fifty members keep the opening privileges.",
+      "body": "The first fifty members hold the opening privileges.",
       "privilege1": "First tasting invitation",
       "privilege2": "Early access to events",
       "privilege3": "Founding price on the future membership"
@@ -79,13 +79,14 @@
     "title": "Menu",
     "intro": "Stone-ground matcha, bubbles and fruit. Everything can be served cold.",
     "originPrefix": "Origin",
-    "closing": "Fifty founding members will taste this menu first."
+    "closing": "Fifty founding members will taste this menu first.",
+    "priceNote": "Opening prices, to be confirmed."
   },
   "story": {
     "eyebrow": "Story",
     "title": "From the Tang hills to Murcia",
     "intro": "Eight moments on the path of matcha.",
-    "closing": "The story continues in Murcia."
+    "closing": "The story continues in Murcia, with fifty founding members."
   },
   "events": {
     "eyebrow": "Events",
@@ -127,7 +128,7 @@
     },
     "menu": {
       "title": "Menu · maisha matcha",
-      "description": "Ceremonial matcha, lattes and sweets. The menu of the matcha salon in Murcia."
+      "description": "Ceremonial matcha, bubbles and fruit. The menu of the matcha salon in Murcia."
     },
     "story": {
       "title": "Story · maisha matcha",

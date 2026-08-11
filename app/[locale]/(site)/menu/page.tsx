@@ -84,7 +84,7 @@ function MenuContent() {
                       </p>
                       {item.origin ? (
                         <p className="mt-2 text-eyebrow uppercase text-sumi/70">
-                          {t("originPrefix")} · {item.origin}
+                          {t("originPrefix")} · {item.origin[locale]}
                         </p>
                       ) : null}
                     </div>
@@ -99,8 +99,12 @@ function MenuContent() {
         ))}
       </div>
 
+      <p className="mt-10 max-w-3xl text-eyebrow uppercase text-sumi/70">
+        {t("priceNote")}
+      </p>
+
       {/* Closing: the carta leads back to the founding list. */}
-      <Reveal className="mt-20 max-w-3xl border-t border-wood/25 pt-10">
+      <Reveal className="mt-16 max-w-3xl border-t border-wood/25 pt-10">
         <p className="font-serif text-2xl font-light text-sumi">
           {t("closing")}
         </p>

@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const toneStyles = {
   light: {
     field:
-      "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/55 transition-colors duration-300 focus:border-gold",
+      "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/70 transition-colors duration-300 focus:border-gold",
     label: "text-eyebrow uppercase text-sumi/70",
     error: "mt-2 text-sm text-sumi/70",
     formError: "text-sm text-sumi/70",
@@ -23,15 +23,16 @@ const toneStyles = {
   },
   dark: {
     field:
-      "w-full border-b border-washi/30 bg-transparent py-2.5 text-washi placeholder:text-washi/45 transition-colors duration-300 focus:border-washi",
-    label: "text-eyebrow uppercase text-washi/70",
+      "w-full border-b border-washi/30 bg-transparent py-2.5 text-washi placeholder:text-washi/65 transition-colors duration-300 focus:border-washi",
+    label: "text-eyebrow uppercase text-washi/85",
     error: "mt-2 text-sm text-washi/75",
     formError: "text-sm text-washi/75",
     successTitle: "font-serif text-3xl font-light text-washi outline-none",
     successLine: "measure mt-3 text-washi/75",
     consent: "text-sm text-washi/75",
     checkbox: "mt-1 size-4 shrink-0 accent-washi",
-    button: `${buttonClass} ring-1 ring-washi/30`,
+    button:
+      "inline-flex min-h-[44px] items-center justify-center rounded-[2px] bg-washi px-7 py-3 text-sm font-medium tracking-wide text-sumi transition-opacity duration-200 hover:opacity-90 active:opacity-75 disabled:opacity-50",
   },
 } as const;
 
@@ -55,6 +56,7 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (status === "submitting") return; // double-submit guard
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
@@ -65,7 +67,12 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
     if (!EMAIL_RE.test(email)) next.email = t("errorEmail");
     if (!consent) next.consent = t("errorConsent");
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      // Move focus to the first invalid field so keyboard/AT users land there.
+      const firstInvalid = next.name ? nameId : next.email ? emailId : consentId;
+      requestAnimationFrame(() => document.getElementById(firstInvalid)?.focus());
+      return;
+    }
 
     setStatus("submitting");
     try {

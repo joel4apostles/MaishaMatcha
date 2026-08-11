@@ -26,11 +26,6 @@
   --text-display--line-height: 1.04;
   --text-display--letter-spacing: -0.01em;
 
-  /* Cinematic hero wordmark: bigger than display, for the 100dvh hero only */
-  --text-hero: clamp(3.25rem, 9vw + 0.5rem, 7rem);
-  --text-hero--line-height: 1;
-  --text-hero--letter-spacing: -0.02em;
-
   /* Poetic hero line */
   --text-poem: clamp(1.25rem, 2.2vw + 0.5rem, 1.875rem);
   --text-poem--line-height: 1.5;
@@ -72,6 +67,13 @@
   /* On dark bands (image hero, founding), gold is invisible — use washi. */
   .dark-band :focus-visible {
     outline-color: var(--color-washi);
+  }
+
+  /* Option tiles hide their radio (sr-only); surface its focus on the tile. */
+  .option-tile:has(:focus-visible) {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 1px;
   }
 
   @media (prefers-reduced-motion: reduce) {

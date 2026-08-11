@@ -24,8 +24,8 @@ const schema = z.object({
 const FROM = process.env.RESEND_FROM ?? "maisha matcha <hola@maishamatcha.es>";
 
 const subjects = {
-  es: "Bienvenido a maisha",
-  en: "Welcome to maisha",
+  es: "Tu plaza en la lista de maisha matcha",
+  en: "Your place on the maisha matcha list",
 } as const;
 
 // Prefer proxy-trusted client IP. On Vercel, x-vercel-forwarded-for is set by

@@ -14,16 +14,16 @@ type Locale = "es" | "en";
 const copy = {
   es: {
     preview: "Gracias por unirte a maisha matcha.",
-    heading: "Bienvenido a maisha",
+    heading: "Te damos la bienvenida a maisha matcha",
     line: "Hoja molida en piedra, agua a su punto, una pausa larga.",
-    next: "Guardamos tu lugar entre los primeros socios fundadores. Te escribiremos una sola vez, antes de la apertura.",
+    next: "Tu nombre está en la lista de los socios fundadores. Te escribiremos una sola vez, antes de la apertura.",
     signature: "maisha matcha · Murcia",
   },
   en: {
     preview: "Thank you for joining maisha matcha.",
-    heading: "Welcome to maisha",
-    line: "Leaf ground on stone, water at its point, a long pause.",
-    next: "We keep your place among the first founding members. We will write once, before the opening.",
+    heading: "Welcome to maisha matcha",
+    line: "Leaf ground on stone, water at the right heat, a long pause.",
+    next: "Your name is on the founding members list. We will write once, before the opening.",
     signature: "maisha matcha · Murcia",
   },
 } as const;
