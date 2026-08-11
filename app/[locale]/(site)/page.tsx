@@ -13,10 +13,11 @@ import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { WordReveal } from "@/components/WordReveal";
 import { ScrollInk } from "@/components/ScrollInk";
-import { KigumiGrid } from "@/components/KigumiGrid";
 import { QuietLink, buttonClass } from "@/components/Button";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { TimelineRail } from "@/components/TimelineRail";
 import { signatureItems } from "@/content/menu";
+import { story } from "@/content/story";
 import { site } from "@/content/site";
 import { pageMetadata, SITE_URL } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -82,6 +83,7 @@ function Home() {
     <>
       <Hero />
       <Manifesto />
+      <StoryTeaser />
       <MenuPreview />
       <TheSpace />
       <Founding />
@@ -94,28 +96,37 @@ const riseDelay = (ms: number) =>
 
 function Hero() {
   const t = useTranslations("home.hero");
+  const space = useTranslations("home.space");
   const cta = useTranslations("cta");
   return (
-    <section className="relative flex min-h-[calc(100svh-9rem)] flex-col px-6 sm:min-h-[calc(100svh-5.5rem)] sm:px-8">
-      {/* The single kigumi motif for this page: a full hero backdrop. */}
-      <div aria-hidden="true" className="absolute inset-0 opacity-[0.05]">
-        <KigumiGrid />
-      </div>
+    <section className="relative flex min-h-[calc(100svh-9rem)] flex-col overflow-hidden px-6 sm:min-h-[calc(100svh-5.5rem)] sm:px-8">
+      {/* The salon render as the opening image. */}
+      <Image
+        src={salonRender}
+        alt={space("altMain")}
+        fill
+        priority
+        placeholder="blur"
+        sizes="100vw"
+        className="object-cover object-[60%_center]"
+      />
+      {/* Flat ink scrim for text legibility — solid color, not a gradient. */}
+      <div aria-hidden="true" className="absolute inset-0 bg-sumi/60" />
 
       <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col items-center justify-center py-16 text-center">
         <p
-          className="anim-rise text-eyebrow uppercase text-sumi/70"
+          className="anim-rise text-eyebrow uppercase text-washi/80"
           style={riseDelay(100)}
         >
           {t("eyebrow")}
         </p>
         <h1
-          className="anim-rise mt-8 font-sans text-hero font-medium lowercase tracking-tight text-gold"
+          className="anim-rise mt-8 font-sans text-hero font-medium lowercase tracking-tight text-washi"
           style={riseDelay(280)}
         >
           maisha matcha
         </h1>
-        <p className="mt-9 max-w-2xl font-serif text-poem font-light text-sumi/85">
+        <p className="mt-9 max-w-2xl font-serif text-poem font-light text-washi/90">
           <WordReveal text={t("line")} baseDelay={500} step={70} />
         </p>
         <div className="anim-rise mt-12" style={riseDelay(1100)}>
@@ -129,11 +140,16 @@ function Hero() {
         className="anim-rise relative mx-auto mb-8 flex flex-col items-center gap-3"
         style={riseDelay(1500)}
       >
-        <span className="text-eyebrow uppercase text-sumi/70">
+        <span className="text-eyebrow uppercase text-washi/80">
           {t("scrollCue")}
         </span>
-        <span aria-hidden="true" className="h-10 w-px bg-wood/60" />
+        <span aria-hidden="true" className="h-10 w-px bg-washi/50" />
       </div>
+
+      {/* Honesty note: project render, not a final photograph. */}
+      <span className="absolute bottom-3 right-4 text-eyebrow uppercase text-washi/60">
+        {space("renderNote")}
+      </span>
     </section>
   );
 }
@@ -165,6 +181,51 @@ function Manifesto() {
           </Reveal>
         </div>
       </div>
+    </Section>
+  );
+}
+
+/** The four pivotal chapters told on the front page; the rest live in /historia. */
+const TEASER_CHAPTERS = ["tang", "eisai", "rikyu", "murcia"];
+
+function StoryTeaser() {
+  const t = useTranslations("story");
+  const cta = useTranslations("cta");
+  const locale = useLocale();
+  const chapters = story.filter((c) => TEASER_CHAPTERS.includes(c.id));
+  return (
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
+      <Reveal>
+        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <Headline className="mt-5">{t("title")}</Headline>
+      </Reveal>
+
+      <div className="relative mt-14 max-w-3xl">
+        <TimelineRail />
+        <ol className="pl-6 sm:pl-10">
+          {chapters.map((chapter, i) => (
+            <li key={chapter.id} className="relative pb-12 last:pb-0">
+              <span
+                aria-hidden="true"
+                className="absolute -left-[calc(1.5rem+3px)] top-2 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
+              />
+              <Reveal delay={i * 120}>
+                <Eyebrow>{chapter.era[locale]}</Eyebrow>
+                <h3 className="mt-3 text-balance font-serif text-2xl font-light text-sumi sm:text-3xl">
+                  {chapter.title[locale]}
+                </h3>
+                <p className="measure mt-3 text-sumi/80">
+                  {chapter.body[locale]}
+                </p>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <Reveal className="mt-10">
+        <QuietLink href="/historia">{cta("toStory")}</QuietLink>
+      </Reveal>
     </Section>
   );
 }
@@ -236,25 +297,7 @@ function TheSpace() {
         <p className="measure mt-6 text-lg text-sumi/80">{t("body")}</p>
       </Reveal>
 
-      {/* The salon, full bleed — the deck's project render. */}
-      <Reveal className="mt-14">
-        <figure className="bleed">
-          <div className="group overflow-hidden">
-            <Image
-              src={salonRender}
-              alt={t("altMain")}
-              sizes="100vw"
-              placeholder="blur"
-              className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
-            />
-          </div>
-          <figcaption className="mx-auto mt-3 max-w-[1100px] px-6 text-eyebrow uppercase text-sumi/70 sm:px-8">
-            {t("renderNote")}
-          </figcaption>
-        </figure>
-      </Reveal>
-
-      <Reveal className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
+      <Reveal className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
         {details.map((image) => (
           <figure key={image.caption} className="group">
             <div className="overflow-hidden rounded-[2px]">
