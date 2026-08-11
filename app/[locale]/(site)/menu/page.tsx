@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Section } from "@/components/Section";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
+import { buttonClass } from "@/components/Button";
 import { menu } from "@/content/menu";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -35,6 +36,7 @@ export default async function MenuPage({
 
 function MenuContent() {
   const t = useTranslations("menu");
+  const cta = useTranslations("cta");
   const locale = useLocale();
   return (
     <Section>
@@ -43,38 +45,62 @@ function MenuContent() {
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
       </Reveal>
 
-      <div className="mt-16 max-w-3xl space-y-14">
+      <div className="mt-16 max-w-3xl space-y-16">
         {menu.map((category) => (
-          <Reveal key={category.id}>
-            <h2 className="text-eyebrow font-medium uppercase text-sumi/70">
-              {category.title[locale]}
-            </h2>
-            <ul className="mt-5 divide-y divide-wood/15 border-t border-wood/15">
-              {category.items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-5"
-                >
-                  <div className="min-w-0 max-w-xl">
-                    <p className="font-serif text-xl text-sumi">{item.name}</p>
-                    <p className="mt-1 text-sm text-sumi/70">
-                      {item.description[locale]}
-                    </p>
-                    {item.origin ? (
-                      <p className="mt-1 text-eyebrow uppercase text-sumi/70">
-                        {t("originPrefix")} · {item.origin}
+          <section
+            key={category.id}
+            id={category.id}
+            className="scroll-mt-24"
+            aria-labelledby={`${category.id}-title`}
+          >
+            <Reveal>
+              <h2
+                id={`${category.id}-title`}
+                className="text-eyebrow font-medium uppercase text-sumi/70"
+              >
+                {category.title[locale]}
+              </h2>
+              <ul className="mt-5 divide-y divide-wood/25 border-t border-wood/25">
+                {category.items.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 py-6"
+                  >
+                    <div className="min-w-0 max-w-xl">
+                      <p className="font-serif text-2xl font-light text-sumi">
+                        {item.name}
                       </p>
-                    ) : null}
-                  </div>
-                  <p className="shrink-0 font-serif text-lg text-sumi/80">
-                    {item.price}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+                      <p className="mt-1.5 text-sumi/75">
+                        {item.description[locale]}
+                      </p>
+                      {item.origin ? (
+                        <p className="mt-2 text-eyebrow uppercase text-sumi/70">
+                          {t("originPrefix")} · {item.origin}
+                        </p>
+                      ) : null}
+                    </div>
+                    <p className="shrink-0 font-serif text-xl text-sumi/85">
+                      {item.price}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          </section>
         ))}
       </div>
+
+      {/* Closing: the carta leads back to the founding list. */}
+      <Reveal className="mt-20 max-w-3xl border-t border-wood/25 pt-10">
+        <p className="font-serif text-2xl font-light text-sumi">
+          {t("closing")}
+        </p>
+        <div className="mt-7">
+          <a href={`/${locale}#socios`} className={buttonClass}>
+            {cta("joinWaitlist")}
+          </a>
+        </div>
+      </Reveal>
     </Section>
   );
 }

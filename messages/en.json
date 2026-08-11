@@ -76,12 +76,14 @@
     "eyebrow": "The menu",
     "title": "Menu",
     "intro": "Stone-ground matcha, bubbles and fruit. Everything can be served cold.",
-    "originPrefix": "Origin"
+    "originPrefix": "Origin",
+    "closing": "Fifty founding members will taste this menu first."
   },
   "story": {
     "eyebrow": "Story",
     "title": "From the Tang hills to Murcia",
-    "intro": "Eight moments on the path of matcha."
+    "intro": "Eight moments on the path of matcha.",
+    "closing": "The story continues in Murcia."
   },
   "events": {
     "eyebrow": "Events",
@@ -103,7 +105,8 @@
       "p1": "We keep your name and email for one purpose: to let you know before the opening and, if you agree, to send occasional news.",
       "p2": "We do not share your data with third parties beyond sending the email. You can unsubscribe at any time by writing to hola@maishamatcha.es.",
       "p3": "Site analytics are anonymous and use no cookies."
-    }
+    },
+    "eyebrow": "Legal"
   },
   "footer": {
     "tagline": "Matcha, light and calm. Murcia.",

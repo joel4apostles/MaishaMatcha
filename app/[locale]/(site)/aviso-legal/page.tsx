@@ -36,10 +36,13 @@ function LegalNoticeContent() {
   const t = useTranslations("legal");
   return (
     <Section>
-      <Eyebrow>{t("provisional")}</Eyebrow>
+      <Eyebrow>{t("eyebrow")}</Eyebrow>
       <Headline as="h1" className="mt-5">
         {t("notice.title")}
       </Headline>
+      <p className="mt-5 inline-flex rounded-[2px] border border-wood/40 px-2.5 py-1 text-eyebrow uppercase text-sumi/70">
+        {t("provisional")}
+      </p>
       <div className="measure mt-8 space-y-5 text-sumi/80">
         <p>{t("notice.p1")}</p>
         <p>{t("notice.p2")}</p>

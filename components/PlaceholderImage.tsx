@@ -28,7 +28,7 @@ export function PlaceholderImage({
         // Flat warm field — brand law forbids gradients.
         backgroundColor: "#e7ddc8",
       }}
-      className={`relative overflow-hidden rounded-[2px] border border-wood/25 ${className}`.trim()}
+      className={`relative overflow-hidden rounded-[2px] border border-wood/35 ${className}`.trim()}
     >
       {withMotif ? (
         <div className="absolute inset-0 opacity-[0.07]">
