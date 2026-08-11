@@ -116,6 +116,28 @@ build-time on first-party CSS only; sharp is only fed our own static images
 infra. Real fix requires next@16 (breaking). Re-assess when bumping Next or
 if remote images / user uploads are ever enabled.
 
+## Content editing (the team's "admin" until Phase 1)
+
+`CONTENT.md` is the team guide: carta drinks live in `content/menu.ts`,
+recipe-builder options/prices/ratios in `content/recipe.ts`. Editing either
+on GitHub (web editor) auto-deploys. Do NOT build an ad-hoc admin dashboard
+on this no-auth site — that is Phase 1 (Payload CMS), where these files
+become collections behind a real login.
+
+## The auditor bench (.claude/agents/)
+
+Read-only critics, each with a verdict protocol (BLOCKER/SHOULD/NIT → SHIP
+or ITERATE). Invoke after work in their domain:
+- **design-reviewer** — visual/brand law + WCAG, on screenshots
+- **ux-auditor** — flows, affordances, forms, mobile ergonomics
+- **chief-architect** — structure, deps, performance budget, phase-migration
+- **cto-review** — TS/React/i18n/a11y engineering quality
+- **cmo-copy** — voice, bilingual quality, conversion, honesty
+- **security-review** — API routes, secrets, input validation
+
+For big milestones run design-reviewer + ux-auditor + cmo-copy in parallel;
+add chief-architect + cto-review before phase transitions.
+
 ## The review loop (run at every visual milestone)
 
 1. `npm run dev` (or `npm run build && npm run start`).
