@@ -10,7 +10,7 @@
   --color-sumi: #1c1b18; /* ink, primary text */
   --color-gold: #786000; /* the signature accent: wordmark, one CTA, focus */
   --color-wood: #b08d57; /* timber hairlines and borders */
-  --color-matcha-ink: #232b1e; /* deep green-black surface: dark bands only */
+  --color-matcha-ink: #37472b; /* deep matcha moss surface: dark bands + hero panel */
 
   /* Type families (wired to next/font variables in the locale layout) */
   --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;

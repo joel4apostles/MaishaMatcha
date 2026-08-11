@@ -118,10 +118,10 @@ function Hero() {
       {/* Light unifying scrim; legibility comes from the ink panel below. */}
       <div aria-hidden="true" className="absolute inset-0 bg-sumi/25" />
 
-      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-24 pt-20">
+      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24">
         {/* Editorial ink panel: flat sumi, AA-safe on any crop or device. */}
         <div
-          className="anim-rise max-w-2xl rounded-[2px] bg-sumi/70 p-7 sm:p-10"
+          className="anim-rise max-w-2xl rounded-[2px] bg-matcha-ink/80 p-6 sm:p-10"
           style={riseDelay(100)}
         >
           <p className="text-eyebrow uppercase text-washi/80">{t("eyebrow")}</p>
@@ -147,7 +147,7 @@ function Hero() {
       />
 
       {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-4 right-4 rounded-[2px] bg-sumi/60 px-2.5 py-1 text-eyebrow uppercase text-washi/80">
+      <span className="absolute bottom-4 right-4 rounded-[2px] bg-matcha-ink/70 px-2.5 py-1 text-eyebrow uppercase text-washi/80">
         {space("renderNote")}
       </span>
     </section>
@@ -264,7 +264,7 @@ function MenuPreview() {
               {/* Whole cell is a real link — the hover affordance is honest. */}
               <Link
                 href="/menu"
-                className="flex min-h-[200px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9"
+                className="flex min-h-[160px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-75 hover:border-matcha-ink/50 hover:bg-matcha-ink/[0.06] hover:opacity-100! sm:min-h-[200px] sm:p-9"
               >
                 <div>
                   <p className="text-eyebrow uppercase text-sumi/70">
@@ -312,17 +312,20 @@ function TheSpace() {
         <p className="measure mt-6 text-lg text-sumi/80">{t("body")}</p>
       </Reveal>
 
-      {/* Full-bleed triptych — the crops read large. */}
+      {/* Full-bleed triptych: swipeable snap gallery on mobile, grid on desktop. */}
       <Reveal className="mt-14">
         <div className="bleed px-4 sm:px-6">
-          <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
+          <div className="mx-auto flex max-w-[1600px] snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:snap-none sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:pb-0">
             {details.map((image) => (
-              <figure key={image.caption} className="group">
+              <figure
+                key={image.caption}
+                className="group w-[82%] shrink-0 snap-start sm:w-auto sm:shrink"
+              >
                 <div className="overflow-hidden rounded-[2px]">
                   <Image
                     src={image.src}
                     alt={image.alt}
-                    sizes="(min-width: 640px) 33vw, 100vw"
+                    sizes="(min-width: 640px) 33vw, 82vw"
                     placeholder="blur"
                     className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />

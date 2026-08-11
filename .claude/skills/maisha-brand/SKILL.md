@@ -23,7 +23,7 @@ Reduced palette, 2–3 colors maximum, much negative space.
   names, poetic lines. Generous letter-spacing on small-caps eyebrows.
 - Body sans: Hanken Grotesk (400/500) — wordmark, body, UI, forms. Never
   Inter, Roboto, Arial, or system defaults.
-- Green appears ONLY as matcha-ink #232B1E, a deep green-black SURFACE for
+- Green appears ONLY as matcha-ink #37472B, a deep green-black SURFACE for
   dark bands ("matcha at night"). Never bright matcha green as an accent —
   the accent is olive-gold, per the deck.
 
@@ -60,14 +60,18 @@ Reduced palette, 2–3 colors maximum, much negative space.
 
 ## Composition patterns (sanctioned)
 - Tonal arc: the home page opens dark (image hero) and closes dark (founding
-  band on sumi). Everything between stays washi. Do not add more dark bands.
-- Image hero: render at low scrim (≤25%); text lives on a flat sumi ink
-  panel (70%+), lower-left. Small text over raw image needs its own chip.
+  band on matcha-ink). Everything between stays washi. No more dark bands.
+- Image hero: render at low scrim (≤25%); text lives on a flat matcha-ink
+  panel (80%), lower-left. Small text over raw image needs its own chip.
 - Header: sticky single row; transparent with washi text over the home hero,
   washi background everywhere else. Colors transition, layout never shifts.
-- Footer closes with the monumental wordmark in wood/20. Decorative,
+- Footer closes with the monumental wordmark in wood/35. Decorative,
   aria-hidden, one per site.
 - On dark bands use the `.dark-band` class: focus rings switch to washi.
+- Interactive cards may tint matcha on hover (bg matcha-ink ≤6%, border
+  matcha-ink/50) — links only, never on inert surfaces.
+- Mobile: image rows become snap-scroll galleries (82% cells); no carousels
+  on desktop, no autoplay anywhere.
 
 ## The quiet test (apply before declaring any screen done)
 Look at the rendered result and ask: does anything shout? A color used
