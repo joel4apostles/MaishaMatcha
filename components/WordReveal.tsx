@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { Fragment, type CSSProperties } from "react";
 
 /**
  * Per-word staggered entrance (fade + 12px rise + blur settle), CSS-only so it
@@ -22,13 +22,17 @@ export function WordReveal({
   return (
     <span className={`word-rise ${className}`.trim()}>
       {words.map((word, i) => (
-        <span
-          key={`${word}-${i}`}
-          style={{ "--wr-delay": `${baseDelay + i * step}ms` } as CSSProperties}
-        >
-          {word}
-          {i < words.length - 1 ? " " : null}
-        </span>
+        <Fragment key={`${word}-${i}`}>
+          <span
+            style={
+              { "--wr-delay": `${baseDelay + i * step}ms` } as CSSProperties
+            }
+          >
+            {word}
+          </span>
+          {/* Space OUTSIDE the inline-block span; inside it gets trimmed. */}
+          {i < words.length - 1 ? " " : null}
+        </Fragment>
       ))}
     </span>
   );
