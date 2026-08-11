@@ -14,6 +14,7 @@ import { Reveal } from "@/components/Reveal";
 import { WordReveal } from "@/components/WordReveal";
 import { ScrollInk } from "@/components/ScrollInk";
 import { QuietLink, buttonClass } from "@/components/Button";
+import { Link } from "@/i18n/navigation";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { TimelineRail } from "@/components/TimelineRail";
 import { signatureItems } from "@/content/menu";
@@ -245,27 +246,33 @@ function MenuPreview() {
       </Reveal>
       <Reveal className="mt-12">
         <ul className="group/menu grid grid-cols-1 gap-4 sm:grid-cols-12">
-          {items.map((item, i) => (
-            <li
-              key={item.id}
-              className={`${bentoSpans[i]} flex min-h-[200px] flex-col justify-between rounded-[2px] border border-wood/30 p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9`}
-            >
-              <div>
-                {item.origin ? (
+          {items.map(({ item, category }, i) => (
+            <li key={item.id} className={`${bentoSpans[i]} flex`}>
+              {/* Whole cell is a real link — the hover affordance is honest. */}
+              <Link
+                href="/menu"
+                className="flex min-h-[200px] w-full flex-col justify-between rounded-[2px] border border-wood/30 p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9"
+              >
+                <div>
                   <p className="text-eyebrow uppercase text-sumi/70">
-                    {item.origin}
+                    {category.title[locale]}
                   </p>
-                ) : null}
-                <p className="mt-3 font-serif text-3xl font-light text-sumi">
-                  {item.name}
-                </p>
-                <p className="mt-3 max-w-md text-sumi/75">
-                  {item.description[locale]}
-                </p>
-              </div>
-              <p className="mt-8 font-serif text-xl text-sumi/85">
-                {item.price}
-              </p>
+                  <p className="mt-3 font-serif text-3xl font-light text-sumi">
+                    {item.name}
+                  </p>
+                  <p className="mt-3 max-w-md text-sumi/75">
+                    {item.description[locale]}
+                  </p>
+                </div>
+                <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-wood/15 pt-4">
+                  <p className="font-serif text-xl text-sumi/85">{item.price}</p>
+                  {item.origin ? (
+                    <p className="text-eyebrow uppercase text-sumi/70">
+                      {item.origin}
+                    </p>
+                  ) : null}
+                </div>
+              </Link>
             </li>
           ))}
         </ul>
