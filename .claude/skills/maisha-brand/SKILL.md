@@ -23,9 +23,14 @@ Reduced palette, 2–3 colors maximum, much negative space.
   names, poetic lines. Generous letter-spacing on small-caps eyebrows.
 - Body sans: Hanken Grotesk (400/500) — wordmark, body, UI, forms. Never
   Inter, Roboto, Arial, or system defaults.
-- Green appears ONLY as matcha-ink #37472B, a deep green-black SURFACE for
-  dark bands ("matcha at night"). Never bright matcha green as an accent —
-  the accent is olive-gold, per the deck.
+- Green is MATERIAL, never a UI accent (the accent stays olive-gold):
+  - matcha-ink #465C33 — deep moss SURFACE: hero ink panel, founding band,
+    OG scrim.
+  - Drink hues (content/menu.ts `color`) — each drink's natural color as a
+    small round swatch ("seen from above") and that card's hover tint
+    (bg ≤10%, border ≤55%). Product color, like food on a table.
+  - matcha powder #6B7F5E + noise speckle — the footer wordmark only
+    (.matcha-powder). Texture, not gradient; one per site.
 
 ## Layout
 - Whitespace is the primary material. Section padding ≥ 6rem desktop,

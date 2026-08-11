@@ -67,7 +67,13 @@ function MenuContent() {
                     className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 py-6"
                   >
                     <div className="min-w-0 max-w-xl">
-                      <p className="font-serif text-2xl font-light text-sumi">
+                      <p className="flex items-center gap-3 font-serif text-2xl font-light text-sumi">
+                        {/* The drink, seen from above. */}
+                        <span
+                          aria-hidden="true"
+                          className="h-3.5 w-3.5 shrink-0 rounded-full ring-1 ring-sumi/10"
+                          style={{ backgroundColor: item.color }}
+                        />
                         {item.name}
                       </p>
                       <p className="mt-1.5 text-sumi/75">

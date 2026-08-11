@@ -5,6 +5,8 @@ export type MenuItem = {
   /** Drink name — kept in Spanish as a proper noun, not localized. */
   name: string;
   price: string;
+  /** The drink's natural hue, seen from above. Used for swatches + hover. */
+  color: string;
   origin?: string;
   signature?: boolean;
   description: Record<Locale, string>;
@@ -29,6 +31,7 @@ export const menu: MenuCategory[] = [
     items: [
       {
         id: "matcha",
+        color: "#6B7F5E",
         name: "Matcha",
         price: "4,50 €",
         origin: "Uji, Kioto",
@@ -40,6 +43,7 @@ export const menu: MenuCategory[] = [
       },
       {
         id: "matcha-coco",
+        color: "#ADBB92",
         name: "Matcha Coco",
         price: "5,00 €",
         description: {
@@ -55,6 +59,7 @@ export const menu: MenuCategory[] = [
     items: [
       {
         id: "matcha-tonica",
+        color: "#93A96F",
         name: "Matcha Tónica",
         price: "5,50 €",
         signature: true,
@@ -65,6 +70,7 @@ export const menu: MenuCategory[] = [
       },
       {
         id: "matcha-yuzu",
+        color: "#C0B056",
         name: "Matcha Yuzu",
         price: "5,50 €",
         description: {
@@ -80,6 +86,7 @@ export const menu: MenuCategory[] = [
     items: [
       {
         id: "matcha-mango",
+        color: "#D69A3F",
         name: "Matcha Mango",
         price: "6,00 €",
         signature: true,
@@ -90,6 +97,7 @@ export const menu: MenuCategory[] = [
       },
       {
         id: "matcha-fresas",
+        color: "#C97C82",
         name: "Matcha Fresas",
         price: "6,00 €",
         signature: true,
@@ -106,6 +114,7 @@ export const menu: MenuCategory[] = [
     items: [
       {
         id: "hibiscus",
+        color: "#9E4453",
         name: "Hibiscus",
         price: "4,00 €",
         description: {
@@ -115,6 +124,7 @@ export const menu: MenuCategory[] = [
       },
       {
         id: "agua-de-coco",
+        color: "#DDD3B8",
         name: "Agua de coco",
         price: "3,50 €",
         description: {
