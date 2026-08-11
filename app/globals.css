@@ -68,6 +68,11 @@
     border-radius: 1px;
   }
 
+  /* On dark bands (image hero, founding), gold is invisible — use washi. */
+  .dark-band :focus-visible {
+    outline-color: var(--color-washi);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -105,12 +110,10 @@
   from {
     opacity: 0;
     transform: translateY(12px);
-    filter: blur(6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 

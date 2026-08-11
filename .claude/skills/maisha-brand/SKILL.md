@@ -54,6 +54,17 @@ Reduced palette, 2–3 colors maximum, much negative space.
   or parentheses. Ranges read as words ("Mar a Dom", "9:00 a 20:00").
 - The Octavio Paz register: matter and light, calm, presence.
 
+## Composition patterns (sanctioned)
+- Tonal arc: the home page opens dark (image hero) and closes dark (founding
+  band on sumi). Everything between stays washi. Do not add more dark bands.
+- Image hero: render at low scrim (≤25%); text lives on a flat sumi ink
+  panel (70%+), lower-left. Small text over raw image needs its own chip.
+- Header: sticky single row; transparent with washi text over the home hero,
+  washi background everywhere else. Colors transition, layout never shifts.
+- Footer closes with the monumental wordmark in wood/20. Decorative,
+  aria-hidden, one per site.
+- On dark bands use the `.dark-band` class: focus rings switch to washi.
+
 ## The quiet test (apply before declaring any screen done)
 Look at the rendered result and ask: does anything shout? A color used
 twice, a bold weight, a busy section, a second accent, a decorative
