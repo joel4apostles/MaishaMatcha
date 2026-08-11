@@ -20,11 +20,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install
-        run: npm ci
+        # On failure, surface npm's debug log directly in the step output.
+        run: npm ci || { tail -n 60 /home/runner/.npm/_logs/*-debug-0.log; exit 1; }
 
       - name: Lint
         run: npm run lint
