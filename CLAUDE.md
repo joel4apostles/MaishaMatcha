@@ -107,6 +107,15 @@ RESEND_FROM             # optional, defaults to "maisha matcha <hola@maishamatch
 NEXT_PUBLIC_SITE_URL    # canonical origin for metadata/OG/sitemap
 ```
 
+## Known audit findings (accepted risk, re-check each release)
+
+`npm audit --omit=dev` reports 3 highs, all transitive inside next@15
+(bundled postcss; sharp/libvips). Assessed 2026-08-11: postcss issues are
+build-time on first-party CSS only; sharp is only fed our own static images
+(no `remotePatterns`, no uploads), and Vercel runs optimization on managed
+infra. Real fix requires next@16 (breaking). Re-assess when bumping Next or
+if remote images / user uploads are ever enabled.
+
 ## The review loop (run at every visual milestone)
 
 1. `npm run dev` (or `npm run build && npm run start`).
