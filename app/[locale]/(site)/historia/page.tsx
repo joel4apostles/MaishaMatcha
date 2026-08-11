@@ -1,9 +1,12 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import salonArbol from "@/public/images/salon-arbol.jpg";
 import { buttonClass } from "@/components/Button";
+import { StageReveal } from "@/components/StageReveal";
+import { StageWords } from "@/components/StageWords";
 import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
@@ -62,15 +65,24 @@ function StoryContent() {
               aria-hidden="true"
               className="absolute -left-[calc(1.5rem+3px)] top-2.5 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
             />
-            <Reveal>
-              <Eyebrow>{chapter.era[locale]}</Eyebrow>
+            {/* Dramatic staged entrance: era, then title word by word, then body. */}
+            <StageReveal>
+              <div data-s style={{ "--sd": "0ms" } as CSSProperties}>
+                <Eyebrow>{chapter.era[locale]}</Eyebrow>
+              </div>
               <Headline as="h2" className="mt-3 text-3xl sm:text-4xl">
-                {chapter.title[locale]}
+                <StageWords
+                  text={chapter.title[locale]}
+                  baseDelay={200}
+                  step={80}
+                />
               </Headline>
-              <p className="measure mt-5 text-lg text-sumi/80">
-                {chapter.body[locale]}
-              </p>
-            </Reveal>
+              <div data-s style={{ "--sd": "550ms" } as CSSProperties}>
+                <p className="measure mt-5 text-lg text-sumi/80">
+                  {chapter.body[locale]}
+                </p>
+              </div>
+            </StageReveal>
             {/* One breath of imagery, at the wabi-sabi chapter: the tree. */}
             {chapter.id === "wabisabi" ? (
               <Reveal className="mt-10 max-w-sm">

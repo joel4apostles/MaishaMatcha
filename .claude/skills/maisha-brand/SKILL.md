@@ -42,6 +42,8 @@ Reduced palette, 2–3 colors maximum, much negative space.
   - Hero word-rise: per-word staggered fade-and-rise on load (CSS only).
   - Manifesto scroll-ink: words go faint (18%) to full ink with scroll.
   - Historia rail: a wood line draws down the timeline with scroll.
+  - Story chapters: staged entrance on scroll (era rises, title assembles
+    word by word, body follows; ~550ms sequence, once per chapter).
   - Hover only: image zoom ≤ 1.04 (0.7s), nav underline slide-in, menu
     bento focus-dim (others to 75%, never below AA).
 - No blur flourishes, no parallax, no pinned/sticky scroll scenes.
