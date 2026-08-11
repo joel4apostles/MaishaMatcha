@@ -23,7 +23,9 @@ Reduced palette, 2–3 colors maximum, much negative space.
   names, poetic lines. Generous letter-spacing on small-caps eyebrows.
 - Body sans: Hanken Grotesk (400/500) — wordmark, body, UI, forms. Never
   Inter, Roboto, Arial, or system defaults.
-- No green. The deck's accent is olive-gold, not matcha green.
+- Green appears ONLY as matcha-ink #232B1E, a deep green-black SURFACE for
+  dark bands ("matcha at night"). Never bright matcha green as an accent —
+  the accent is olive-gold, per the deck.
 
 ## Layout
 - Whitespace is the primary material. Section padding ≥ 6rem desktop,
