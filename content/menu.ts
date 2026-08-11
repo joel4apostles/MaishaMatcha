@@ -126,7 +126,12 @@ export const menu: MenuCategory[] = [
   },
 ];
 
-/** The four signature preparations, for the home menu preview. */
-export function signatureItems(): MenuItem[] {
-  return menu.flatMap((c) => c.items).filter((i) => i.signature);
+/** The four signature preparations with their category, for the home preview. */
+export function signatureItems(): {
+  item: MenuItem;
+  category: MenuCategory;
+}[] {
+  return menu.flatMap((category) =>
+    category.items.filter((i) => i.signature).map((item) => ({ item, category })),
+  );
 }
