@@ -41,7 +41,7 @@ function MenuContent() {
   return (
     <Section>
       <Reveal>
-        <Headline as="h1">{t("title")}</Headline>
+        <Headline as="h1" className="text-display">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
       </Reveal>
 

@@ -50,7 +50,7 @@ function StoryContent() {
     <Section>
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <Headline as="h1" className="mt-5">
+        <Headline as="h1" className="mt-5 text-display">
           {t("title")}
         </Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
@@ -70,7 +70,7 @@ function StoryContent() {
               <div data-s style={{ "--sd": "0ms" } as CSSProperties}>
                 <Eyebrow>{chapter.era[locale]}</Eyebrow>
               </div>
-              <Headline as="h2" className="mt-3 text-3xl sm:text-4xl">
+              <Headline as="h2" className="mt-3 text-4xl sm:text-5xl">
                 <StageWords
                   text={chapter.title[locale]}
                   baseDelay={200}

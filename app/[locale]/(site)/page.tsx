@@ -214,7 +214,7 @@ function StoryTeaser() {
                 <div data-s style={stageDelay(0)}>
                   <Eyebrow>{chapter.era[locale]}</Eyebrow>
                 </div>
-                <h3 className="mt-3 text-balance font-serif text-2xl font-light text-sumi sm:text-3xl">
+                <h3 className="mt-3 text-balance font-serif text-3xl font-light text-sumi sm:text-4xl">
                   <StageWords
                     text={chapter.title[locale]}
                     baseDelay={200}
@@ -344,7 +344,7 @@ function Founding() {
   const privileges = [t("privilege1"), t("privilege2"), t("privilege3")];
   return (
     // Inverted closing band: the page opens dark and closes dark.
-    <Section id="socios" className="dark-band bg-sumi" as="section">
+    <Section id="socios" className="dark-band bg-matcha-ink" as="section">
       <Reveal className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         <div>
           <p className="text-eyebrow font-medium uppercase text-washi/70">

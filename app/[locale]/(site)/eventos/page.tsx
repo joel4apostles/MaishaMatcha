@@ -43,7 +43,7 @@ function EventsContent() {
     <Section>
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <Headline as="h1" className="mt-5">
+        <Headline as="h1" className="mt-5 text-display">
           {t("title")}
         </Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
