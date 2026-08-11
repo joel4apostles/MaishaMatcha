@@ -66,10 +66,10 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* Monumental closing wordmark — quiet wood tone, decorative only. */}
+      {/* Monumental closing wordmark — matcha green with a powder speckle. */}
       <p
         aria-hidden="true"
-        className="select-none overflow-hidden whitespace-nowrap px-4 pb-1 text-center font-sans text-[clamp(3rem,11vw,9.5rem)] font-medium lowercase leading-none tracking-tight text-wood/35"
+        className="matcha-powder select-none overflow-hidden whitespace-nowrap px-4 pb-1 text-center font-sans text-[clamp(3rem,11vw,9.5rem)] font-medium lowercase leading-none tracking-tight"
       >
         maisha matcha
       </p>

@@ -264,12 +264,21 @@ function MenuPreview() {
               {/* Whole cell is a real link — the hover affordance is honest. */}
               <Link
                 href="/menu"
-                className="flex min-h-[160px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-75 hover:border-matcha-ink/50 hover:bg-matcha-ink/[0.06] hover:opacity-100! sm:min-h-[200px] sm:p-9"
+                style={{ "--drink": item.color } as CSSProperties}
+                className="flex min-h-[160px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-75 hover:border-[color-mix(in_srgb,var(--drink)_55%,transparent)] hover:bg-[color-mix(in_srgb,var(--drink)_10%,transparent)] hover:opacity-100! sm:min-h-[200px] sm:p-9"
               >
                 <div>
-                  <p className="text-eyebrow uppercase text-sumi/70">
-                    {category.title[locale]}
-                  </p>
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-eyebrow uppercase text-sumi/70">
+                      {category.title[locale]}
+                    </p>
+                    {/* The drink, seen from above. */}
+                    <span
+                      aria-hidden="true"
+                      className="h-4 w-4 shrink-0 rounded-full ring-1 ring-sumi/10"
+                      style={{ backgroundColor: item.color }}
+                    />
+                  </div>
                   <p className="mt-3 font-serif text-3xl font-light text-sumi">
                     {item.name}
                   </p>
