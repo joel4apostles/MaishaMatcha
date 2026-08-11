@@ -61,6 +61,17 @@ npm run lint           # ESLint (must be zero errors)
 - `components/` — primitives: `Section`, `Eyebrow`, `Headline`, `Button`
   (+ `buttonClass`/`quietLinkClass`), `Reveal`, `KigumiGrid`, `PlaceholderImage`,
   `WaitlistForm`, `SiteHeader`, `SiteFooter`, `LocaleSwitcher`.
+- Motion primitives (all hand-rolled, no animation deps): `WordReveal`
+  (CSS-only staggered word entrance, hero), `ScrollInk` (scroll-linked
+  faint→ink text, manifesto), `TimelineRail` (self-drawing historia rail).
+  Keyframes (`word-rise`, `rise`) + `--text-hero`/`--text-poem` tokens live in
+  `app/globals.css`. See the maisha-brand skill for the sanctioned motion
+  vocabulary — one effect per place, nothing loops.
+- Imagery: `public/images/salon*.jpg` are extracted from the founder's design
+  deck (page 10 render + crops) — the deck's OTHER photos are third-party
+  references (Aesop/Blue Bottle/nendo/artists) and must NOT be published
+  without permission. Space section uses next/image static imports with blur
+  placeholders and an honest "project render" caption.
 - `lib/seo.ts` — `pageMetadata({locale, path, title, description})` builds
   per-locale title/description + canonical + hreflang alternates + OG image.
   Every page's `generateMetadata` uses it. `SITE_URL` from `NEXT_PUBLIC_SITE_URL`.

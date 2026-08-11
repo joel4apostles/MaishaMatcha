@@ -6,7 +6,7 @@ export default function NotFound() {
   const t = useTranslations("notFound");
   return (
     <main className="mx-auto flex min-h-dvh max-w-[1100px] flex-col justify-center px-6 py-24 sm:px-8">
-      <p className="text-eyebrow uppercase text-sumi/65">404</p>
+      <p className="text-eyebrow uppercase text-sumi/70">404</p>
       <h1 className="mt-4 font-serif text-title font-light text-sumi">
         {t("title")}
       </h1>

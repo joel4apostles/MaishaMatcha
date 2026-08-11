@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import { Section } from "@/components/Section";
-import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { menu } from "@/content/menu";
@@ -40,17 +39,16 @@ function MenuContent() {
   return (
     <Section>
       <Reveal>
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <Headline as="h1" className="mt-5">
-          {t("title")}
-        </Headline>
+        <Headline as="h1">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
       </Reveal>
 
-      <div className="mt-16 space-y-14">
+      <div className="mt-16 max-w-3xl space-y-14">
         {menu.map((category) => (
           <Reveal key={category.id}>
-            <Eyebrow>{category.title[locale]}</Eyebrow>
+            <h2 className="text-eyebrow font-medium uppercase text-sumi/70">
+              {category.title[locale]}
+            </h2>
             <ul className="mt-5 divide-y divide-wood/15 border-t border-wood/15">
               {category.items.map((item) => (
                 <li
@@ -63,7 +61,7 @@ function MenuContent() {
                       {item.description[locale]}
                     </p>
                     {item.origin ? (
-                      <p className="mt-1 text-eyebrow uppercase text-sumi/60">
+                      <p className="mt-1 text-eyebrow uppercase text-sumi/70">
                         {t("originPrefix")} · {item.origin}
                       </p>
                     ) : null}

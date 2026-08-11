@@ -61,7 +61,7 @@ function EventsContent() {
               <Headline as="h2" className="mt-3 text-2xl">
                 {event.title[locale]}
               </Headline>
-              <p className="mt-2 text-sm text-sumi/65">{event.when[locale]}</p>
+              <p className="mt-2 text-sm text-sumi/70">{event.when[locale]}</p>
               <p className="measure mt-4 text-sumi/80">
                 {event.description[locale]}
               </p>

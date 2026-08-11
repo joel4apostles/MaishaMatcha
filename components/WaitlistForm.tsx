@@ -9,7 +9,7 @@ type Status = "idle" | "submitting" | "success" | "error";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const fieldClass =
-  "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/45 transition-colors focus:border-gold";
+  "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/55 transition-colors focus:border-gold";
 
 export function WaitlistForm() {
   const t = useTranslations("waitlist");
@@ -134,7 +134,7 @@ export function WaitlistForm() {
               id={consentId}
               name="consent"
               type="checkbox"
-              className="mt-1 size-4 shrink-0 accent-gold"
+              className="mt-1 size-4 shrink-0 accent-sumi"
               aria-invalid={errors.consent ? "true" : undefined}
               aria-describedby={errors.consent ? `${consentId}-error` : undefined}
             />

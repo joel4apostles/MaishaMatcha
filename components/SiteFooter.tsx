@@ -4,7 +4,7 @@ import { site, siteHours } from "@/content/site";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
 const legalLinkClass =
-  "text-sm text-sumi/70 underline decoration-wood/40 decoration-1 underline-offset-4 transition-colors hover:text-sumi hover:decoration-gold";
+  "text-sm text-sumi/70 underline decoration-wood/40 decoration-1 underline-offset-4 transition-colors hover:text-sumi hover:decoration-sumi/70";
 
 export function SiteFooter() {
   const t = useTranslations("footer");
@@ -21,7 +21,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <p className="text-eyebrow uppercase text-sumi/60">
+          <p className="text-eyebrow uppercase text-sumi/70">
             {t("visitLabel")}
           </p>
           <address className="mt-3 text-sm not-italic text-sumi/80">
@@ -32,19 +32,31 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <p className="text-eyebrow uppercase text-sumi/60">
+          <p className="text-eyebrow uppercase text-sumi/70">
             {t("hoursLabel")}
           </p>
           <p className="mt-3 text-sm text-sumi/80">{siteHours(locale)}</p>
-          <p className="mt-4 text-eyebrow uppercase text-sumi/60">
+          <p className="mt-4 text-eyebrow uppercase text-sumi/70">
             {t("followLabel")}
           </p>
           <a
             href={site.instagramUrl}
-            className="mt-3 inline-block text-sm text-sumi/80 underline decoration-wood/40 decoration-1 underline-offset-4 transition-colors hover:text-sumi hover:decoration-gold"
+            className="mt-3 inline-flex items-center gap-2 text-sm text-sumi/80 underline decoration-wood/40 decoration-1 underline-offset-4 transition-colors hover:text-sumi hover:decoration-sumi/70"
             rel="noreferrer"
             target="_blank"
           >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="h-4 w-4 text-sumi/70"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="4.2" />
+              <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none" />
+            </svg>
             {site.instagram}
           </a>
         </div>
@@ -55,7 +67,7 @@ export function SiteFooter() {
       </div>
 
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-wood/15 px-6 py-6 sm:px-8">
-        <p className="text-sm text-sumi/65">{t("rights")}</p>
+        <p className="text-sm text-sumi/70">{t("rights")}</p>
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <Link href="/aviso-legal" className={legalLinkClass}>
             {t("legalNotice")}
