@@ -11,7 +11,7 @@
     "joinWaitlist": "Unirse a la lista",
     "toMenu": "Ver la carta completa",
     "toStory": "Leer la historia completa",
-    "toWaitlist": "Reservar un lugar",
+    "toWaitlist": "Reservar plaza",
     "create": "Crea tu bebida"
   },
   "home": {
@@ -51,7 +51,7 @@
     "founding": {
       "eyebrow": "Socios fundadores",
       "title": "Los primeros cincuenta",
-      "scarcity": "Cincuenta lugares. Ni uno más.",
+      "scarcity": "Cincuenta plazas. Ni una más.",
       "body": "Los primeros cincuenta socios conservan los privilegios de apertura.",
       "privilege1": "Primera invitación a cata",
       "privilege2": "Acceso anticipado a los eventos",
@@ -79,13 +79,14 @@
     "title": "Carta",
     "intro": "Matcha molido en piedra, burbujas y fruta. Todo puede servirse frío.",
     "originPrefix": "Origen",
-    "closing": "Cincuenta socios fundadores estrenarán esta carta."
+    "closing": "Cincuenta socios fundadores estrenarán esta carta.",
+    "priceNote": "Precios de apertura, por confirmar."
   },
   "story": {
     "eyebrow": "Historia",
     "title": "Del monte Tang a Murcia",
     "intro": "Ocho momentos en el camino del matcha.",
-    "closing": "La historia continúa en Murcia."
+    "closing": "La historia continúa en Murcia, con cincuenta socios fundadores."
   },
   "events": {
     "eyebrow": "Eventos",
@@ -127,7 +128,7 @@
     },
     "menu": {
       "title": "Carta · maisha matcha",
-      "description": "Matcha ceremonial, lattes y dulces. La carta del salón de matcha en Murcia."
+      "description": "Matcha ceremonial, burbujas y fruta. La carta del salón de matcha en Murcia."
     },
     "story": {
       "title": "Historia · maisha matcha",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname } from "@/i18n/navigation";
+import { usePathname, getPathname } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -33,6 +33,15 @@ export function LocaleSwitcher({ tone = "dark" }: { tone?: "light" | "dark" }) {
           <Link
             href={pathname}
             locale={locale}
+            onClick={(e) => {
+              // Preserve query (?r=recipe) and hash across the switch.
+              e.preventDefault();
+              const target =
+                getPathname({ href: pathname, locale }) +
+                window.location.search +
+                window.location.hash;
+              window.location.assign(target);
+            }}
             aria-current={locale === active ? "true" : undefined}
             className={`inline-flex items-center px-1 py-3 -my-3 ${locale === active ? activeClass : idleClass}`}
           >

@@ -14,7 +14,7 @@ export const events: EventItem[] = [
     title: { es: "Cata de apertura", en: "Opening tasting" },
     when: { es: "Fecha por anunciar", en: "Date to be announced" },
     description: {
-      es: "Una cata guiada de grados ceremoniales, del usucha al koicha. Diez lugares.",
+      es: "Una cata guiada de grados ceremoniales, del usucha al koicha. Diez plazas.",
       en: "A guided tasting of ceremonial grades, from usucha to koicha. Ten places.",
     },
     membersOnly: true,

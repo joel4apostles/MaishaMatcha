@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { intensities, bases, fruits, temps } from "@/content/recipe";
+import { quietLinkClass } from "@/components/Button";
 import {
   DEFAULT_RECIPE,
   type RecipeIds,
@@ -17,9 +18,9 @@ import {
 } from "@/lib/recipe";
 
 const optionClass = (selected: boolean) =>
-  `flex min-h-[44px] w-full cursor-pointer flex-col justify-center rounded-[2px] border px-4 py-3 transition-[border-color,background-color] duration-200 ease-out ${
+  `option-tile flex min-h-[44px] w-full cursor-pointer flex-col justify-center rounded-[2px] border px-4 py-3 transition-[border-color,background-color] duration-200 ease-out ${
     selected
-      ? "border-matcha-ink/70 bg-matcha-ink/[0.07]"
+      ? "border-sumi/60 bg-matcha-ink/[0.06]"
       : "border-wood/40 hover:border-wood/70"
   }`;
 
@@ -27,24 +28,41 @@ function StepHeading({ children, note }: { children: string; note?: string }) {
   return (
     <legend className="flex items-baseline gap-3 text-eyebrow font-medium uppercase text-sumi/70">
       {children}
-      {note ? <span className="normal-case text-sumi/50">{note}</span> : null}
+      {note ? <span className="normal-case text-sumi/70">{note}</span> : null}
     </legend>
   );
 }
 
 export function RecipeBuilder() {
   const t = useTranslations("create");
+  const cta = useTranslations("cta");
   const locale = useLocale();
   const [ids, setIds] = useState<RecipeIds>(DEFAULT_RECIPE);
   const [copied, setCopied] = useState(false);
   const [qrSvg, setQrSvg] = useState<string | null>(null);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Only write to the URL after a real choice — a pristine visit or a shared
+  // link must never have its address rewritten out from under it.
+  const interacted = useRef(false);
 
-  // Prefill from a shared link (?r=...), then keep the URL in sync.
+  const choose = (updater: (s: RecipeIds) => RecipeIds) => {
+    interacted.current = true;
+    setIds(updater);
+  };
+
+  // Prefill from a shared link (?r=...).
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("r");
     if (param) setIds(fromParam(param));
   }, []);
+
+  // Clear any pending copy-confirmation timer on unmount.
+  useEffect(
+    () => () => {
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+    },
+    [],
+  );
 
   const recipe = useMemo(() => resolveRecipe(ids), [ids]);
   const price = formatPrice(priceCents(recipe));
@@ -53,19 +71,28 @@ export function RecipeBuilder() {
   const color = blendColor(recipe);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("r", toParam(ids));
-    window.history.replaceState(null, "", url);
+    // Canonical share URL: origin + localized path + the recipe. Nothing else
+    // (no stray campaign params inside the QR).
+    const share = `${window.location.origin}${window.location.pathname}?r=${toParam(ids)}`;
 
-    // QR encodes the shareable URL; generated client-side, on demand.
+    if (interacted.current) {
+      window.history.replaceState(null, "", share);
+    }
+
+    // QR encodes the share URL; generated client-side, on demand.
     let cancelled = false;
-    import("qrcode-generator").then(({ default: qrcode }) => {
-      if (cancelled) return;
-      const qr = qrcode(0, "M");
-      qr.addData(url.toString());
-      qr.make();
-      setQrSvg(qr.createSvgTag({ cellSize: 3, margin: 0, scalable: true }));
-    });
+    import("qrcode-generator")
+      .then(({ default: qrcode }) => {
+        if (cancelled) return;
+        const qr = qrcode(0, "M");
+        qr.addData(share);
+        qr.make();
+        setQrSvg(qr.createSvgTag({ cellSize: 3, margin: 0, scalable: true }));
+      })
+      .catch(() => {
+        // Chunk failed to load — the bordered placeholder stays; the code
+        // and link still work.
+      });
     return () => {
       cancelled = true;
     };
@@ -73,7 +100,8 @@ export function RecipeBuilder() {
 
   async function copyLink() {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const share = `${window.location.origin}${window.location.pathname}?r=${toParam(ids)}`;
+      await navigator.clipboard.writeText(share);
       setCopied(true);
       if (copyTimer.current) clearTimeout(copyTimer.current);
       copyTimer.current = setTimeout(() => setCopied(false), 2500);
@@ -105,7 +133,7 @@ export function RecipeBuilder() {
                   name="intensity"
                   className="sr-only"
                   checked={ids.intensity === option.id}
-                  onChange={() => setIds((s) => ({ ...s, intensity: option.id }))}
+                  onChange={() => choose((s) => ({ ...s, intensity: option.id }))}
                 />
                 <span className="font-serif text-xl text-sumi">
                   {option.label[locale]}
@@ -128,7 +156,7 @@ export function RecipeBuilder() {
                   name="base"
                   className="sr-only"
                   checked={ids.base === option.id}
-                  onChange={() => setIds((s) => ({ ...s, base: option.id }))}
+                  onChange={() => choose((s) => ({ ...s, base: option.id }))}
                 />
                 <span className="font-serif text-xl text-sumi">
                   {option.label[locale]}
@@ -148,7 +176,7 @@ export function RecipeBuilder() {
                 name="fruit"
                 className="sr-only"
                 checked={ids.fruit === null}
-                onChange={() => setIds((s) => ({ ...s, fruit: null }))}
+                onChange={() => choose((s) => ({ ...s, fruit: null }))}
               />
               <span className="font-serif text-xl text-sumi">{t("noFruit")}</span>
             </label>
@@ -159,7 +187,7 @@ export function RecipeBuilder() {
                   name="fruit"
                   className="sr-only"
                   checked={ids.fruit === option.id}
-                  onChange={() => setIds((s) => ({ ...s, fruit: option.id }))}
+                  onChange={() => choose((s) => ({ ...s, fruit: option.id }))}
                 />
                 <span className="flex items-center gap-3 font-serif text-xl text-sumi">
                   <span
@@ -184,7 +212,7 @@ export function RecipeBuilder() {
                   name="temp"
                   className="sr-only"
                   checked={ids.temp === option.id}
-                  onChange={() => setIds((s) => ({ ...s, temp: option.id }))}
+                  onChange={() => choose((s) => ({ ...s, temp: option.id }))}
                 />
                 <span className="font-serif text-xl text-sumi">
                   {option.label[locale]}
@@ -264,6 +292,13 @@ export function RecipeBuilder() {
         <p className="mt-4 text-eyebrow uppercase text-sumi/70">
           {t("priceNote")}
         </p>
+
+        {/* The highest-intent moment on the site leads somewhere. */}
+        <div className="mt-6">
+          <a href={`/${locale}#socios`} className={quietLinkClass}>
+            {cta("toWaitlist")}
+          </a>
+        </div>
       </div>
     </div>
   );

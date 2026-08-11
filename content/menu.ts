@@ -7,7 +7,7 @@ export type MenuItem = {
   price: string;
   /** The drink's natural hue, seen from above. Used for swatches + hover. */
   color: string;
-  origin?: string;
+  origin?: Record<Locale, string>;
   signature?: boolean;
   description: Record<Locale, string>;
 };
@@ -34,7 +34,7 @@ export const menu: MenuCategory[] = [
         color: "#6B7F5E",
         name: "Matcha",
         price: "4,50 €",
-        origin: "Uji, Kioto",
+        origin: { es: "Uji, Kioto", en: "Uji, Kyoto" },
         signature: true,
         description: {
           es: "Piedra, agua, espuma. Batido al momento.",
@@ -115,7 +115,7 @@ export const menu: MenuCategory[] = [
       {
         id: "hibiscus",
         color: "#9E4453",
-        name: "Hibiscus",
+        name: "Hibisco",
         price: "4,00 €",
         description: {
           es: "Infusión fría de hibisco.",

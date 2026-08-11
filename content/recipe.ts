@@ -68,7 +68,7 @@ export const intensities: Intensity[] = [
     grams: 3,
     surchargeCents: 100,
     label: { es: "Intenso", en: "Intense" },
-    note: { es: "Denso, para detenerse", en: "Dense, made to pause over" },
+    note: { es: "Denso, para detenerse", en: "Dense, to linger over" },
   },
 ];
 
@@ -142,7 +142,7 @@ export const fruits: Fruit[] = [
     code: "HIB",
     surchargeCents: 100,
     hue: "#9E4453",
-    label: { es: "Hibiscus", en: "Hibiscus" },
+    label: { es: "Hibisco", en: "Hibiscus" },
   },
 ];
 
