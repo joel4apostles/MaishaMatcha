@@ -13,6 +13,8 @@ import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { WordReveal } from "@/components/WordReveal";
 import { ScrollInk } from "@/components/ScrollInk";
+import { StageReveal } from "@/components/StageReveal";
+import { StageWords } from "@/components/StageWords";
 import { QuietLink, buttonClass } from "@/components/Button";
 import { Link } from "@/i18n/navigation";
 import { WaitlistForm } from "@/components/WaitlistForm";
@@ -94,6 +96,8 @@ function Home() {
 
 const riseDelay = (ms: number) =>
   ({ "--rise-delay": `${ms}ms` }) as CSSProperties;
+
+const stageDelay = (ms: number) => ({ "--sd": `${ms}ms` }) as CSSProperties;
 
 function Hero() {
   const t = useTranslations("home.hero");
@@ -199,21 +203,30 @@ function StoryTeaser() {
       <div className="relative mt-14 max-w-3xl">
         <TimelineRail />
         <ol className="pl-6 sm:pl-10">
-          {chapters.map((chapter, i) => (
+          {chapters.map((chapter) => (
             <li key={chapter.id} className="relative pb-12 last:pb-0">
               <span
                 aria-hidden="true"
                 className="absolute -left-[calc(1.5rem+3px)] top-2 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
               />
-              <Reveal delay={i * 120}>
-                <Eyebrow>{chapter.era[locale]}</Eyebrow>
+              {/* Dramatic staged entrance: era, then title word by word, then body. */}
+              <StageReveal>
+                <div data-s style={stageDelay(0)}>
+                  <Eyebrow>{chapter.era[locale]}</Eyebrow>
+                </div>
                 <h3 className="mt-3 text-balance font-serif text-2xl font-light text-sumi sm:text-3xl">
-                  {chapter.title[locale]}
+                  <StageWords
+                    text={chapter.title[locale]}
+                    baseDelay={200}
+                    step={80}
+                  />
                 </h3>
-                <p className="measure mt-3 text-sumi/80">
-                  {chapter.body[locale]}
-                </p>
-              </Reveal>
+                <div data-s style={stageDelay(550)}>
+                  <p className="measure mt-3 text-sumi/80">
+                    {chapter.body[locale]}
+                  </p>
+                </div>
+              </StageReveal>
             </li>
           ))}
         </ol>
