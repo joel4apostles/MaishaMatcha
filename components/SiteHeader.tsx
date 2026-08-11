@@ -2,8 +2,14 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
+// Underline slides in from the left on hover: a flat 1px pseudo-element that
+// scales open. No gradients (brand law), no JS. Hit area expanded to 44px
+// without shifting layout (py + negative margin).
 const linkClass =
-  "text-sm text-sumi/80 underline decoration-transparent decoration-1 underline-offset-4 transition-colors hover:text-sumi hover:decoration-wood/60";
+  "relative inline-flex items-center py-2.5 -my-2.5 text-sm text-sumi/80 transition-colors hover:text-sumi " +
+  "after:absolute after:bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left " +
+  "after:scale-x-0 after:bg-wood after:transition-transform after:duration-300 after:ease-out " +
+  "hover:after:scale-x-100";
 
 export function SiteHeader() {
   const t = useTranslations("nav");

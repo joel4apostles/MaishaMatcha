@@ -16,7 +16,8 @@
     "hero": {
       "eyebrow": "Murcia · Primer salón de matcha",
       "wordmark": "maisha matcha",
-      "line": "Hoja molida en piedra, agua a su punto, una pausa larga."
+      "line": "Hoja molida en piedra, agua a su punto, una pausa larga.",
+      "scrollCue": "Desliza"
     },
     "manifesto": {
       "eyebrow": "Manifiesto",
@@ -35,16 +36,19 @@
       "eyebrow": "El espacio",
       "title": "Una sala de té en Murcia",
       "body": "Tatami y madera cálida. Cerámica hecha a mano: chawan, chasen, chashaku. En la pared, una obra tejida. En el centro, un árbol. Nada más.",
-      "caption1": "chashitsu",
-      "caption2": "chawan",
+      "caption1": "la caja de luz",
+      "caption2": "la barra",
       "caption3": "el árbol",
-      "alt1": "La sala de té, con tatami y madera cálida.",
-      "alt2": "Un chawan de cerámica hecho a mano.",
-      "alt3": "El árbol en el centro de la sala."
+      "alt1": "Estanterías de madera iluminadas con cuencos de cerámica.",
+      "alt2": "La barra de piedra bajo una obra tejida.",
+      "alt3": "El árbol junto a las celosías de madera.",
+      "altMain": "El salón: madera cálida, tatami, la barra de piedra y el árbol.",
+      "renderNote": "Imagen del proyecto. No es una imagen final."
     },
     "founding": {
       "eyebrow": "Socios fundadores",
       "title": "Los primeros cincuenta",
+      "scarcity": "Cincuenta lugares. Ni uno más.",
       "body": "Los primeros cincuenta socios conservan los privilegios de apertura.",
       "privilege1": "Primera invitación a cata",
       "privilege2": "Acceso anticipado a los eventos",
@@ -70,7 +74,7 @@
   "menu": {
     "eyebrow": "La carta",
     "title": "Carta",
-    "intro": "Matcha ceremonial, lattes y algunos dulces. Leche de avena por defecto.",
+    "intro": "Matcha molido en piedra, burbujas y fruta. Todo puede servirse frío.",
     "originPrefix": "Origen"
   },
   "story": {

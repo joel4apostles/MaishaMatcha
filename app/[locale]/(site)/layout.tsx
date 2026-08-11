@@ -28,7 +28,7 @@ function SiteShell({ children }: { children: ReactNode }) {
         {t("skip")}
       </a>
       <SiteHeader />
-      <main id="main" className="flex-1">
+      <main id="main" className="flex-1 overflow-x-clip">
         {children}
       </main>
       <SiteFooter />

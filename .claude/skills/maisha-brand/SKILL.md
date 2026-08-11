@@ -35,9 +35,16 @@ Reduced palette, 2–3 colors maximum, much negative space.
   placeholders, OG image). Depth comes from whitespace and hairlines, not
   from blends.
 
-## Motion
-- Fade-and-rise on scroll only: 12px, 0.6s, ease-out, once.
-- Nothing loops, bounces, or pulses. Respect prefers-reduced-motion.
+## Motion (v2 vocabulary, founder-approved cinematic pass)
+- Base: fade-and-rise, 12px, 0.6s, ease-out, once. Nothing loops, bounces,
+  or pulses. Respect prefers-reduced-motion; no-JS fallback is fully visible.
+- Sanctioned extensions, each used in ONE place:
+  - Hero word-rise: per-word staggered fade-and-rise on load (CSS only).
+  - Manifesto scroll-ink: words go faint (18%) to full ink with scroll.
+  - Historia rail: a wood line draws down the timeline with scroll.
+  - Hover only: image zoom ≤ 1.04 (0.7s), nav underline slide-in, menu
+    bento focus-dim (others to 75%, never below AA).
+- No blur flourishes, no parallax, no pinned/sticky scroll scenes.
 
 ## Tone of voice (ES first, then EN)
 - Poetic, sober, almost silent. Short sentences. Concrete nouns.

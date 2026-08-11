@@ -11,7 +11,7 @@ export const buttonClass =
 
 /** Quiet inline link — underline in wood, gold only on hover. */
 export const quietLinkClass =
-  "inline-flex min-h-[44px] items-center text-sm text-sumi underline decoration-wood/50 decoration-1 underline-offset-4 transition-colors hover:decoration-gold";
+  "inline-flex min-h-[44px] items-center text-sm text-sumi underline decoration-wood/50 decoration-1 underline-offset-4 transition-colors hover:decoration-sumi/70";
 
 export function Button({
   href,

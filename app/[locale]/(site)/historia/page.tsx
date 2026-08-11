@@ -5,6 +5,7 @@ import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
+import { TimelineRail } from "@/components/TimelineRail";
 import { story } from "@/content/story";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -47,7 +48,9 @@ function StoryContent() {
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
       </Reveal>
 
-      <ol className="mt-16 border-l border-wood/25 pl-6 sm:pl-10">
+      <div className="relative mt-16">
+        <TimelineRail />
+        <ol className="pl-6 sm:pl-10">
         {story.map((chapter) => (
           <li key={chapter.id} className="relative pb-14 last:pb-0">
             <span
@@ -63,7 +66,8 @@ function StoryContent() {
             </Reveal>
           </li>
         ))}
-      </ol>
+        </ol>
+      </div>
     </Section>
   );
 }

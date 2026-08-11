@@ -16,7 +16,8 @@
     "hero": {
       "eyebrow": "Murcia · The first matcha salon",
       "wordmark": "maisha matcha",
-      "line": "Leaf ground on stone, water at its point, a long pause."
+      "line": "Leaf ground on stone, water at its point, a long pause.",
+      "scrollCue": "Scroll"
     },
     "manifesto": {
       "eyebrow": "Manifesto",
@@ -35,16 +36,19 @@
       "eyebrow": "The space",
       "title": "A tea room in Murcia",
       "body": "Tatami and warm wood. Handmade ceramics: chawan, chasen, chashaku. On the wall, a woven work. At the centre, a tree. Nothing more.",
-      "caption1": "chashitsu",
-      "caption2": "chawan",
+      "caption1": "the box of light",
+      "caption2": "the counter",
       "caption3": "the tree",
-      "alt1": "The tea room, with tatami and warm wood.",
-      "alt2": "A handmade ceramic chawan.",
-      "alt3": "The tree at the centre of the room."
+      "alt1": "Lit timber shelving holding ceramic bowls.",
+      "alt2": "The stone counter beneath a woven work.",
+      "alt3": "The tree beside the timber lattice screens.",
+      "altMain": "The salon: warm wood, tatami, the stone counter and the tree.",
+      "renderNote": "Project image. Not a final photograph."
     },
     "founding": {
       "eyebrow": "Founding members",
       "title": "The first fifty",
+      "scarcity": "Fifty places. Not one more.",
       "body": "The first fifty members keep the opening privileges.",
       "privilege1": "First tasting invitation",
       "privilege2": "Early access to events",
@@ -70,7 +74,7 @@
   "menu": {
     "eyebrow": "The menu",
     "title": "Menu",
-    "intro": "Ceremonial matcha, lattes and a few sweets. Oat milk by default.",
+    "intro": "Stone-ground matcha, bubbles and fruit. Everything can be served cold.",
     "originPrefix": "Origin"
   },
   "story": {

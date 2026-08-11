@@ -2,7 +2,7 @@ import type { Locale } from "@/i18n/routing";
 
 export type MenuItem = {
   id: string;
-  /** Drink name — a proper noun, not localized. */
+  /** Drink name — kept in Spanish as a proper noun, not localized. */
   name: string;
   price: string;
   origin?: string;
@@ -16,105 +16,110 @@ export type MenuCategory = {
   items: MenuItem[];
 };
 
+/**
+ * The carta, composed from the founder's ingredient list:
+ * matcha · tónica · agua con gas · leche de coco · agua de coco
+ * mango · yuzu · fresas · hibiscus
+ * Prices are launch drafts, pending confirmation.
+ */
 export const menu: MenuCategory[] = [
   {
-    id: "ceremonial",
-    title: { es: "Ceremonial", en: "Ceremonial" },
+    id: "matcha",
+    title: { es: "El matcha", en: "The matcha" },
     items: [
       {
-        id: "usucha",
-        name: "Usucha",
+        id: "matcha",
+        name: "Matcha",
         price: "4,50 €",
         origin: "Uji, Kioto",
         signature: true,
         description: {
-          es: "Matcha batido con agua. Ligero, herbáceo, sin leche.",
-          en: "Matcha whisked with water. Light, grassy, no milk.",
+          es: "Piedra, agua, espuma. Batido al momento.",
+          en: "Stone, water, foam. Whisked to order.",
         },
       },
       {
-        id: "koicha",
-        name: "Koicha",
-        price: "7,00 €",
-        origin: "Uji, Kioto",
-        signature: true,
+        id: "matcha-coco",
+        name: "Matcha Coco",
+        price: "5,00 €",
         description: {
-          es: "Matcha espeso, de hoja joven. Denso, dulce, para detenerse.",
-          en: "Thick matcha from young leaf. Dense, sweet, made to pause over.",
+          es: "Leche de coco, templado o frío.",
+          en: "Coconut milk, warm or cold.",
         },
       },
     ],
   },
   {
-    id: "lattes",
-    title: { es: "Lattes", en: "Lattes" },
+    id: "burbujas",
+    title: { es: "Con burbujas", en: "With bubbles" },
     items: [
       {
-        id: "matcha-latte",
-        name: "Matcha latte",
-        price: "4,80 €",
+        id: "matcha-tonica",
+        name: "Matcha Tónica",
+        price: "5,50 €",
         signature: true,
         description: {
-          es: "Matcha y leche de avena. Redondo, templado.",
-          en: "Matcha and oat milk. Round, warm.",
+          es: "Tónica, hielo, piel de yuzu.",
+          en: "Tonic water, ice, yuzu peel.",
         },
       },
       {
-        id: "hojicha-latte",
-        name: "Hōjicha latte",
-        price: "4,50 €",
-        description: {
-          es: "Té verde tostado y avena. Notas de madera y caramelo.",
-          en: "Roasted green tea and oat. Wood and caramel notes.",
-        },
-      },
-    ],
-  },
-  {
-    id: "especiales",
-    title: { es: "Especiales", en: "Specials" },
-    items: [
-      {
-        id: "estacional",
-        name: "De temporada",
+        id: "matcha-yuzu",
+        name: "Matcha Yuzu",
         price: "5,50 €",
         description: {
-          es: "La preparación del mes, según la fruta y la hora.",
-          en: "The preparation of the month, by season and hour.",
+          es: "Cítrico japonés, agua con gas.",
+          en: "Japanese citrus, sparkling water.",
         },
       },
+    ],
+  },
+  {
+    id: "fruta",
+    title: { es: "Con fruta", en: "With fruit" },
+    items: [
       {
-        id: "omakase",
-        name: "Omakase del barista",
+        id: "matcha-mango",
+        name: "Matcha Mango",
         price: "6,00 €",
         signature: true,
         description: {
-          es: "Sin carta. El barista elige por ti.",
-          en: "No menu. The barista chooses for you.",
+          es: "Mango batido, leche de coco.",
+          en: "Blended mango, coconut milk.",
+        },
+      },
+      {
+        id: "matcha-fresas",
+        name: "Matcha Fresas",
+        price: "6,00 €",
+        signature: true,
+        description: {
+          es: "Fresas de temporada, agua de coco.",
+          en: "Seasonal strawberries, coconut water.",
         },
       },
     ],
   },
   {
-    id: "dulces",
-    title: { es: "Dulces", en: "Sweets" },
+    id: "sin-matcha",
+    title: { es: "Sin matcha", en: "Without matcha" },
     items: [
       {
-        id: "dorayaki",
-        name: "Dorayaki de matcha",
-        price: "3,50 €",
+        id: "hibiscus",
+        name: "Hibiscus",
+        price: "4,00 €",
         description: {
-          es: "Dos discos de bizcocho, relleno de judía dulce.",
-          en: "Two soft rounds, sweet red-bean filling.",
+          es: "Infusión fría de hibisco.",
+          en: "Cold hibiscus infusion.",
         },
       },
       {
-        id: "warabi",
-        name: "Warabi mochi",
-        price: "4,00 €",
+        id: "agua-de-coco",
+        name: "Agua de coco",
+        price: "3,50 €",
         description: {
-          es: "Gelatina fresca de helecho, kinako y matcha.",
-          en: "Cool bracken jelly, kinako and matcha.",
+          es: "Fría, tal cual.",
+          en: "Cold, as it is.",
         },
       },
     ],

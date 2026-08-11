@@ -16,6 +16,7 @@ export function LocaleSwitcher() {
 
   return (
     <div
+      role="group"
       aria-label={t("switcherAria")}
       className="flex items-center gap-2 text-eyebrow uppercase"
     >
@@ -25,11 +26,11 @@ export function LocaleSwitcher() {
             href={pathname}
             locale={locale}
             aria-current={locale === active ? "true" : undefined}
-            className={
+            className={`inline-flex items-center px-1 py-3 -my-3 ${
               locale === active
                 ? "text-sumi"
-                : "text-sumi/60 transition-colors hover:text-sumi"
-            }
+                : "text-sumi/70 transition-colors hover:text-sumi"
+            }`}
           >
             {locale}
           </Link>

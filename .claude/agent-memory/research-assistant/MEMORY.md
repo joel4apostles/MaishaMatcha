@@ -1,0 +1,1 @@
+- [Maisha brand constraints](maisha_brand_constraints.md) — the filter for any UI component/effect: no gradients/glows/loops/2nd accent; fade-and-rise only

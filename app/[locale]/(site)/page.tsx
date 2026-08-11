@@ -1,11 +1,18 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
+import salonRender from "@/public/images/salon.jpg";
+import salonEstantes from "@/public/images/salon-estantes.jpg";
+import salonBarra from "@/public/images/salon-barra.jpg";
+import salonArbol from "@/public/images/salon-arbol.jpg";
 import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
-import { PlaceholderImage } from "@/components/PlaceholderImage";
+import { WordReveal } from "@/components/WordReveal";
+import { ScrollInk } from "@/components/ScrollInk";
 import { KigumiGrid } from "@/components/KigumiGrid";
 import { QuietLink, buttonClass } from "@/components/Button";
 import { WaitlistForm } from "@/components/WaitlistForm";
@@ -82,39 +89,50 @@ function Home() {
   );
 }
 
+const riseDelay = (ms: number) =>
+  ({ "--rise-delay": `${ms}ms` }) as CSSProperties;
+
 function Hero() {
   const t = useTranslations("home.hero");
   const cta = useTranslations("cta");
   return (
-    <section className="px-6 pb-16 pt-16 sm:px-8 sm:pb-24 sm:pt-24">
-      <div className="mx-auto grid max-w-[1100px] grid-cols-1 items-center gap-12 md:grid-cols-[1.05fr_0.95fr] md:gap-16">
-        <div>
-          <Eyebrow>{t("eyebrow")}</Eyebrow>
-          <h1 className="mt-6 font-sans text-display font-medium lowercase tracking-tight text-gold">
-            maisha matcha
-          </h1>
-          <p className="measure mt-6 text-lg text-sumi/80">{t("line")}</p>
-          <div className="mt-10">
-            <a href="#socios" className={buttonClass}>
-              {cta("joinWaitlist")}
-            </a>
-          </div>
+    <section className="relative flex min-h-[calc(100svh-9rem)] flex-col px-6 sm:min-h-[calc(100svh-5.5rem)] sm:px-8">
+      {/* The single kigumi motif for this page: a full hero backdrop. */}
+      <div aria-hidden="true" className="absolute inset-0 opacity-[0.05]">
+        <KigumiGrid />
+      </div>
+
+      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col items-center justify-center py-16 text-center">
+        <p
+          className="anim-rise text-eyebrow uppercase text-sumi/70"
+          style={riseDelay(100)}
+        >
+          {t("eyebrow")}
+        </p>
+        <h1
+          className="anim-rise mt-8 font-sans text-hero font-medium lowercase tracking-tight text-gold"
+          style={riseDelay(280)}
+        >
+          maisha matcha
+        </h1>
+        <p className="mt-9 max-w-2xl font-serif text-poem font-light text-sumi/85">
+          <WordReveal text={t("line")} baseDelay={500} step={70} />
+        </p>
+        <div className="anim-rise mt-12" style={riseDelay(1100)}>
+          <a href="#socios" className={buttonClass}>
+            {cta("joinWaitlist")}
+          </a>
         </div>
-        {/* The single kigumi motif for this page lives in the hero image. */}
-        <div className="relative">
-          <PlaceholderImage
-            label={t("eyebrow")}
-            subject="maisha"
-            ratio="4 / 5"
-            withMotif
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-3 -top-3 hidden h-24 w-24 opacity-[0.08] md:block"
-          >
-            <KigumiGrid />
-          </div>
-        </div>
+      </div>
+
+      <div
+        className="anim-rise relative mx-auto mb-8 flex flex-col items-center gap-3"
+        style={riseDelay(1500)}
+      >
+        <span className="text-eyebrow uppercase text-sumi/70">
+          {t("scrollCue")}
+        </span>
+        <span aria-hidden="true" className="h-10 w-px bg-wood/60" />
       </div>
     </section>
   );
@@ -122,30 +140,41 @@ function Hero() {
 
 function Manifesto() {
   const t = useTranslations("home.manifesto");
+  const inkClass =
+    "measure font-serif text-2xl font-light leading-relaxed text-sumi sm:text-[1.75rem]";
   return (
-    <Section aria-label={t("eyebrow")} className="border-t border-wood/15">
-      <Reveal className="grid grid-cols-1 gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
-        <div>
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
+        <Reveal>
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>
+        </Reveal>
+        <div className="space-y-8">
+          <ScrollInk text={t("p1")} className={inkClass} />
+          <ScrollInk text={t("p2")} className={inkClass} />
+          <ScrollInk text={t("p3")} className={inkClass} />
+          <Reveal>
+            <figure className="mt-10 border-l border-wood/40 pl-5">
+              <blockquote className="font-serif text-2xl font-light italic text-sumi">
+                {t("quote")}
+              </blockquote>
+              <figcaption className="mt-2 text-eyebrow uppercase text-sumi/70">
+                {t("quoteAuthor")}
+              </figcaption>
+            </figure>
+          </Reveal>
         </div>
-        <div className="measure space-y-5 text-lg text-sumi/80">
-          <p>{t("p1")}</p>
-          <p>{t("p2")}</p>
-          <p>{t("p3")}</p>
-          <figure className="mt-10 border-l border-wood/40 pl-5">
-            <blockquote className="font-serif text-2xl font-light italic text-sumi">
-              {t("quote")}
-            </blockquote>
-            <figcaption className="mt-2 text-eyebrow uppercase text-sumi/50">
-              {t("quoteAuthor")}
-            </figcaption>
-          </figure>
-        </div>
-      </Reveal>
+      </div>
     </Section>
   );
 }
+
+const bentoSpans = [
+  "sm:col-span-7",
+  "sm:col-span-5",
+  "sm:col-span-5",
+  "sm:col-span-7",
+];
 
 function MenuPreview() {
   const t = useTranslations("home.menuPreview");
@@ -153,29 +182,38 @@ function MenuPreview() {
   const locale = useLocale();
   const items = signatureItems();
   return (
-    <Section aria-label={t("eyebrow")} className="border-t border-wood/15">
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
-        <ul className="mt-10 divide-y divide-wood/15 border-y border-wood/15">
-          {items.map((item) => (
+      </Reveal>
+      <Reveal className="mt-12">
+        <ul className="group/menu grid grid-cols-1 gap-4 sm:grid-cols-12">
+          {items.map((item, i) => (
             <li
               key={item.id}
-              className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-5"
+              className={`${bentoSpans[i]} flex min-h-[200px] flex-col justify-between rounded-[2px] border border-wood/25 bg-wood/[0.05] p-7 transition-opacity duration-300 ease-out group-hover/menu:opacity-75 hover:opacity-100! sm:p-9`}
             >
-              <div className="min-w-0">
-                <p className="font-serif text-xl text-sumi">{item.name}</p>
-                <p className="mt-1 text-sm text-sumi/70">
+              <div>
+                {item.origin ? (
+                  <p className="text-eyebrow uppercase text-sumi/70">
+                    {item.origin}
+                  </p>
+                ) : null}
+                <p className="mt-3 font-serif text-3xl font-light text-sumi">
+                  {item.name}
+                </p>
+                <p className="mt-3 max-w-md text-sumi/75">
                   {item.description[locale]}
                 </p>
               </div>
-              <p className="shrink-0 font-serif text-lg text-sumi/80">
+              <p className="mt-8 font-serif text-xl text-sumi/85">
                 {item.price}
               </p>
             </li>
           ))}
         </ul>
-        <div className="mt-8">
+        <div className="mt-10">
           <QuietLink href="/menu">{cta("toMenu")}</QuietLink>
         </div>
       </Reveal>
@@ -185,17 +223,54 @@ function MenuPreview() {
 
 function TheSpace() {
   const t = useTranslations("home.space");
+  const details = [
+    { src: salonEstantes, alt: t("alt1"), caption: t("caption1") },
+    { src: salonBarra, alt: t("alt2"), caption: t("caption2") },
+    { src: salonArbol, alt: t("alt3"), caption: t("caption3") },
+  ];
   return (
-    <Section aria-label={t("eyebrow")} className="border-t border-wood/15">
+    <Section ariaLabel={t("eyebrow")} className="border-t border-wood/15">
       <Reveal>
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("body")}</p>
       </Reveal>
-      <Reveal className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <PlaceholderImage label={t("alt1")} subject={t("caption1")} ratio="3 / 4" />
-        <PlaceholderImage label={t("alt2")} subject={t("caption2")} ratio="3 / 4" />
-        <PlaceholderImage label={t("alt3")} subject={t("caption3")} ratio="3 / 4" />
+
+      {/* The salon, full bleed — the deck's project render. */}
+      <Reveal className="mt-14">
+        <figure className="bleed">
+          <div className="group overflow-hidden">
+            <Image
+              src={salonRender}
+              alt={t("altMain")}
+              sizes="100vw"
+              placeholder="blur"
+              className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+            />
+          </div>
+          <figcaption className="mx-auto mt-3 max-w-[1100px] px-6 text-eyebrow uppercase text-sumi/70 sm:px-8">
+            {t("renderNote")}
+          </figcaption>
+        </figure>
+      </Reveal>
+
+      <Reveal className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
+        {details.map((image) => (
+          <figure key={image.caption} className="group">
+            <div className="overflow-hidden rounded-[2px]">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                sizes="(min-width: 640px) 33vw, 100vw"
+                placeholder="blur"
+                className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              />
+            </div>
+            <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">
+              {image.caption}
+            </figcaption>
+          </figure>
+        ))}
       </Reveal>
     </Section>
   );
@@ -210,7 +285,10 @@ function Founding() {
         <div>
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>
-          <p className="measure mt-6 text-lg text-sumi/80">{t("body")}</p>
+          <p className="mt-6 font-serif text-2xl font-light text-sumi sm:text-3xl">
+            {t("scarcity")}
+          </p>
+          <p className="measure mt-4 text-lg text-sumi/80">{t("body")}</p>
           <ul className="mt-8 space-y-3">
             {privileges.map((p) => (
               <li key={p} className="flex items-start gap-3 text-sumi/80">
