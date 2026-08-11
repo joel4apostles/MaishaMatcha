@@ -297,6 +297,26 @@ function MenuPreview() {
               </Link>
             </li>
           ))}
+          {/* Fifth cell: compose your own. */}
+          <li className="flex sm:col-span-12">
+            <Link
+              href="/crea"
+              className="flex w-full flex-wrap items-center justify-between gap-4 rounded-[2px] border border-matcha-ink/40 bg-matcha-ink/[0.05] p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-75 hover:border-matcha-ink/70 hover:bg-matcha-ink/[0.09] hover:opacity-100! sm:p-9"
+            >
+              <div>
+                <p className="text-eyebrow uppercase text-sumi/70">
+                  {t("createEyebrow")}
+                </p>
+                <p className="mt-3 font-serif text-3xl font-light text-sumi">
+                  {cta("create")}
+                </p>
+              </div>
+              <span
+                aria-hidden="true"
+                className="hidden h-10 w-10 rounded-full bg-matcha-ink/80 sm:block"
+              />
+            </Link>
+          </li>
         </ul>
         <div className="mt-10">
           <QuietLink href="/menu">{cta("toMenu")}</QuietLink>

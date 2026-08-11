@@ -11,7 +11,8 @@
     "joinWaitlist": "Join the list",
     "toMenu": "See the full menu",
     "toStory": "Read the full story",
-    "toWaitlist": "Keep a place"
+    "toWaitlist": "Keep a place",
+    "create": "Create your drink"
   },
   "home": {
     "hero": {
@@ -31,7 +32,8 @@
     },
     "menuPreview": {
       "eyebrow": "The menu",
-      "title": "Four preparations"
+      "title": "Four preparations",
+      "createEyebrow": "Your way"
     },
     "space": {
       "eyebrow": "The space",
@@ -142,11 +144,34 @@
     "privacy": {
       "title": "Privacy · maisha matcha",
       "description": "How we handle your data at maisha matcha."
+    },
+    "create": {
+      "title": "Create your drink · maisha matcha",
+      "description": "Compose your own matcha: intensity, base and fruit. We prepare it at the salon."
     }
   },
   "notFound": {
     "title": "Nothing here.",
     "line": "The page you are looking for does not exist.",
     "home": "Back to home"
+  },
+  "create": {
+    "eyebrow": "Your way",
+    "title": "Create your drink",
+    "intro": "Choose the matcha, the base and the fruit. We prepare it at the counter.",
+    "stepIntensity": "The matcha",
+    "stepBase": "The base",
+    "stepFruit": "The fruit",
+    "stepFruitNote": "Optional",
+    "noFruit": "No fruit",
+    "stepTemp": "The temperature",
+    "cardTitle": "Your recipe",
+    "cardHint": "Show it at the counter and we will make it on the spot.",
+    "ratioLabel": "Ratio",
+    "priceLabel": "Price",
+    "codeLabel": "Code",
+    "copyLink": "Copy link",
+    "copied": "Link copied.",
+    "priceNote": "Opening prices, to be confirmed."
   }
 }

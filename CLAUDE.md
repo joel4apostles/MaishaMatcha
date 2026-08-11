@@ -138,7 +138,14 @@ if remote images / user uploads are ever enabled.
   keep the typed `/content` shape as the collection schema.
 - **Phase 2 — Stripe founding membership**: paid founding tier, member accounts,
   the "founding price" promise honored at checkout.
-- **Phase 3 — Recipe builder**: build/share/redeem matcha recipes.
+- **Phase 3 — Recipe builder**: MVP SHIPPED without a database. `/crea`
+  (`/create`): 4-step builder from `content/recipe.ts` (intensities, bases,
+  fruits, temps: locale labels + surcharges + hues). `lib/recipe.ts` holds the
+  pure logic: price (base 400c + surcharges), ratio label, hex color blend,
+  URL codec (`?r=intensity.base.fruit.temp`, fruit "no" when none), display
+  code (CLA·TON·YUZ·F). The recipe card shows a QR (qrcode-generator, dynamic
+  import) encoding the share URL; redeem = show the card at the counter.
+  Remaining for full phase 3: accounts/persistence, named recipes, pre-order.
 - **Phase 4 — Events / RSVP**: real events + seat-limited RSVP (the "reservado a
   socios fundadores" gating becomes functional).
 - **Phase 5 — Email campaigns**: broadcast beyond the confirmation email; the

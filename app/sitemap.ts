@@ -6,6 +6,7 @@ import { SITE_URL } from "@/lib/seo";
 const paths: AppPathname[] = [
   "/",
   "/menu",
+  "/crea",
   "/historia",
   "/eventos",
   "/aviso-legal",
