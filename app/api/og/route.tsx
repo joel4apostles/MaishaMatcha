@@ -57,7 +57,7 @@ export async function GET(request: Request) {
             style={{
               position: "absolute",
               inset: 0,
-              backgroundColor: "rgba(28,27,24,0.55)",
+              backgroundColor: "rgba(55,71,43,0.6)",
             }}
           />
           <div

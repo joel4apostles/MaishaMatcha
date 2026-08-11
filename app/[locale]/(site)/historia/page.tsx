@@ -60,7 +60,7 @@ function StoryContent() {
         <TimelineRail />
         <ol className="pl-6 sm:pl-10">
         {story.map((chapter) => (
-          <li key={chapter.id} className="relative pb-16 last:pb-0">
+          <li key={chapter.id} className="relative pb-12 last:pb-0 sm:pb-16">
             <span
               aria-hidden="true"
               className="absolute -left-[calc(1.5rem+3px)] top-2.5 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
