@@ -47,5 +47,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# payload local dev
+payload.db*
+/media
+
 # misc
 *.pem

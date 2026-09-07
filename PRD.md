@@ -67,7 +67,19 @@ StageWords/WordReveal merge, menu deep-links from home cards, mobile sticky
 recipe summary, KV rate limiter (on first abuse signal).
 
 Full-design pass across the site. Inputs: the five-agent baseline audit
-above, founder direction, the deck. Non-negotiables: brand
+above, founder direction, the deck.
+
+**2026-09-07 — brand kit adopted (Concept 1, kit green site-wide).** The
+"Maisha Proposed Brand Identity" kit's M-leaf icon + serif wordmark lockup
+extracted as exact vectors (IoU-verified) → favicon/app icons, header/footer
+lockup, hero wordmark. Kit green #9BAB37 replaces the moss as THE brand
+green; bright bands flip to sumi ink (contrast battery: sumi 6.8:1, sumi/85
+5.3:1; washi and gold fail on green — banned there). Recipe builder gains
+DrinkGlass: a live glass where each choice pours/blends/bubbles/ices with
+one-shot transitions (founder ask: "see the visual process of making the
+matcha"). Open follow-ups: OG image with the new lockup, footer monumental
+wordmark still typographic (kit serif version pending), eventos/email still
+lagging the identity. Non-negotiables: brand
 law, AA contrast, Lighthouse ≥95, no new dark bands, no gradients. Open
 design intents from the founder: matcha color presence (delivered — keep
 tuning by eye), drink-hue system (delivered), bigger typographic hierarchy
@@ -77,10 +89,18 @@ final prices, real photography.
 
 ## Next phases
 
-- **Phase 1 — Payload CMS + admin dashboard**: `content/*.ts` become
-  collections behind a real login. The team manages carta, recipe options,
-  prices, ratios, events and story from an admin UI with roles. This — not
-  an ad-hoc panel — is the "adaptive recipes" milestone.
+- **Phase 1 — Payload CMS + admin dashboard: IN PROGRESS (2026-09-07).**
+  Payload 3 embedded at /admin. Collections live: Users(roles), Media,
+  MenuCategories/Items (prices in cents), RecipeOptions (builder steps),
+  Events, StoryChapters, InventoryItems + StockMovements (append-only
+  ledger, phase 6 pulled forward), Orders (status board, recipe codes),
+  Members (founding/premium subscribers — Joel confirmed the premium
+  ordering system needs the DB). ES/EN localization mirrors the site.
+  DB: SQLite locally, DATABASE_URL (Neon/Vercel Postgres) in production +
+  PAYLOAD_SECRET. Seed script imports content/*.ts (`npm run seed`).
+  Remaining: boot-verify admin, first admin user, seed run, migrate public
+  pages from content files to CMS queries with revalidation, media storage
+  adapter (Vercel Blob) for prod uploads.
 - **Phase 2 — Stripe founding membership**: paid founding tier, accounts;
   the founding-price promise honored at checkout.
 - **Phase 3 completion — recipes get memory**: saved/named recipes attached

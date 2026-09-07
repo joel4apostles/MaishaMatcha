@@ -12,6 +12,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { TimelineRail } from "@/components/TimelineRail";
+import { StoryVisual } from "@/components/StoryVisual";
 import { story } from "@/content/story";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -56,11 +57,16 @@ function StoryContent() {
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
       </Reveal>
 
-      <div className="relative mt-16">
+      <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,48rem)_1fr] lg:gap-16">
+      <div className="relative">
         <TimelineRail />
         <ol className="pl-6 sm:pl-10">
         {story.map((chapter) => (
-          <li key={chapter.id} className="relative pb-12 last:pb-0 sm:pb-16">
+          <li
+            key={chapter.id}
+            data-story-id={chapter.id}
+            className="relative pb-12 last:pb-0 sm:pb-16"
+          >
             <span
               aria-hidden="true"
               className="absolute -left-[calc(1.5rem+3px)] top-2.5 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
@@ -105,6 +111,20 @@ function StoryContent() {
           </li>
         ))}
         </ol>
+      </div>
+
+      {/* The visual matches the history: era emblems crossfade per chapter. */}
+      <div className="hidden lg:block">
+        <div className="sticky top-24">
+          <StoryVisual
+            items={story.map((c) => ({
+              id: c.id,
+              glyph: c.glyph,
+              era: c.era[locale],
+            }))}
+          />
+        </div>
+      </div>
       </div>
 
       {/* Closing: history hands over to the founding list. */}

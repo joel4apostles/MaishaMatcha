@@ -10,11 +10,12 @@
   --color-sumi: #1c1b18; /* ink, primary text */
   --color-gold: #786000; /* the signature accent: wordmark, one CTA, focus */
   --color-wood: #b08d57; /* timber hairlines and borders */
-  --color-matcha-ink: #465c33; /* deep matcha moss surface: dark bands + hero panel */
+  --color-matcha: #9bab37; /* the brand kit matcha green: bands, mark, hovers */
 
-  /* Type families (wired to next/font variables in the locale layout) */
+  /* Type families (wired to next/font variables in the locale layout).
+     Serif = Fraunces, matching the brand kit's warm rounded terminals. */
   --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-serif-brand), Georgia, "Times New Roman", serif;
 
   /* Small-caps eyebrow */
   --text-eyebrow: 0.75rem;
@@ -69,6 +70,11 @@
     outline-color: var(--color-washi);
   }
 
+  /* Bright brand-green bands read as light surfaces: focus rings go sumi. */
+  .brand-band :focus-visible {
+    outline-color: var(--color-sumi);
+  }
+
   /* Option tiles hide their radio (sr-only); surface its focus on the tile. */
   .option-tile:has(:focus-visible) {
     outline: 2px solid var(--color-gold);
@@ -102,18 +108,6 @@
     margin-left: calc(50% - 50vw);
   }
 
-  /*
-   * Matcha-powder text: green fill with a fine noise speckle clipped to the
-   * glyphs. Texture via SVG turbulence (not a gradient). Decorative only.
-   */
-  .matcha-powder {
-    color: transparent;
-    background-color: #6b7f5e;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.94 0 0 0 0 0.90 0.7 0 0 0 -0.15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
-    background-size: 240px 240px;
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
 }
 
 /*

@@ -72,6 +72,13 @@ npm run lint           # ESLint (must be zero errors)
   references (Aesop/Blue Bottle/nendo/artists) and must NOT be published
   without permission. Space section uses next/image static imports with blur
   placeholders and an honest "project render" caption.
+- Brand assets: `components/BrandMark.tsx` (icon) + `BrandWordmark.tsx`
+  (serif lockup) are exact vectors extracted from the brand kit PDF
+  ("Maisha Proposed Brand Identity", Concept 1) via PyMuPDF path
+  serialization, silhouettes verified by pixel IoU (0.988 / 0.979) against
+  the kit's own render. Favicon = `app/icon.svg` (+ `apple-icon.png`),
+  auto-wired by Next conventions. `DrinkGlass.tsx` renders the live
+  drink-making visual in the recipe builder (one-shot transitions only).
 - `lib/seo.ts` — `pageMetadata({locale, path, title, description})` builds
   per-locale title/description + canonical + hreflang alternates + OG image.
   Every page's `generateMetadata` uses it. `SITE_URL` from `NEXT_PUBLIC_SITE_URL`.

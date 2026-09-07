@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { AppPathname } from "@/i18n/routing";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { BrandMark } from "./BrandMark";
+import { BrandWordmark } from "./BrandWordmark";
 
 const NAV: { href: AppPathname; key: "menu" | "story" | "events" }[] = [
   { href: "/menu", key: "menu" },
@@ -53,9 +55,11 @@ export function SiteHeader() {
         <Link
           href="/"
           aria-current={isHome ? "page" : undefined}
-          className={`font-sans text-base font-medium lowercase tracking-tight sm:text-lg ${overlay ? "text-washi" : "text-gold"}`}
+          aria-label="maisha matcha"
+          className={`flex items-center gap-2.5 ${overlay ? "text-washi" : "text-matcha"}`}
         >
-          maisha matcha
+          <BrandMark className="h-5 w-auto shrink-0 sm:h-6" />
+          <BrandWordmark className="h-7 w-auto shrink-0 sm:h-8" />
         </Link>
         <div className="flex items-center gap-4 sm:gap-7">
           <ul className="flex items-center gap-4 sm:gap-6">

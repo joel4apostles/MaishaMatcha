@@ -22,17 +22,18 @@ const toneStyles = {
     button: buttonClass,
   },
   dark: {
+    // "dark" = the bright brand-green band: sumi ink throughout (AA >= 4.8:1)
     field:
-      "w-full border-b border-washi/30 bg-transparent py-2.5 text-washi placeholder:text-washi/65 transition-colors duration-300 focus:border-washi",
-    label: "text-eyebrow uppercase text-washi/85",
-    error: "mt-2 text-sm text-washi/75",
-    formError: "text-sm text-washi/75",
-    successTitle: "font-serif text-3xl font-light text-washi outline-none",
-    successLine: "measure mt-3 text-washi/75",
-    consent: "text-sm text-washi/75",
-    checkbox: "mt-1 size-4 shrink-0 accent-washi",
+      "w-full border-b border-sumi/30 bg-transparent py-2.5 text-sumi placeholder:text-sumi/80 transition-colors duration-300 focus:border-sumi",
+    label: "text-eyebrow uppercase text-sumi/85",
+    error: "mt-2 text-sm text-sumi/85",
+    formError: "text-sm text-sumi/85",
+    successTitle: "font-serif text-3xl font-light text-sumi outline-none",
+    successLine: "measure mt-3 text-sumi/85",
+    consent: "text-sm text-sumi/85",
+    checkbox: "mt-1 size-4 shrink-0 accent-sumi",
     button:
-      "inline-flex min-h-[44px] items-center justify-center rounded-[2px] bg-washi px-7 py-3 text-sm font-medium tracking-wide text-sumi transition-opacity duration-200 hover:opacity-90 active:opacity-75 disabled:opacity-50",
+      "inline-flex min-h-[44px] items-center justify-center rounded-[2px] bg-sumi px-7 py-3 text-sm font-medium tracking-wide text-washi transition-opacity duration-200 hover:opacity-90 active:opacity-75 disabled:opacity-50",
   },
 } as const;
 

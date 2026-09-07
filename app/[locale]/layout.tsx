@@ -2,15 +2,18 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { Cormorant_Garamond, Hanken_Grotesk } from "next/font/google";
+import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
-const serif = Cormorant_Garamond({
+// Brand-kit typography: the kit's serif has warm, rounded terminals —
+// Fraunces (soft optical serif) is its closest Google face. Body stays
+// Hanken Grotesk, already the kit's warm-rounded sans register.
+const serif = Fraunces({
   subsets: ["latin"],
-  weight: ["300", "400"],
-  variable: "--font-cormorant",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-serif-brand",
   display: "swap",
 });
 

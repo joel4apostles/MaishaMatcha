@@ -4,6 +4,7 @@ import { routing } from "./i18n/routing";
 export default createMiddleware(routing);
 
 export const config = {
-  // Match all paths except API, Next internals, and files with an extension.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  // Match all paths except API, the Payload admin, Next internals, media
+  // uploads, and files with an extension.
+  matcher: ["/((?!api|admin|media|_next|_vercel|.*\\..*).*)"],
 };

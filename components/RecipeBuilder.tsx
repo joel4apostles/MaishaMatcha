@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { intensities, bases, fruits, temps } from "@/content/recipe";
 import { quietLinkClass } from "@/components/Button";
+import { DrinkGlass } from "@/components/DrinkGlass";
 import {
   DEFAULT_RECIPE,
   type RecipeIds,
@@ -12,7 +13,6 @@ import {
   formatPrice,
   ratioLabel,
   displayCode,
-  blendColor,
   toParam,
   fromParam,
 } from "@/lib/recipe";
@@ -20,7 +20,7 @@ import {
 const optionClass = (selected: boolean) =>
   `option-tile flex min-h-[44px] w-full cursor-pointer flex-col justify-center rounded-[2px] border px-4 py-3 transition-[border-color,background-color] duration-200 ease-out ${
     selected
-      ? "border-sumi/60 bg-matcha-ink/[0.06]"
+      ? "border-sumi/60 bg-matcha/[0.06]"
       : "border-wood/40 hover:border-wood/70"
   }`;
 
@@ -68,7 +68,6 @@ export function RecipeBuilder() {
   const price = formatPrice(priceCents(recipe));
   const ratio = ratioLabel(recipe);
   const code = displayCode(recipe);
-  const color = blendColor(recipe);
 
   useEffect(() => {
     // Canonical share URL: origin + localized path + the recipe. Nothing else
@@ -229,12 +228,8 @@ export function RecipeBuilder() {
           <p className="text-eyebrow uppercase text-sumi/70">{t("cardTitle")}</p>
 
           <div className="mt-6 flex items-center gap-5">
-            {/* The drink, seen from above. */}
-            <span
-              aria-hidden="true"
-              className="h-16 w-16 shrink-0 rounded-full ring-1 ring-sumi/15 transition-colors duration-500 ease-out"
-              style={{ backgroundColor: color }}
-            />
+            {/* The drink, being made — responds to every choice. */}
+            <DrinkGlass recipe={recipe} className="h-32 w-auto shrink-0" />
             <p className="font-serif text-2xl font-light leading-snug text-sumi">
               {chosen}
             </p>

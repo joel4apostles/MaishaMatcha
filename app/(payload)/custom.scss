@@ -1,0 +1,131 @@
+/*
+ * maisha matcha admin theme — the dashboard wears the brand.
+ * Payload themes via CSS custom properties; the elevation ramp runs
+ * washi (#F5F1E8) -> sumi (#1C1B18); success ramp is the kit matcha
+ * (#9BAB37). Dark mode inverts the ramp. Type is Hanken Grotesk with
+ * Fraunces for the login lockup context.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap");
+
+:root {
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+html[data-theme="light"] {
+  --theme-bg: #f5f1e8;
+  --theme-input-bg: #fbf9f3;
+  --theme-text: #1c1b18;
+  --theme-border-color: #d8d2c4;
+
+  --theme-elevation-0: #f5f1e8;
+  --theme-elevation-25: #f0ece3;
+  --theme-elevation-50: #eae7de;
+  --theme-elevation-100: #dfdcd3;
+  --theme-elevation-150: #d4d1c9;
+  --theme-elevation-200: #cac6be;
+  --theme-elevation-250: #bfbbb4;
+  --theme-elevation-300: #b4b0a9;
+  --theme-elevation-350: #a9a59f;
+  --theme-elevation-400: #9e9a94;
+  --theme-elevation-450: #93908a;
+  --theme-elevation-500: #88857f;
+  --theme-elevation-550: #7e7a75;
+  --theme-elevation-600: #73706a;
+  --theme-elevation-650: #686560;
+  --theme-elevation-700: #5d5a55;
+  --theme-elevation-750: #524f4b;
+  --theme-elevation-800: #474540;
+  --theme-elevation-850: #3c3a36;
+  --theme-elevation-900: #32302b;
+  --theme-elevation-950: #272521;
+  --theme-elevation-1000: #1c1b18;
+
+  --theme-success-50: #f3f5e3;
+  --theme-success-100: #e6ebc9;
+  --theme-success-200: #d3dca3;
+  --theme-success-300: #c0cd7d;
+  --theme-success-400: #adbc5a;
+  --theme-success-500: #9bab37;
+  --theme-success-600: #7f8d2d;
+  --theme-success-700: #646f23;
+  --theme-success-800: #4a521a;
+  --theme-success-900: #303610;
+}
+
+html[data-theme="dark"] {
+  --theme-bg: #1c1b18;
+  --theme-input-bg: #272521;
+  --theme-text: #f5f1e8;
+  --theme-border-color: #47453f;
+
+  --theme-elevation-0: #1c1b18;
+  --theme-elevation-25: #22201c;
+  --theme-elevation-50: #272521;
+  --theme-elevation-100: #32302b;
+  --theme-elevation-150: #3c3a36;
+  --theme-elevation-200: #474540;
+  --theme-elevation-250: #524f4b;
+  --theme-elevation-300: #5d5a55;
+  --theme-elevation-350: #686560;
+  --theme-elevation-400: #73706a;
+  --theme-elevation-450: #7e7a75;
+  --theme-elevation-500: #88857f;
+  --theme-elevation-550: #93908a;
+  --theme-elevation-600: #9e9a94;
+  --theme-elevation-650: #a9a59f;
+  --theme-elevation-700: #b4b0a9;
+  --theme-elevation-750: #bfbbb4;
+  --theme-elevation-800: #cac6be;
+  --theme-elevation-850: #d4d1c9;
+  --theme-elevation-900: #dfdcd3;
+  --theme-elevation-950: #eae7de;
+  --theme-elevation-1000: #f5f1e8;
+
+  --theme-success-50: #303610;
+  --theme-success-100: #4a521a;
+  --theme-success-200: #646f23;
+  --theme-success-300: #7f8d2d;
+  --theme-success-400: #8d9c32;
+  --theme-success-500: #9bab37;
+  --theme-success-600: #adbc5a;
+  --theme-success-700: #c0cd7d;
+  --theme-success-800: #d3dca3;
+  --theme-success-900: #e6ebc9;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+/* The login lockup: icon above wordmark, kit green, breathing room. */
+.maisha-admin-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  color: #9bab37;
+
+  svg {
+    display: block;
+    height: auto;
+  }
+  svg:first-child {
+    width: 5.5rem;
+  }
+  svg:last-child {
+    width: 13rem;
+  }
+}
+
+/* The nav icon: the M-leaf mark in kit green. */
+.maisha-admin-icon {
+  display: inline-flex;
+  color: #9bab37;
+
+  svg {
+    display: block;
+    width: 2rem;
+    height: auto;
+  }
+}

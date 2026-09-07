@@ -7,6 +7,7 @@ import salonRender from "@/public/images/salon.jpg";
 import salonEstantes from "@/public/images/salon-estantes.jpg";
 import salonBarra from "@/public/images/salon-barra.jpg";
 import salonArbol from "@/public/images/salon-arbol.jpg";
+import matchaPowder from "@/public/images/matcha-powder.jpg";
 import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
@@ -15,10 +16,13 @@ import { WordReveal } from "@/components/WordReveal";
 import { ScrollInk } from "@/components/ScrollInk";
 import { StageReveal } from "@/components/StageReveal";
 import { StageWords } from "@/components/StageWords";
-import { QuietLink, buttonClass } from "@/components/Button";
+import { QuietLink, buttonClass, inkButtonClass } from "@/components/Button";
 import { Link } from "@/i18n/navigation";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { BrandWordmark } from "@/components/BrandWordmark";
+import { BrandMark } from "@/components/BrandMark";
 import { TimelineRail } from "@/components/TimelineRail";
+import { StoryVisual } from "@/components/StoryVisual";
 import { signatureItems } from "@/content/menu";
 import { story } from "@/content/story";
 import { site } from "@/content/site";
@@ -119,22 +123,36 @@ function Hero() {
       <div aria-hidden="true" className="absolute inset-0 bg-sumi/25" />
 
       <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24">
-        {/* Editorial ink panel: flat matcha-ink, AA-safe on any crop or device. */}
+        {/* Brand panel: flat kit matcha, sumi ink — AA-verified on any crop. */}
         <div
-          className="anim-rise max-w-2xl rounded-[2px] bg-matcha-ink/80 p-6 sm:p-10"
+          className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10"
           style={riseDelay(100)}
         >
-          <p className="text-eyebrow uppercase text-washi/80">{t("eyebrow")}</p>
-          <h1 className="mt-5 font-sans text-display font-medium lowercase tracking-tight text-washi">
-            maisha matcha
+          {/* Real matcha powder under a green veil (contrast-safe at 20%). */}
+          <Image
+            src={matchaPowder}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes="672px"
+            placeholder="blur"
+            className="object-cover"
+          />
+          <div aria-hidden="true" className="absolute inset-0 bg-matcha/80" />
+          <div className="relative">
+          <p className="text-eyebrow uppercase text-sumi/85">{t("eyebrow")}</p>
+          <h1 className="mt-6 text-sumi">
+            <span className="sr-only">maisha matcha</span>
+            <BrandWordmark className="h-auto w-full max-w-sm" />
           </h1>
-          <p className="mt-6 max-w-xl font-serif text-poem font-light text-washi/90">
+          <p className="mt-7 max-w-xl font-serif text-poem font-light text-sumi/85">
             <WordReveal text={t("line")} baseDelay={400} step={70} />
           </p>
           <div className="mt-9">
-            <a href="#socios" className={buttonClass}>
+            <a href="#socios" className={inkButtonClass}>
               {cta("joinWaitlist")}
             </a>
+          </div>
           </div>
         </div>
       </div>
@@ -147,7 +165,7 @@ function Hero() {
       />
 
       {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-4 right-4 rounded-[2px] bg-matcha-ink/80 px-2.5 py-1 text-eyebrow uppercase text-washi/80">
+      <span className="absolute bottom-4 right-4 rounded-[2px] bg-matcha/90 px-2.5 py-1 text-eyebrow uppercase text-sumi/85">
         {space("renderNote")}
       </span>
     </section>
@@ -164,6 +182,10 @@ function Manifesto() {
         <Reveal>
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>
+          {/* The brand icon inhabits the column's quiet — a watermark. */}
+          <BrandMark
+            className="mt-12 hidden h-36 w-auto text-matcha/20 md:block"
+          />
         </Reveal>
         <div className="space-y-8">
           <ScrollInk text={t("p1")} className={inkClass} />
@@ -200,11 +222,16 @@ function StoryTeaser() {
         <Headline className="mt-5">{t("title")}</Headline>
       </Reveal>
 
-      <div className="relative mt-14 max-w-3xl">
+      <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,48rem)_1fr] lg:gap-16">
+      <div className="relative max-w-3xl">
         <TimelineRail />
         <ol className="pl-6 sm:pl-10">
           {chapters.map((chapter) => (
-            <li key={chapter.id} className="relative pb-12 last:pb-0">
+            <li
+              key={chapter.id}
+              data-story-id={chapter.id}
+              className="relative pb-12 last:pb-0"
+            >
               <span
                 aria-hidden="true"
                 className="absolute -left-[calc(1.5rem+3px)] top-2 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
@@ -230,6 +257,20 @@ function StoryTeaser() {
             </li>
           ))}
         </ol>
+      </div>
+
+      {/* The visual matches the history: era emblems crossfade per chapter. */}
+      <div className="hidden lg:block">
+        <Reveal className="sticky top-24">
+          <StoryVisual
+            items={chapters.map((c) => ({
+              id: c.id,
+              glyph: c.glyph,
+              era: c.era[locale],
+            }))}
+          />
+        </Reveal>
+      </div>
       </div>
 
       <Reveal className="mt-10">
@@ -301,7 +342,7 @@ function MenuPreview() {
           <li className="flex sm:col-span-12">
             <Link
               href="/crea"
-              className="flex w-full flex-wrap items-center justify-between gap-4 rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-matcha-ink/50 hover:bg-matcha-ink/[0.06] hover:opacity-100! sm:p-9"
+              className="flex w-full flex-wrap items-center justify-between gap-4 rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-matcha/50 hover:bg-matcha/[0.06] hover:opacity-100! sm:p-9"
             >
               <div>
                 <p className="text-eyebrow uppercase text-sumi/70">
@@ -372,25 +413,36 @@ function Founding() {
   const privileges = [t("privilege1"), t("privilege2"), t("privilege3")];
   return (
     // Inverted closing band: the page opens dark and closes dark.
-    <Section id="socios" className="dark-band scroll-mt-16 bg-matcha-ink" as="section">
-      <Reveal className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+    <Section id="socios" className="brand-band relative scroll-mt-16 overflow-hidden bg-matcha" as="section">
+      {/* Real matcha powder across the band, under a green veil. */}
+      <Image
+        src={matchaPowder}
+        alt=""
+        aria-hidden="true"
+        fill
+        sizes="100vw"
+        placeholder="blur"
+        className="object-cover"
+      />
+      <div aria-hidden="true" className="absolute inset-0 bg-matcha/80" />
+      <Reveal className="relative grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         <div>
-          <p className="text-eyebrow font-medium uppercase text-washi/85">
+          <p className="text-eyebrow font-medium uppercase text-sumi/85">
             {t("eyebrow")}
           </p>
-          <h2 className="mt-5 text-balance font-serif text-title font-light text-washi">
+          <h2 className="mt-5 text-balance font-serif text-title font-light text-sumi">
             {t("title")}
           </h2>
-          <p className="mt-6 font-serif text-2xl font-light text-washi sm:text-3xl">
+          <p className="mt-6 font-serif text-2xl font-light text-sumi sm:text-3xl">
             {t("scarcity")}
           </p>
-          <p className="measure mt-4 text-lg text-washi/80">{t("body")}</p>
+          <p className="measure mt-4 text-lg text-sumi/85">{t("body")}</p>
           <ul className="mt-8 space-y-3">
             {privileges.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-washi/80">
+              <li key={p} className="flex items-start gap-3 text-sumi/85">
                 <span
                   aria-hidden="true"
-                  className="mt-3 h-px w-5 shrink-0 bg-wood/70"
+                  className="mt-3 h-px w-5 shrink-0 bg-sumi/50"
                 />
                 <span>{p}</span>
               </li>

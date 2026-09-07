@@ -2,6 +2,8 @@ import type { Locale } from "@/i18n/routing";
 
 export type StoryChapter = {
   id: string;
+  /** Calligraphic emblem of the era; null = the brand icon (the arrival). */
+  glyph: string | null;
   era: Record<Locale, string>;
   title: Record<Locale, string>;
   body: Record<Locale, string>;
@@ -10,6 +12,7 @@ export type StoryChapter = {
 export const story: StoryChapter[] = [
   {
     id: "tang",
+    glyph: "茶",
     era: { es: "China · s. VIII", en: "China · 8th c." },
     title: { es: "El primer libro del té", en: "The first book of tea" },
     body: {
@@ -19,6 +22,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "song",
+    glyph: "点",
     era: { es: "China · s. XI", en: "China · 11th c." },
     title: { es: "El té batido", en: "Whisked tea" },
     body: {
@@ -28,6 +32,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "eisai",
+    glyph: "禅",
     era: { es: "Japón · 1191", en: "Japan · 1191" },
     title: { es: "Eisai trae la semilla", en: "Eisai brings the seed" },
     body: {
@@ -37,6 +42,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "rikyu",
+    glyph: "和",
     era: { es: "Japón · s. XVI", en: "Japan · 16th c." },
     title: { es: "Sen no Rikyū y el chanoyu", en: "Sen no Rikyū and chanoyu" },
     body: {
@@ -46,6 +52,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "wabisabi",
+    glyph: "侘",
     era: { es: "Estética", en: "Aesthetic" },
     title: { es: "Wabi-sabi", en: "Wabi-sabi" },
     body: {
@@ -55,6 +62,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "cultivo",
+    glyph: "陰",
     era: { es: "El campo", en: "The field" },
     title: { es: "Sombra, piedra, grado", en: "Shade, stone, grade" },
     body: {
@@ -64,6 +72,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "uji",
+    glyph: "宇",
     era: { es: "Uji, Kioto", en: "Uji, Kyoto" },
     title: { es: "El origen", en: "The origin" },
     body: {
@@ -73,6 +82,7 @@ export const story: StoryChapter[] = [
   },
   {
     id: "murcia",
+    glyph: null,
     era: { es: "Murcia · hoy", en: "Murcia · today" },
     title: { es: "Por qué aquí, por qué ahora", en: "Why here, why now" },
     body: {
