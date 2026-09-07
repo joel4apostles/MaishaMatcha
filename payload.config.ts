@@ -51,6 +51,9 @@ export default buildConfig({
   },
   admin: {
     user: Users.slug,
+    // The dashboard wears the brand: washi light theme, always (OS dark
+    // mode otherwise flips it to a near-black look that reads unbranded).
+    theme: "light",
     meta: {
       titleSuffix: " · maisha matcha",
     },

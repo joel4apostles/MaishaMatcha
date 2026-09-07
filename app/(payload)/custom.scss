@@ -10,6 +10,14 @@
 
 :root {
   --font-body: "Hanken Grotesk", system-ui, sans-serif;
+
+  /* Base ramps some components reference directly — matcha, not blue. */
+  --color-success-500: #9bab37;
+  --color-success-600: #7f8d2d;
+  --color-success-700: #646f23;
+  --color-blue-500: #7f8d2d;
+  --color-blue-600: #646f23;
+  --color-blue-700: #4a521a;
 }
 
 html[data-theme="light"] {
