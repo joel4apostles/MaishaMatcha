@@ -1,22 +1,26 @@
 # CLAUDE.md — maisha matcha
 
 Launch website for **maisha matcha**, the first premium matcha salon in Murcia,
-Spain. Phase 0: a bilingual (ES default, EN) marketing site with a single
-dynamic feature (a founding-members waitlist). Later phases add a CMS, payments,
-and more — scaffold cleanly, build only what a phase specifies.
+Spain. Phase 0 (shipped): a bilingual (ES default, EN) marketing site with a
+founding-members waitlist. Phase 1 is IN PROGRESS: Payload CMS embedded at
+`/admin` (built + committed, not yet wired to prod Postgres). Later phases add
+payments and more — scaffold cleanly, build only what a phase specifies.
 
 ## Brand law (read first)
 
 The **`maisha-brand`** skill (`.claude/skills/maisha-brand/SKILL.md`) is the law
 for all user-facing UI, copy, and email. Load it before any such work. Summary:
 
-- Palette (from the founder's design deck, 2–3 colors max, much whitespace):
-  `washi #F5F1E8` paper · `sumi #1C1B18` ink · `gold #786000` the signature
-  accent · `wood #B08D57` timber hairlines. **No green.**
-- `gold` is RARE: the wordmark, one primary CTA per view, the focus ring.
-  Nothing else.
-- Wordmark "maisha matcha" is lowercase **body sans (Hanken Grotesk), medium,
-  in gold** — not the serif. Editorial headlines use **Cormorant Garamond**.
+- Palette (2–3 colors max, much whitespace): `washi #F5F1E8` paper ·
+  `sumi #1C1B18` ink · `matcha #9BAB37` THE brand green (kit Concept 1,
+  founder-adopted 2026-09-07) · `gold #786000` legacy accent · `wood #B08D57`
+  timber hairlines. Deep green `#454F0B` exists in the official logo files.
+- Bright-green bands are LIGHT surfaces: ink on them is **sumi** (washi and
+  gold both fail contrast ≈2.3:1 on matcha green — never put them on it).
+  CTAs on green are sumi-filled. Focus rings via `.brand-band`/`.dark-band`.
+- Logo lockup: `BrandMark` + `BrandWordmark` components, exact vectors from
+  the official designer SVGs. Editorial headlines use **Fraunces** (replaced
+  Cormorant to match the kit); body is **Hanken Grotesk**.
 - **No em/en dashes** in copy (use commas, periods, parentheses; ranges as
   words: "Mar a Dom"). **No gradients** anywhere — flat color fields only.
 - Tone: poetic, sober, almost silent. No exclamation marks, no emojis, no
@@ -30,8 +34,14 @@ OG, admin) inherits them.
 ## Stack & hard constraints
 
 - **Next.js 15 (App Router) + TypeScript strict + Tailwind CSS 4**, Vercel.
-- **No database, no CMS, no auth, no payments.** Content lives in typed files
-  under `/content`. The only server code is `/api/waitlist` and `/api/og`.
+- **Payload CMS 3** embedded at `/admin` (route group `app/(payload)/`,
+  config `payload.config.ts`, collections in `cms/collections/`): SQLite file
+  in dev, Postgres via `DATABASE_URL` in prod (Supabase Transaction-pooler
+  URI, port 6543; direct 5432 only if migrations complain). Vercel's FS is
+  read-only, so prod REQUIRES `DATABASE_URL`. Public pages still read the
+  typed files under `/content` (CMS-backed rendering is the next migration).
+- **No payments yet** (Stripe is Phase 2). Public server code is
+  `/api/waitlist`, `/api/og`, and Payload's `/api/[...slug]`.
 - i18n via **next-intl**: routes `/es` (default) and `/en`, localized pathnames
   (`/historia`↔`/story`, `/eventos`↔`/events`, etc.). Zero hardcoded strings.
 - Custom components only on public pages. Motion is CSS + IntersectionObserver
@@ -42,12 +52,23 @@ OG, admin) inherits them.
 ## Commands
 
 ```bash
-npm run dev            # dev server (localhost:3000)
+npm run dev            # dev server (localhost:3000; /admin included)
 npm run build          # production build (must stay clean)
 npm run start          # serve the build
 npx tsc --noEmit       # type check (strict)
 npm run lint           # ESLint (must be zero errors)
+
+# Payload CMS
+npm run seed                    # import content/*.ts into collections (es + en)
+npm run generate:types          # regenerate cms/payload-types.ts
+npm run generate:importmap      # regenerate app/(payload)/admin/importMap.js
 ```
+
+NEVER `npm run build` while `next dev` is running — they share `.next` and
+the dev server 500s on stale chunks. Kill dev → build → `rm -rf .next` →
+restart dev. And after ANY `npm install`, repair the lockfile:
+`npm_config_legacy_peer_deps=false npm install --package-lock-only`
+(a global `~/.npmrc` flag otherwise poisons `npm ci` on CI/Vercel).
 
 ## Structure & conventions
 
@@ -77,8 +98,17 @@ npm run lint           # ESLint (must be zero errors)
   ("Maisha Proposed Brand Identity", Concept 1) via PyMuPDF path
   serialization, silhouettes verified by pixel IoU (0.988 / 0.979) against
   the kit's own render. Favicon = `app/icon.svg` (+ `apple-icon.png`),
-  auto-wired by Next conventions. `DrinkGlass.tsx` renders the live
-  drink-making visual in the recipe builder (one-shot transitions only).
+  auto-wired by Next conventions. `PhotoDrink.tsx` is the recipe-builder
+  visual: the kit's real drink photograph (`public/images/drink-real.jpg`,
+  the 736×1308 image inside the brand identity PDF) re-tinted live to
+  `blendColor(recipe)` via `mix-blend-color`, plus a warm veil that lifts
+  when the drink is frío. `DrinkGlass.tsx` (animated SVG pour) is kept in
+  the repo but unused.
+- `cms/` — Payload: `collections/` (Users, Media, MenuCategories, MenuItems,
+  RecipeOptions, Events, StoryChapters, InventoryItems, StockMovements
+  append-only ledger + cached-stock hook, Orders, Members), `seed.ts`,
+  `components/AdminLogo|AdminIcon`. Admin theme in `app/(payload)/custom.scss`
+  (washi/sumi elevation ramps, matcha success ramp, theme forced light).
 - `lib/seo.ts` — `pageMetadata({locale, path, title, description})` builds
   per-locale title/description + canonical + hreflang alternates + OG image.
   Every page's `generateMetadata` uses it. `SITE_URL` from `NEXT_PUBLIC_SITE_URL`.
@@ -112,6 +142,8 @@ RESEND_API_KEY          # server-only; waitlist audience + confirmation email
 RESEND_AUDIENCE_ID
 RESEND_FROM             # optional, defaults to "maisha matcha <hola@maishamatcha.es>"
 NEXT_PUBLIC_SITE_URL    # canonical origin for metadata/OG/sitemap
+PAYLOAD_SECRET          # signs admin auth cookies — long random string in prod
+DATABASE_URL            # prod Postgres (Supabase pooler :6543); dev falls back to SQLite
 ```
 
 ## Known audit findings (accepted risk, re-check each release)
@@ -123,13 +155,14 @@ build-time on first-party CSS only; sharp is only fed our own static images
 infra. Real fix requires next@16 (breaking). Re-assess when bumping Next or
 if remote images / user uploads are ever enabled.
 
-## Content editing (the team's "admin" until Phase 1)
+## Content editing
 
-`CONTENT.md` is the team guide: carta drinks live in `content/menu.ts`,
-recipe-builder options/prices/ratios in `content/recipe.ts`. Editing either
-on GitHub (web editor) auto-deploys. Do NOT build an ad-hoc admin dashboard
-on this no-auth site — that is Phase 1 (Payload CMS), where these files
-become collections behind a real login.
+Until public pages read from the CMS, `CONTENT.md` remains the team guide:
+carta drinks in `content/menu.ts`, recipe-builder options/prices/ratios in
+`content/recipe.ts`; editing on GitHub auto-deploys. The Payload admin at
+`/admin` holds the same content as collections (via `npm run seed`) plus
+inventory/orders/members — it becomes the single source of truth once the
+pages are migrated to CMS queries.
 
 ## The auditor bench (.claude/agents/)
 
@@ -163,8 +196,11 @@ add chief-architect + cto-review before phase transitions.
 
 ## Roadmap (later phases, same repo)
 
-- **Phase 1 — Payload CMS**: move menu/story/events/space content behind Payload;
-  keep the typed `/content` shape as the collection schema.
+- **Phase 1 — Payload CMS**: IN PROGRESS. Admin scaffolded, themed, and
+  committed with 11 collections + seed script. Remaining: create first admin
+  user, seed, Supabase Postgres + `DATABASE_URL`/`PAYLOAD_SECRET` on Vercel,
+  media storage (Vercel Blob or Supabase Storage — serverless FS is
+  read-only), then migrate public pages to CMS queries with revalidation.
 - **Phase 2 — Stripe founding membership**: paid founding tier, member accounts,
   the "founding price" promise honored at checkout.
 - **Phase 3 — Recipe builder**: MVP SHIPPED without a database. `/crea`
@@ -180,7 +216,15 @@ add chief-architect + cto-review before phase transitions.
 - **Phase 5 — Email campaigns**: broadcast beyond the confirmation email; the
   Resend audience built here is the seed list.
 - **Phase 6 — Inventory ledger**: stock over an append-only stock-movements
-  pattern.
+  pattern. Collections exist (`InventoryItems` + `StockMovements` + cached
+  stock hook); depletion wiring comes with Phase 7.
+- **Phase 7 — POS + supplier automation**: counter point-of-sale where the
+  team records each sale with grams of matcha used; barista accounts (Users
+  role `barista`, POS-only access) with every order stamped by its barista;
+  sales write gram "out" movements into the stock ledger; `Suppliers`
+  collection + `reorderThresholdGrams` on inventory items → automated
+  reorder email to the supplier when stock crosses the threshold (Resend;
+  draft-for-team-approval first, debounced to one email per crossing).
 
 When a phase lands, update this file and the `maisha-brand` skill if the brand
 system evolves.

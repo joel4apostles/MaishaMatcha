@@ -111,6 +111,40 @@ final prices, real photography.
 - **Phase 5 — Email campaigns**: Resend audience built by the waitlist is
   the seed list; templates inherit the identity.
 - **Phase 6 — Inventory ledger**: stock as append-only movements.
+  Collections already live (pulled forward with Phase 1); depletion wiring
+  comes with Phase 7.
+- **Phase 7 — POS + supplier automation (founder vision, 2026-09-17).**
+  maisha is a physical salon: website + admin + a counter POS. The canonical
+  flow: customer orders a matcha latte → the barista (own account) taps the
+  drink → the screen pre-fills its default grams + matcha variety → the
+  barista measures and can adjust to the actual scoop → charge → the Order
+  stores drink, price, recorded grams, variety, barista, timestamp → a
+  StockMovement subtracts those grams from that variety, admin inventory
+  updates live → when stock crosses `reorderThresholdGrams`, a reorder
+  email to the linked Supplier (Resend; draft-for-team-approval before
+  auto-send; debounced, one email per crossing). Data prerequisites:
+  MenuItems gain `defaultGrams` + a relationship to their InventoryItem
+  variety; Users gain a `barista` role (POS-only access); Orders gain a
+  `barista` relationship; new Suppliers collection (name, email, varieties).
+  Side benefit: recipe-vs-measured gram drift per barista falls out of the
+  order data.
+
+## Task board (session tasks #18-24, 2026-09-17)
+
+| # | Task | Status |
+|---|------|--------|
+| 18 | Payload CMS: install + config + admin route scaffold | done |
+| 19 | Payload collections: content + inventory + orders + media | done |
+| 20 | Seed from content files + verify admin + ship (first user, `npm run seed`, Supabase DATABASE_URL + PAYLOAD_SECRET on Vercel, prod /admin verified) | in progress |
+| 21 | POS counter sales screen (pre-filled grams, editable, tap-first) | pending, needs 20 + 22 |
+| 22 | Barista accounts + per-barista order attribution | pending |
+| 23 | Sales-driven inventory depletion in grams (StockMovements per drink line) | pending, needs 21 |
+| 24 | Suppliers collection + automated low-stock reorder emails | pending, needs 23 |
+
+Order of attack: finish 20, then 22 → 21 → 23 → 24. Between 20 and the POS
+block sits the founder's stated priority: UX/UI polish + full mobile
+optimization pass (390px CDP audit, auditor bench re-run on the new
+identity).
 
 ## Open items
 

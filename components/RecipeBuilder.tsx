@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { intensities, bases, fruits, temps } from "@/content/recipe";
 import { quietLinkClass } from "@/components/Button";
-import { DrinkGlass } from "@/components/DrinkGlass";
+import { PhotoDrink } from "@/components/PhotoDrink";
 import {
   DEFAULT_RECIPE,
   type RecipeIds,
@@ -228,8 +228,8 @@ export function RecipeBuilder() {
           <p className="text-eyebrow uppercase text-sumi/70">{t("cardTitle")}</p>
 
           <div className="mt-6 flex items-center gap-5">
-            {/* The drink, being made — responds to every choice. */}
-            <DrinkGlass recipe={recipe} className="h-32 w-auto shrink-0" />
+            {/* The drink, photographic — re-tints live to every choice. */}
+            <PhotoDrink recipe={recipe} className="h-36 w-24 shrink-0" />
             <p className="font-serif text-2xl font-light leading-snug text-sumi">
               {chosen}
             </p>
