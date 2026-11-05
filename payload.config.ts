@@ -3,7 +3,6 @@ import { fileURLToPath } from "url";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
 
 import { Users } from "./cms/collections/Users";
 import { Media } from "./cms/collections/Media";
@@ -57,7 +56,6 @@ export default buildConfig({
   ...(siteURL ? { serverURL: siteURL, csrf: [siteURL] } : {}),
   db,
   sharp,
-  editor: lexicalEditor(),
   localization: {
     locales: ["es", "en"],
     defaultLocale: "es",

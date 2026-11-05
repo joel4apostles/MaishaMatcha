@@ -183,11 +183,16 @@ FIRST_OWNER_EMAIL       # prod: only this email may create the first (owner) acc
 
 ## Known audit findings (accepted risk, re-check each release)
 
-Re-assessed 2026-11-05 after Next 16 + Payload 3.93: the next@15 findings
-are gone. What remains (`npm audit --omit=dev`) sits inside Payload's admin
-editor stack (lexical/happy-dom, dompurify via monaco, drizzle-kit/esbuild
-tooling). Reachable only by signed-in owner/manager in /admin, never by
-public visitors or the counter. Re-check on every Payload upgrade.
+Security audit 2026-11-05 (security-audit skill): no high or critical
+advisories left. Removed the unused rich-text editor (cleared the
+lexical/happy-dom highs) and pinned `dompurify` to 3.4.17 via
+`overrides` (cleared the critical inside Payload's Monaco editor).
+Accepted: 5 low + 5 moderate in build/migration tooling (drizzle-kit,
+esbuild-kit), email rendering (html-to-text) and Payload's deepmerge; none
+reachable from public routes. Baseline security headers set in
+`next.config.ts`; a full script-src CSP (nonces) is still to do.
+Re-check on every Payload upgrade and remove the dompurify override once
+Payload ships a fixed Monaco.
 
 ## Content editing
 

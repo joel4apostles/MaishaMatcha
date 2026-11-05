@@ -23,7 +23,6 @@
   "dependencies": {
     "@payloadcms/db-postgres": "3.93.0",
     "@payloadcms/next": "3.93.0",
-    "@payloadcms/richtext-lexical": "3.93.0",
     "@react-email/components": "^1.0.0",
     "@vercel/analytics": "^2.0.0",
     "graphql": "^16.14.2",
@@ -52,5 +51,8 @@
   },
   "engines": {
     "node": "24.x"
+  },
+  "overrides": {
+    "dompurify": "3.4.17"
   }
 }
