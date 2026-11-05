@@ -8,10 +8,11 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 import { BrandMark } from "./BrandMark";
 import { BrandWordmark } from "./BrandWordmark";
 
-const NAV: { href: AppPathname; key: "menu" | "story" | "events" }[] = [
+const NAV: { href: AppPathname; key: "menu" | "story" | "events" | "order" }[] = [
   { href: "/menu", key: "menu" },
   { href: "/historia", key: "story" },
   { href: "/eventos", key: "events" },
+  { href: "/pedir", key: "order" },
 ];
 
 /**

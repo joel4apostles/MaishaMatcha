@@ -97,7 +97,15 @@ export function KitchenDisplay({ initial }: { initial: Order[] }) {
                       </span>
                     </div>
                     <p className="text-sm text-sumi/75">
-                      {[o.service === "takeaway" ? t("takeaway") : t("here"), o.staffName, o.paid ? null : t("unpaid")]
+                      {[
+                        o.channel === "online" ? t("web") : null,
+                        o.pickupAt
+                          ? t("pickupAt", { time: new Date(o.pickupAt).toLocaleTimeString("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }) })
+                          : null,
+                        o.service === "takeaway" ? t("takeaway") : t("here"),
+                        o.staffName,
+                        o.paid ? null : t("unpaid"),
+                      ]
                         .filter(Boolean)
                         .join(" · ")}
                     </p>

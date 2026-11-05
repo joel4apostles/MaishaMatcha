@@ -267,6 +267,10 @@ async function issueInvoice(
   });
 }
 
+/** Issue the simplified invoice for a paid order (counter or web). */
+export const issueInvoiceFor = (req: PayloadRequest, order: { id: number; totalCents: number; taxBreakdown?: unknown }) =>
+  issueInvoice(req, order);
+
 export async function payOrder(
   payload: Payload,
   actor: Actor,
@@ -435,9 +439,16 @@ export async function kitchenQueue(payload: Payload) {
     limit: 100,
     sort: "createdAt",
     where: {
-      or: [
-        { status: { in: ["received", "preparing"] } },
-        { and: [{ status: { equals: "ready" } }, { statusChangedAt: { greater_than: since } }] },
+      and: [
+        {
+          or: [
+            { status: { in: ["received", "preparing"] } },
+            { and: [{ status: { equals: "ready" } }, { statusChangedAt: { greater_than: since } }] },
+          ],
+        },
+        // A card order sent to Stripe waits here until it is paid: an
+        // abandoned checkout never makes the bar prepare a drink.
+        { or: [{ payOnline: { not_equals: true } }, { paymentStatus: { equals: "paid" } }] },
       ],
     },
   });
@@ -449,7 +460,8 @@ export async function kitchenQueue(payload: Payload) {
     service: o.service,
     createdAt: o.createdAt,
     statusChangedAt: o.statusChangedAt ?? o.createdAt,
-    staffName: typeof o.staff === "object" && o.staff ? o.staff.name : null,
+    staffName: typeof o.staff === "object" && o.staff ? o.staff.name : (o.customerName ?? null),
+    pickupAt: o.pickupAt ?? null,
     paid: o.paymentStatus === "paid",
     note: o.note ?? null,
     lines: (o.lines ?? []).map((l) => ({
@@ -474,6 +486,10 @@ export async function advanceOrder(payload: Payload, actor: Actor, orderId: numb
   });
   if (to === "cancelled") {
     await writeAudit({ payload }, { action: "order.void", entity: "orders", entityId: orderId, actorId: actor.staffId, deviceId: actor.deviceId });
+  }
+  if (to === "ready" && order.channel === "online") {
+    const { sendReady } = await import("@/lib/online");
+    await sendReady(payload, orderId).catch(() => undefined);
   }
   return { ok: true };
 }

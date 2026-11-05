@@ -11,6 +11,14 @@ export const routing = defineRouting({
       es: "/carta",
       en: "/menu",
     },
+    "/pedir": {
+      es: "/pedir",
+      en: "/order",
+    },
+    "/pedido/[token]": {
+      es: "/pedido/[token]",
+      en: "/order-status/[token]",
+    },
     "/crea": {
       es: "/crea",
       en: "/create",
@@ -35,4 +43,5 @@ export const routing = defineRouting({
 });
 
 export type Locale = (typeof routing.locales)[number];
-export type AppPathname = keyof typeof routing.pathnames;
+/** Static pages only (links, sitemap, metadata); dynamic ones need params. */
+export type AppPathname = Exclude<keyof typeof routing.pathnames, `${string}[${string}`>;

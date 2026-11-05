@@ -5,7 +5,8 @@
     "story": "Story",
     "events": "Events",
     "home": "Home",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "order": "Order"
   },
   "cta": {
     "joinWaitlist": "Join the list",
@@ -150,6 +151,10 @@
     "create": {
       "title": "Create your drink · maisha matcha",
       "description": "Compose your drink with matcha from Uji, Nishio or Kagoshima: usucha or latte, the milk and the extras. We prepare it at the salon."
+    },
+    "order": {
+      "title": "Order · maisha matcha",
+      "description": "Order your matcha and collect it at the counter, Plaza Cetina 3, Murcia."
     }
   },
   "notFound": {
@@ -331,7 +336,9 @@
       "takeaway": "Takeaway",
       "unpaid": "unpaid",
       "empty": "Nothing pending.",
-      "offline": "Offline. Retrying..."
+      "offline": "Offline. Retrying...",
+      "web": "Web",
+      "pickupAt": "Pickup {time}"
     },
     "ticket": {
       "title": "Simplified invoice",
@@ -384,5 +391,66 @@
         "generic": "Could not complete it. Try again."
       }
     }
+  },
+  "order": {
+    "eyebrow": "For pickup",
+    "title": "Order and collect",
+    "intro": "Choose your drinks and the time. They will be waiting at the counter.",
+    "closedTitle": "Online ordering is coming soon",
+    "closedBody": "In the meantime, we are waiting for you at the counter.",
+    "unavailable": "We cannot show the menu right now. Come back in a moment.",
+    "yourOrder": "Your order",
+    "empty": "Nothing chosen yet.",
+    "add": "Add · {price}",
+    "choose": "Choose",
+    "soldOut": "Sold out",
+    "required": "required",
+    "multiple": "choose any",
+    "close": "Close",
+    "chooseRequired": "Choose {group}.",
+    "remove": "Remove {name}",
+    "total": "Total",
+    "pickup": "Pickup time",
+    "noSlots": "No times left today or tomorrow.",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "full": "full",
+    "name": "Name",
+    "email": "Email",
+    "emailHint": "We send the confirmation and the ready notice.",
+    "phone": "Phone (optional)",
+    "note": "Note for the counter (optional)",
+    "payAtPickup": "Pay at pickup",
+    "payOnline": "Pay now by card",
+    "submitPickup": "Place order",
+    "submitPay": "Pay {total}",
+    "sending": "Sending...",
+    "legal": "By ordering you accept the processing of your data to handle the order.",
+    "errors": {
+      "closed": "Online ordering is closed right now.",
+      "slot-full": "That time just filled up. Choose another.",
+      "invalid": "Check the order: something is missing.",
+      "rate-limited": "Too many attempts. Wait a minute.",
+      "generic": "Could not send the order. Try again.",
+      "missing-required": "A required option is missing.",
+      "unavailable-item": "An item has sold out.",
+      "unavailable-option": "An option has sold out."
+    },
+    "status": {
+      "eyebrow": "Your order",
+      "title": "Order {label}",
+      "received": "Received. We will have it ready for your time.",
+      "preparing": "Being prepared now.",
+      "ready": "Ready. We are waiting at the counter.",
+      "collected": "Collected. Thank you.",
+      "cancelled": "This order was cancelled.",
+      "pickup": "Pickup: {time}",
+      "paid": "Paid",
+      "unpaid": "Pay at pickup",
+      "awaiting": "Waiting for the payment confirmation...",
+      "notFound": "We could not find this order.",
+      "live": "This page updates by itself."
+    },
+    "toCarta": "See the carta"
   }
 }

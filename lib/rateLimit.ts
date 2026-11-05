@@ -8,10 +8,10 @@ const hits = new Map<string, number[]>();
 const WINDOW_MS = 60_000;
 const LIMIT = 5;
 
-export function rateLimit(key: string): boolean {
+export function rateLimit(key: string, limit = LIMIT): boolean {
   const now = Date.now();
   const recent = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
-  if (recent.length >= LIMIT) {
+  if (recent.length >= limit) {
     hits.set(key, recent);
     return false;
   }

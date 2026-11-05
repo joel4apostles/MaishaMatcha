@@ -218,6 +218,12 @@ export interface Order {
     | null;
   note?: string | null;
   customerName?: string | null;
+  payOnline?: boolean | null;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
+  pickupAt?: string | null;
+  readyNotifiedAt?: string | null;
+  publicToken?: string | null;
   member?: (number | null) | Member;
   staff?: (number | null) | User;
   device?: (number | null) | PosDevice;
@@ -1067,6 +1073,12 @@ export interface OrdersSelect<T extends boolean = true> {
   taxBreakdown?: T;
   note?: T;
   customerName?: T;
+  payOnline?: T;
+  customerEmail?: T;
+  customerPhone?: T;
+  pickupAt?: T;
+  readyNotifiedAt?: T;
+  publicToken?: T;
   member?: T;
   staff?: T;
   device?: T;
@@ -1576,6 +1588,22 @@ export interface Business {
   invoiceSeries?: string | null;
   receiptFooter?: string | null;
   /**
+   * Apagado: la web dice que los pedidos online llegan pronto.
+   */
+  onlineOrdering?: boolean | null;
+  /**
+   * HH:MM
+   */
+  openingTime?: string | null;
+  /**
+   * HH:MM
+   */
+  closingTime?: string | null;
+  openDays?: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[] | null;
+  slotMinutes?: number | null;
+  slotCapacity?: number | null;
+  leadMinutes?: number | null;
+  /**
    * Avisa de las bebidas cuyo margen baje de aquí.
    */
   targetMarginPercent?: number | null;
@@ -1593,6 +1621,13 @@ export interface BusinessSelect<T extends boolean = true> {
   address?: T;
   invoiceSeries?: T;
   receiptFooter?: T;
+  onlineOrdering?: T;
+  openingTime?: T;
+  closingTime?: T;
+  openDays?: T;
+  slotMinutes?: T;
+  slotCapacity?: T;
+  leadMinutes?: T;
   targetMarginPercent?: T;
   updatedAt?: T;
   createdAt?: T;

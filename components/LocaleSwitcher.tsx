@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, getPathname } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
@@ -13,6 +14,12 @@ import { routing } from "@/i18n/routing";
 export function LocaleSwitcher({ tone = "dark" }: { tone?: "light" | "dark" }) {
   const active = useLocale();
   const pathname = usePathname();
+  const params = useParams<{ token?: string }>();
+  // The private order page is the one dynamic route: carry its token.
+  const href =
+    pathname === "/pedido/[token]" && params.token
+      ? ({ pathname, params: { token: params.token } } as const)
+      : (pathname as Exclude<typeof pathname, "/pedido/[token]">);
   const t = useTranslations("footer");
 
   const activeClass = tone === "light" ? "text-washi" : "text-sumi";
@@ -31,13 +38,13 @@ export function LocaleSwitcher({ tone = "dark" }: { tone?: "light" | "dark" }) {
       {routing.locales.map((locale, index) => (
         <span key={locale} className="flex items-center gap-0.5">
           <Link
-            href={pathname}
+            href={href}
             locale={locale}
             onClick={(e) => {
               // Preserve query (?r=recipe) and hash across the switch.
               e.preventDefault();
               const target =
-                getPathname({ href: pathname, locale }) +
+                getPathname({ href, locale }) +
                 window.location.search +
                 window.location.hash;
               window.location.assign(target);

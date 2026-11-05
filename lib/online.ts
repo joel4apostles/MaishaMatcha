@@ -1,0 +1,227 @@
+import { randomBytes } from "node:crypto";
+import {
+  commitTransaction,
+  createLocalReq,
+  initTransaction,
+  killTransaction,
+  type Payload,
+} from "payload";
+import { query, sql, table } from "@/cms/db";
+import { deductForOrder, draftReorders } from "@/lib/inventory";
+import { emailFrame, escapeHtml, sendEmail } from "@/lib/email";
+import { formatEuro } from "@/lib/money";
+import { priceOrder, type LineInput } from "@/lib/pos/pricing";
+import { issueInvoiceFor, loadCatalog } from "@/lib/pos/sales";
+import { isBookable, pickupSlots, type SlotSettings } from "@/lib/slots";
+
+/**
+ * Web orders: pickup slots, server pricing, pay at pickup or online
+ * (Stripe), the private status page and the customer emails.
+ */
+export async function onlineSettings(payload: Payload) {
+  const b = await payload.findGlobal({ slug: "business", overrideAccess: true });
+  const settings: SlotSettings = {
+    openingTime: b.openingTime || "08:00",
+    closingTime: b.closingTime || "18:00",
+    openDays: (b.openDays as string[] | null) ?? ["tue", "wed", "thu", "fri", "sat", "sun"],
+    slotMinutes: b.slotMinutes ?? 15,
+    slotCapacity: b.slotCapacity ?? 6,
+    leadMinutes: b.leadMinutes ?? 15,
+  };
+  return { enabled: Boolean(b.onlineOrdering), settings };
+}
+
+export async function takenSlots(payload: Payload, now = new Date()) {
+  const { docs } = await payload.find({
+    collection: "orders",
+    overrideAccess: true,
+    depth: 0,
+    limit: 2000,
+    where: {
+      and: [
+        { channel: { equals: "online" } },
+        { status: { not_equals: "cancelled" } },
+        { pickupAt: { greater_than_equal: now.toISOString() } },
+      ],
+    },
+  });
+  const taken = new Map<string, number>();
+  for (const o of docs) if (o.pickupAt) taken.set(new Date(o.pickupAt).toISOString(), (taken.get(new Date(o.pickupAt).toISOString()) ?? 0) + 1);
+  return taken;
+}
+
+export async function availableSlots(payload: Payload, now = new Date()) {
+  const { enabled, settings } = await onlineSettings(payload);
+  if (!enabled) return { enabled, slots: [] };
+  return { enabled, slots: pickupSlots(settings, now, await takenSlots(payload, now), 2) };
+}
+
+export type PlaceInput = {
+  lines: LineInput[];
+  pickupAt: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  note?: string | null;
+  payOnline: boolean;
+  idempotencyKey: string;
+};
+
+export type PlaceResult =
+  | { ok: true; orderId: number; token: string; label: string; totalCents: number }
+  | { ok: false; error: "closed" | "slot-full" | "invalid" | string };
+
+export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now = new Date()): Promise<PlaceResult> {
+  const { enabled, settings } = await onlineSettings(payload);
+  if (!enabled) return { ok: false, error: "closed" };
+
+  const existing = await payload.find({
+    collection: "orders",
+    overrideAccess: true,
+    depth: 0,
+    limit: 1,
+    where: { idempotencyKey: { equals: input.idempotencyKey } },
+  });
+  if (existing.docs[0]) {
+    const o = existing.docs[0];
+    return { ok: true, orderId: o.id, token: o.publicToken ?? "", label: o.label ?? "", totalCents: o.totalCents };
+  }
+
+  const catalog = new Map((await loadCatalog(payload)).map((i) => [i.id, i]));
+  const priced = priceOrder(catalog, input.lines);
+  if (!priced.ok) return { ok: false, error: priced.error };
+
+  const req = await createLocalReq({}, payload);
+  await initTransaction(req);
+  try {
+    // Re-check the slot inside the transaction, under a lock on the
+    // sequence row, so two customers cannot both take the last place.
+    const seq = table(payload, "sequences");
+    await query(payload, sql`insert into ${seq} (key, value, updated_at, created_at) values ('order-label', 0, now(), now()) on conflict (key) do nothing`, req);
+    const rows = await query(payload, sql`update ${seq} set value = value + 1 where key = 'order-label' returning value`, req);
+    if (!isBookable(settings, now, await takenSlots(payload, now), input.pickupAt)) {
+      await killTransaction(req);
+      return { ok: false, error: "slot-full" };
+    }
+    const label = `W-${String(Number(rows[0].value) % 10000).padStart(4, "0")}`;
+    const token = randomBytes(24).toString("base64url");
+    const order = await payload.create({
+      collection: "orders",
+      req,
+      overrideAccess: true,
+      data: {
+        label,
+        channel: "online",
+        service: "takeaway",
+        status: "received",
+        paymentStatus: "unpaid",
+        payOnline: input.payOnline,
+        lines: priced.lines,
+        totalCents: priced.totalCents,
+        taxBreakdown: priced.taxBreakdown,
+        note: input.note?.trim() || undefined,
+        customerName: input.name.trim(),
+        customerEmail: input.email.trim(),
+        customerPhone: input.phone?.trim() || undefined,
+        pickupAt: input.pickupAt,
+        statusChangedAt: now.toISOString(),
+        publicToken: token,
+        idempotencyKey: input.idempotencyKey,
+      } as never,
+    });
+    await commitTransaction(req);
+    return { ok: true, orderId: order.id, token, label, totalCents: priced.totalCents };
+  } catch (err) {
+    await killTransaction(req);
+    throw err;
+  }
+}
+
+/** Stripe confirmed payment: record it, invoice, deduct stock. Idempotent. */
+export async function markOnlinePaid(payload: Payload, orderId: number, providerRef: string) {
+  const req = await createLocalReq({}, payload);
+  await initTransaction(req);
+  let touched: number[] = [];
+  try {
+    const orders = table(payload, "orders");
+    await query(payload, sql`select id from ${orders} where id = ${orderId} for update`, req);
+    const order = await payload.findByID({ collection: "orders", id: orderId, req, depth: 0, overrideAccess: true }).catch(() => null);
+    if (!order || order.paymentStatus !== "unpaid") {
+      await commitTransaction(req);
+      return false;
+    }
+    await payload.create({
+      collection: "payments",
+      req,
+      overrideAccess: true,
+      data: { order: order.id, method: "online", amountCents: order.totalCents, providerRef },
+    });
+    await issueInvoiceFor(req, order);
+    touched = await deductForOrder(req, order);
+    await payload.update({ collection: "orders", id: order.id, req, overrideAccess: true, data: { paymentStatus: "paid" } });
+    await commitTransaction(req);
+  } catch (err) {
+    await killTransaction(req);
+    throw err;
+  }
+  if (touched.length) await draftReorders(payload, touched).catch(() => undefined);
+  await sendConfirmation(payload, orderId).catch(() => undefined);
+  return true;
+}
+
+/** What the customer's private status page may show. */
+export async function orderByToken(payload: Payload, token: string) {
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;
+  const { docs } = await payload.find({
+    collection: "orders",
+    overrideAccess: true,
+    depth: 0,
+    limit: 1,
+    where: { publicToken: { equals: token } },
+  });
+  const o = docs[0];
+  if (!o) return null;
+  return {
+    label: o.label ?? "",
+    status: o.status,
+    paymentStatus: o.paymentStatus,
+    payOnline: Boolean(o.payOnline),
+    pickupAt: o.pickupAt ?? null,
+    totalCents: o.totalCents,
+    firstName: (o.customerName ?? "").split(" ")[0],
+    lines: (o.lines ?? []).map((l) => ({
+      name: l.name,
+      quantity: l.quantity,
+      modifiers: ((l.modifiers as { label: string }[] | null) ?? []).map((m) => m.label),
+    })),
+  };
+}
+
+const siteUrl = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+export async function sendConfirmation(payload: Payload, orderId: number) {
+  const o = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true });
+  if (!o.customerEmail || !o.publicToken) return;
+  const when = o.pickupAt ? new Date(o.pickupAt).toLocaleString("es-ES", { timeZone: "Europe/Madrid", weekday: "long", hour: "2-digit", minute: "2-digit" }) : "";
+  const items = (o.lines ?? []).map((l) => `<li>${l.quantity} × ${escapeHtml(l.name)}</li>`).join("");
+  await sendEmail(
+    o.customerEmail,
+    `Tu pedido ${o.label} · maisha matcha`,
+    emailFrame(
+      `Pedido ${o.label}`,
+      `<p>Recógelo ${escapeHtml(when)}.</p><ul>${items}</ul><p>Total ${formatEuro(o.totalCents)}${o.paymentStatus === "paid" ? ", pagado" : ", se paga al recoger"}.</p>
+       <p><a style="color:#1C1B18" href="${siteUrl()}/es/pedido/${o.publicToken}">Ver el estado del pedido</a></p>`,
+    ),
+  );
+}
+
+export async function sendReady(payload: Payload, orderId: number) {
+  const o = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true });
+  if (o.channel !== "online" || !o.customerEmail || o.readyNotifiedAt) return;
+  await sendEmail(
+    o.customerEmail,
+    `Tu pedido ${o.label} está listo`,
+    emailFrame(`${o.label} está listo`, `<p>Te esperamos en la barra. Plaza Cetina, 3.</p>`),
+  );
+  await payload.update({ collection: "orders", id: orderId, overrideAccess: true, data: { readyNotifiedAt: new Date().toISOString() } });
+}

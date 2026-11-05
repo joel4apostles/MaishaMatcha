@@ -5,7 +5,8 @@
     "story": "Historia",
     "events": "Eventos",
     "home": "Inicio",
-    "skip": "Saltar al contenido"
+    "skip": "Saltar al contenido",
+    "order": "Pedir"
   },
   "cta": {
     "joinWaitlist": "Unirse a la lista",
@@ -150,6 +151,10 @@
     "create": {
       "title": "Crea tu bebida · maisha matcha",
       "description": "Compón tu bebida con el matcha de Uji, Nishio o Kagoshima: usucha o latte, la leche y los extras. La preparamos en el salón."
+    },
+    "order": {
+      "title": "Pedir · maisha matcha",
+      "description": "Pide tu matcha y recógelo en la barra, en Plaza Cetina, 3, Murcia."
     }
   },
   "notFound": {
@@ -331,7 +336,9 @@
       "takeaway": "Para llevar",
       "unpaid": "sin cobrar",
       "empty": "Nada pendiente.",
-      "offline": "Sin conexión. Reintentando..."
+      "offline": "Sin conexión. Reintentando...",
+      "web": "Web",
+      "pickupAt": "Recoge {time}"
     },
     "ticket": {
       "title": "Factura simplificada",
@@ -384,5 +391,66 @@
         "generic": "No se ha podido completar. Inténtalo otra vez."
       }
     }
+  },
+  "order": {
+    "eyebrow": "Para recoger",
+    "title": "Pide y recoge",
+    "intro": "Elige tus bebidas y la hora. Te esperan en la barra.",
+    "closedTitle": "Los pedidos online llegan pronto",
+    "closedBody": "Mientras tanto, te esperamos en la barra.",
+    "unavailable": "Ahora mismo no podemos mostrar la carta. Vuelve en un momento.",
+    "yourOrder": "Tu pedido",
+    "empty": "Aún no has elegido nada.",
+    "add": "Añadir · {price}",
+    "choose": "Elegir",
+    "soldOut": "Agotado",
+    "required": "obligatorio",
+    "multiple": "puedes elegir varios",
+    "close": "Cerrar",
+    "chooseRequired": "Elige {group}.",
+    "remove": "Quitar {name}",
+    "total": "Total",
+    "pickup": "Hora de recogida",
+    "noSlots": "No quedan horas libres hoy ni mañana.",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "full": "completo",
+    "name": "Nombre",
+    "email": "Email",
+    "emailHint": "Te enviamos la confirmación y el aviso de listo.",
+    "phone": "Teléfono (opcional)",
+    "note": "Nota para la barra (opcional)",
+    "payAtPickup": "Pagar al recoger",
+    "payOnline": "Pagar ahora con tarjeta",
+    "submitPickup": "Hacer el pedido",
+    "submitPay": "Pagar {total}",
+    "sending": "Enviando...",
+    "legal": "Al pedir aceptas el tratamiento de tus datos para gestionar el pedido.",
+    "errors": {
+      "closed": "Los pedidos online están cerrados ahora mismo.",
+      "slot-full": "Esa hora acaba de completarse. Elige otra.",
+      "invalid": "Revisa el pedido: falta algún dato.",
+      "rate-limited": "Demasiados intentos. Espera un minuto.",
+      "generic": "No se ha podido enviar el pedido. Inténtalo otra vez.",
+      "missing-required": "Falta elegir una opción obligatoria.",
+      "unavailable-item": "Un producto se ha agotado.",
+      "unavailable-option": "Una opción se ha agotado."
+    },
+    "status": {
+      "eyebrow": "Tu pedido",
+      "title": "Pedido {label}",
+      "received": "Recibido. Lo prepararemos para tu hora.",
+      "preparing": "Preparándose ahora.",
+      "ready": "Listo. Te esperamos en la barra.",
+      "collected": "Entregado. Gracias.",
+      "cancelled": "Este pedido se ha anulado.",
+      "pickup": "Recogida: {time}",
+      "paid": "Pagado",
+      "unpaid": "Se paga al recoger",
+      "awaiting": "Esperando la confirmación del pago...",
+      "notFound": "No encontramos este pedido.",
+      "live": "Esta página se actualiza sola."
+    },
+    "toCarta": "Ver la carta"
   }
 }
