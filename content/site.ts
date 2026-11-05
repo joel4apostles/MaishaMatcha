@@ -11,8 +11,9 @@ export const site = {
   email: "hola@maishamatcha.es",
   instagram: "@maishamatcha",
   instagramUrl: "https://instagram.com/maishamatcha",
-  // Placeholder address / geo for JSON-LD and the footer.
-  address: "Centro de Murcia",
+  // Address from the founder (2026-11-05). geo is still approximate (city
+  // centre): replace with the exact pin from Google Maps.
+  address: "Plaza Cetina, 3",
   geo: { lat: 37.9834, lng: -1.128 },
 } as const;
 
