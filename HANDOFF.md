@@ -5,15 +5,15 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, just after midnight (Opus 5.5 session)
+Last updated: 2026-11-06, early morning (Opus 5.5 session)
 
 ## Where things stand
 
 - **Live site** (maisha-matcha.vercel.app) is still the 2026-09-17 deploy.
-  `main` is 25 commits ahead of origin, NOT pushed. Pushing deploys: run
+  `main` is 28 commits ahead of origin, NOT pushed. Pushing deploys: run
   the `security-audit` skill, then the go-live checklist in `POS-PLAN.md`
   section 7 (Supabase + Vercel env first).
-- **Built locally, tested (104 tests, `npm test`):** counter POS (PIN sign-in,
+- **Built locally, tested (119 tests, `npm test`):** counter POS (PIN sign-in,
   shifts, Z report, cash/card-on-terminal, tickets with AEAT QR, invoice hash
   chain, KDS, refunds/voids with manager PIN, offline cash queue), inventory
   and suppliers (gram deduction, counts, batches, reorder drafts, approve to
@@ -22,9 +22,16 @@ Last updated: 2026-11-06, just after midnight (Opus 5.5 session)
   Stripe Checkout confirmed by webhook, private status page
   `/es/pedido/<token>`, emails, KDS shows "Web" + pickup time), and the
   **recipe builder** linking to an order plus recipes saved on the device.
+- **Customers (2026-11-06):** optional accounts at `/es/cuenta` (emailed
+  sign-in link + confirm button, no passwords; guest ordering unchanged),
+  founding membership via Stripe (closed until Empresa has price, IVA,
+  places and the switch), event bookings on CMS events with locked seats,
+  email letters (Campaigns: owner approves, opted-in only, one-click
+  unsubscribe). Security review: SHIP, all SHOULDs fixed (9334a8e).
+  Carta and story stay in code on purpose (see CLAUDE.md "Content split").
 - Online ordering is OFF until the owner ticks it in /admin > Empresa.
-  Security review of web ordering: SHIP; all its findings fixed (commit
-  44ea242). Browser-verified at 390 and 1440, both locales.
+  Security review of web ordering: SHIP; all findings fixed (44ea242).
+  Every flow browser-verified at 390 and 1440, both locales.
 - Design-reviewer re-review of the macron fix was never recorded: re-run it.
 - Phase 2 mocks: claude.ai artifact "maisha barra mocks"
   (https://claude.ai/artifact/PQdSsim5kdGCvjw3tmDDap).
@@ -35,14 +42,16 @@ Last updated: 2026-11-06, just after midnight (Opus 5.5 session)
   DATABASE_URL, PAYLOAD_SECRET, FIRST_OWNER_EMAIL, NEXT_PUBLIC_SITE_URL,
   RESEND_API_KEY/RESEND_AUDIENCE_ID, STRIPE_SECRET_KEY/STRIPE_WEBHOOK_SECRET
   (webhook events: checkout.session.completed, .async_payment_succeeded,
-  .expired, .async_payment_failed). NIF + legal name in Empresa. Confirm
+  .expired, .async_payment_failed). NIF + legal name in Empresa. For the
+  founding membership: price, IVA rate, number of places, perks. Real
+  event dates and capacities in /admin > Eventos. Confirm
   prices (OJ 9,50, Yuzu 9,80), milks, allergens, open days, recipe grams
   and costs, map pin.
 - Blocked on founder: Stripe Terminal (2i), AEAT submission (2j),
   CafeRadar stamps.
-- Engineering queue (POS-PLAN section 8, "+" row): customer accounts,
-  founding membership (Stripe), events RSVP, email campaigns, CMS-backed
-  public pages, full script-src CSP with nonces, real-iPhone keyboard test.
+- Engineering queue: full script-src CSP with nonces, real-iPhone keyboard
+  test, privacy notice update (accounts, Stripe, letters), design-reviewer
+  pass on /cuenta, /pedir and /eventos.
 
 ## Environment gotchas
 
