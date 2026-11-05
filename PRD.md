@@ -135,7 +135,7 @@ final prices, real photography.
 |---|------|--------|
 | 18 | Payload CMS: install + config + admin route scaffold | done |
 | 19 | Payload collections: content + inventory + orders + media | done |
-| 20 | Seed from content files + verify admin + ship (first user, `npm run seed`, Supabase DATABASE_URL + PAYLOAD_SECRET on Vercel, prod /admin verified) | in progress |
+| 20 | Seed from content files + verify admin + ship (first user, `npm run seed`, Supabase DATABASE_URL + PAYLOAD_SECRET on Vercel, prod /admin verified) | in progress: local first user + seed done 2026-11-05; remaining: Supabase project, Vercel env, seed prod, verify prod /admin |
 | 21 | POS counter sales screen (pre-filled grams, editable, tap-first) | pending, needs 20 + 22 |
 | 22 | Barista accounts + per-barista order attribution | pending |
 | 23 | Sales-driven inventory depletion in grams (StockMovements per drink line) | pending, needs 21 |

@@ -132,7 +132,13 @@ restart dev. And after ANY `npm install`, repair the lockfile:
 4. **Waitlist degrades without env**: missing `RESEND_API_KEY`/
    `RESEND_AUDIENCE_ID` → log a non-sensitive payload, return success. Never
    crash, never leak config.
-5. **OG image** (`/api/og`) uses next/og's default font by design (deterministic,
+5. **Seed runs via `tsx`, not `payload run`.** `payload run` exits as soon
+   as the module loads, so the seed silently did nothing. The package is
+   `"type": "module"` because Payload is ESM-only.
+6. **System `python3` and `git` are Xcode shims.** Until the Xcode license
+   is accepted they fail. Use Node for scripted edits, and git directly at
+   `/Applications/Xcode.app/Contents/Developer/usr/bin/git`.
+7. **OG image** (`/api/og`) uses next/og's default font by design (deterministic,
    no network). Swapping in Cormorant/Hanken is a nice-to-have, not required.
 
 ## Environment
