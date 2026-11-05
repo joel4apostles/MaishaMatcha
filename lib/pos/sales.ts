@@ -104,7 +104,7 @@ export async function loadCatalog(
   channel: "counter" | "online" = "counter",
 ): Promise<CatalogItem[]> {
   const [items, groups, options, rates] = await Promise.all([
-    payload.find({ collection: "menu-items", limit: 500, depth: 1, locale, sort: "order", overrideAccess: true, populate: { media: { url: true, alt: true, width: true, height: true } } }),
+    payload.find({ collection: "menu-items", limit: 500, depth: 1, locale, sort: "order", overrideAccess: true }),
     payload.find({ collection: "modifier-groups", limit: 200, depth: 0, locale, sort: "order", overrideAccess: true }),
     payload.find({ collection: "modifiers", limit: 1000, depth: 0, locale, sort: "order", overrideAccess: true }),
     payload.find({ collection: "tax-rates", limit: 50, depth: 0, overrideAccess: true }),
@@ -145,11 +145,26 @@ export async function loadCatalog(
       description: i.description ?? null,
       photo:
         i.photo && typeof i.photo === "object" && i.photo.url
-          ? { url: i.photo.url, alt: i.photo.alt ?? i.name, width: i.photo.width ?? 800, height: i.photo.height ?? 1000 }
+          ? { url: localPath(i.photo.url), alt: i.photo.alt ?? i.name, width: i.photo.width ?? 800, height: i.photo.height ?? 1000 }
           : null,
       defaultGrams: i.defaultGrams ?? null,
       groups: (i.modifierGroups ?? []).map((g) => groupOf.get(id(g))).filter((g): g is CatalogGroup => Boolean(g)),
     }));
+}
+
+/**
+ * Payload returns absolute media URLs when the site URL is set. Our own
+ * files become plain paths (so next/image optimizes them); external storage
+ * keeps its absolute URL.
+ */
+function localPath(url: string) {
+  try {
+    const u = new URL(url, "http://local.invalid");
+    const site = process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL).origin : null;
+    return u.origin === "http://local.invalid" || u.origin === site ? u.pathname + u.search : url;
+  } catch {
+    return url;
+  }
 }
 
 // ----------------------------------------------------------------- shifts

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import stillLife from "@/public/images/shop-still-life.jpg";
 import { getPayload } from "payload";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import config from "@payload-config";
@@ -44,31 +46,37 @@ export default async function ShopPage({ params }: { params: Promise<{ locale: s
 
   return (
     <Section>
-      <Eyebrow>{t("eyebrow")}</Eyebrow>
-      <Headline as="h1" className="mt-5 text-display">
-        {data.open ? t("title") : t("soon")}
-      </Headline>
+      <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[minmax(0,1fr)_20rem] md:gap-16">
+        <div>
+          <Eyebrow>{t("eyebrow")}</Eyebrow>
+          <Headline as="h1" className="mt-5 text-display">
+            {data.open ? t("title") : t("soon")}
+          </Headline>
+          <p className="measure mt-6 text-lg text-sumi/80">{data.open ? t("intro") : t("soonBody")}</p>
+          {!data.open ? (
+            <div className="mt-8">
+              <QuietLink href="/menu">{o("toCarta")}</QuietLink>
+            </div>
+          ) : null}
+        </div>
+        {/* The salon's own still life: tins, chasen, chawan on the bar tiles. */}
+        <figure className="max-w-xs md:max-w-none">
+          <div className="overflow-hidden rounded-[2px]">
+            <Image src={stillLife} alt={t("photoAlt")} sizes="(min-width: 768px) 320px, 80vw" placeholder="blur" className="h-auto w-full" priority />
+          </div>
+        </figure>
+      </div>
       {data.open ? (
-        <>
-          <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
-          <div className="mt-14">
-            <OnlineOrder
-              variant="shop"
-              catalog={data.products}
-              slots={data.slots}
-              stripe={stripeEnabled()}
-              customer={member ? { name: member.name, email: member.email } : null}
-            />
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="measure mt-6 text-lg text-sumi/80">{t("soonBody")}</p>
-          <div className="mt-8">
-            <QuietLink href="/menu">{o("toCarta")}</QuietLink>
-          </div>
-        </>
-      )}
+        <div className="mt-16">
+          <OnlineOrder
+            variant="shop"
+            catalog={data.products}
+            slots={data.slots}
+            stripe={stripeEnabled()}
+            customer={member ? { name: member.name, email: member.email } : null}
+          />
+        </div>
+      ) : null}
     </Section>
   );
 }

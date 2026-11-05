@@ -161,6 +161,7 @@ export function OnlineOrder({
                             src={item.photo.url}
                             alt={item.photo.alt}
                             fill
+                            unoptimized={/^https?:/.test(item.photo.url)}
                             sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 100vw"
                             className="object-cover"
                           />
