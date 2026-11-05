@@ -187,3 +187,56 @@ describe("email letters", () => {
     expect(await unsubscribe(payload, "forged")).toBe(false);
   });
 });
+
+describe("security review fixes", () => {
+  it("flags a second founding payment for refund instead of granting twice", async () => {
+    const founder = (await payload.find({ collection: "members", where: { email: { equals: "f1@example.com" } }, overrideAccess: true })).docs[0];
+    const order = await payload.create({
+      collection: "orders",
+      overrideAccess: true,
+      data: {
+        kind: "membership", channel: "online", service: "takeaway", status: "collected", paymentStatus: "unpaid", payOnline: true,
+        lines: [{ name: "Socio fundador", quantity: 1, unitCents: 9000, taxRateBasisPoints: 2100, modifiers: [] }],
+        totalCents: 9000, taxBreakdown: [{ rateBasisPoints: 2100, grossCents: 9000, baseCents: 7438, taxCents: 1562 }],
+        member: founder.id, customerEmail: founder.email, idempotencyKey: crypto.randomUUID(),
+      } as never,
+    });
+    await completeFounding(payload, order.id, "pi_twice", 9000);
+    const o = await payload.findByID({ collection: "orders", id: order.id, overrideAccess: true });
+    expect(o.note).toMatch(/^DEVOLVER/);
+    expect((await payload.findByID({ collection: "members", id: founder.id, overrideAccess: true })).foundingNumber).toBe(1);
+  });
+
+  it("refuses a second checkout while one is pending", async () => {
+    await payload.updateGlobal({ slug: "business", data: { foundingCap: 50 } });
+    const m = await member("twotabs@example.com");
+    expect((await startFounding(payload, m, "es", "http://x")).ok).toBe(true);
+    expect(await startFounding(payload, m, "es", "http://x")).toEqual({ ok: false, error: "pending" });
+  });
+
+  it("does not let staff forge consent or founding status", async () => {
+    const manager = await staff(payload, "mgr-m@test.local", "manager", "Marta");
+    const m = await member("consent@example.com");
+    await payload.update({ collection: "members", id: m.id, user: manager, overrideAccess: false, data: { emailOptIn: true, tier: "founding", foundingNumber: 99 } });
+    const after = await payload.findByID({ collection: "members", id: m.id, overrideAccess: true });
+    expect(after).toMatchObject({ emailOptIn: false, tier: "customer" });
+    expect(after.foundingNumber ?? null).toBeNull();
+  });
+
+  it("sends test letters only to the person saving", async () => {
+    const owner = (await payload.find({ collection: "users", where: { email: { equals: "owner-m@test.local" } }, overrideAccess: true })).docs[0];
+    const c = await payload.create({ collection: "campaigns", overrideAccess: true, data: { subject: "x", title: "x", body: "x", audience: "all", locale: "es", status: "draft" } });
+    await expect(
+      payload.update({ collection: "campaigns", id: c.id, user: owner, overrideAccess: false, data: { sendTestTo: "someone@else.com" } }),
+    ).rejects.toThrow();
+  });
+
+  it("stores order emails in one spelling so erasure finds them", async () => {
+    const o = await payload.create({
+      collection: "orders",
+      overrideAccess: true,
+      data: { channel: "online", service: "takeaway", status: "collected", paymentStatus: "paid", lines: [], totalCents: 0, customerEmail: " Mixed@Example.COM ", idempotencyKey: crypto.randomUUID() } as never,
+    });
+    expect(o.customerEmail).toBe("mixed@example.com");
+  });
+});

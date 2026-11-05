@@ -509,7 +509,8 @@
       "confirm": "El email no coincide.",
       "closed": "La membresía fundadora no está abierta ahora.",
       "already": "Ya eres socio fundador.",
-      "signed-out": "Tu sesión ha terminado. Vuelve a entrar."
+      "signed-out": "Tu sesión ha terminado. Vuelve a entrar.",
+      "pending": "Ya tienes un pago empezado. Termínalo en la otra pestaña o espera media hora."
     }
   },
   "rsvp": {

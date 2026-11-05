@@ -18,6 +18,15 @@ export const Orders: CollectionConfig = {
   },
   defaultSort: "-createdAt",
   access: { read: anyStaff, create: nobody, update: nobody, delete: nobody },
+  hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        // One spelling per customer, so accounts and erasure find every order.
+        if (data?.customerEmail) data.customerEmail = String(data.customerEmail).trim().toLowerCase();
+        return data;
+      },
+    ],
+  },
   fields: [
     { name: "label", type: "text", admin: { readOnly: true, description: "Número visible: 0042" } },
     {

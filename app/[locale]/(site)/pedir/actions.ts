@@ -53,7 +53,9 @@ export async function placeOrderAction(input: z.infer<typeof schema>): Promise<{
 
   // Signed-in members get the order on their account (the session decides, not the client).
   const member = await currentMember();
-  const placed = await placeOnlineOrder(payload, { ...p.data, payOnline, memberId: member?.id ?? null });
+  const placed = await placeOnlineOrder(payload, { ...p.data, payOnline,
+    memberId: member && member.email === p.data.email.trim().toLowerCase() ? member.id : null,
+  });
   if (!placed.ok) return { ok: false, error: placed.error };
 
   const statusPath = `/${p.data.locale}/${p.data.locale === "es" ? "pedido" : "order-status"}/${placed.token}`;

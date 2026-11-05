@@ -509,7 +509,8 @@
       "confirm": "The email does not match.",
       "closed": "The founding membership is not open now.",
       "already": "You are already a founding member.",
-      "signed-out": "Your session has ended. Sign in again."
+      "signed-out": "Your session has ended. Sign in again.",
+      "pending": "You already have a payment in progress. Finish it in the other tab or wait half an hour."
     }
   },
   "rsvp": {

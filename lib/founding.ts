@@ -30,7 +30,10 @@ export async function foundingSettings(payload: Payload, locale: "es" | "en" = "
   };
 }
 
-export type StartResult = { ok: true; url: string } | { ok: false; error: "closed" | "already" | "generic" };
+export type StartResult = { ok: true; url: string } | { ok: false; error: "closed" | "already" | "pending" | "generic" };
+
+/** A checkout started in the last half hour that Stripe has not settled. */
+const PENDING_MINUTES = 30;
 
 export async function startFounding(
   payload: Payload,
@@ -41,6 +44,21 @@ export async function startFounding(
   if (member.tier === "founding") return { ok: false, error: "already" };
   const s = await foundingSettings(payload, locale);
   if (!s.open || !s.priceCents || s.rateBasisPoints == null) return { ok: false, error: "closed" };
+  // Two tabs must not mean two payments.
+  const pending = await payload.count({
+    collection: "orders",
+    overrideAccess: true,
+    where: {
+      and: [
+        { kind: { equals: "membership" } },
+        { member: { equals: member.id } },
+        { paymentStatus: { equals: "unpaid" } },
+        { status: { not_equals: "cancelled" } },
+        { createdAt: { greater_than: new Date(Date.now() - PENDING_MINUTES * 60000).toISOString() } },
+      ],
+    },
+  });
+  if (pending.totalDocs > 0) return { ok: false, error: "pending" };
   const name = locale === "es" ? "Socio fundador · maisha matcha" : "Founding member · maisha matcha";
   const breakdown = taxBreakdown([{ grossCents: s.priceCents, rateBasisPoints: s.rateBasisPoints }]);
   const order = await payload.create({
@@ -102,7 +120,25 @@ export async function completeFounding(payload: Payload, orderId: number, provid
     const members = table(payload, "members");
     await query(payload, sql`select id from ${members} where id = ${memberId} for update`, req);
     const m = await payload.findByID({ collection: "members", id: memberId, req, depth: 0, overrideAccess: true });
-    if (m.tier !== "founding") {
+    const cap = (await payload.findGlobal({ slug: "business", req, overrideAccess: true })).foundingCap ?? 50;
+    const founders = (await payload.count({ collection: "members", req, overrideAccess: true, where: { tier: { equals: "founding" } } })).totalDocs;
+    if (m.tier === "founding" || founders >= cap) {
+      // Paid but no place to give (a second payment, or the last place went
+      // to a checkout that finished first): flag it for a refund, loudly.
+      await payload.update({
+        collection: "orders",
+        id: orderId,
+        req,
+        overrideAccess: true,
+        data: { note: m.tier === "founding" ? "DEVOLVER: segundo pago de la cuota de socio." : "DEVOLVER: pagada sin plaza libre (cupo completo)." },
+      });
+      await req.payload.create({
+        collection: "audit-log",
+        req,
+        overrideAccess: true,
+        data: { action: "founding.refund-due", entity: "orders", entityId: String(orderId), reason: "Cuota de socio pagada sin plaza: devolver en Stripe." },
+      }).catch(() => undefined);
+    } else {
       const seq = table(payload, "sequences");
       await query(payload, sql`insert into ${seq} (key, value, updated_at, created_at) values ('founding-number', 0, now(), now()) on conflict (key) do nothing`, req);
       const rows = await query(payload, sql`update ${seq} set value = value + 1 where key = 'founding-number' returning value`, req);

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { hasRole } from "@/lib/auth/roles";
+import { query, sql, table } from "../db";
 import { owner, ownerOrManager } from "../access";
 
 /**
@@ -15,8 +16,16 @@ export const Campaigns: CollectionConfig = {
   access: { read: ownerOrManager, create: ownerOrManager, update: ownerOrManager, delete: owner },
   hooks: {
     beforeChange: [
-      ({ data, originalDoc, req, context }) => {
+      async ({ data, originalDoc, req, context }) => {
         if (context?.system) return data;
+        if (data.sendTestTo && data.sendTestTo !== originalDoc?.sendTestTo && String(data.sendTestTo).toLowerCase() !== String(req.user?.email ?? "").toLowerCase()) {
+          throw new Error("La prueba solo se envía a tu propio email.");
+        }
+        // Two approving saves at once: the row lock lets only one see "draft".
+        if (data.status === "approved" && originalDoc?.id && originalDoc.status !== "approved") {
+          const rows = await query(req.payload, sql`select status from ${table(req.payload, "campaigns")} where id = ${originalDoc.id} for update`, req);
+          if (rows[0]?.status !== "draft") throw new Error("Esta carta ya se envió.");
+        }
         // A sent letter is history: it cannot be edited or sent again.
         if (originalDoc?.status === "sent") {
           throw new Error("Esta carta ya se envió.");

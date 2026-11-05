@@ -62,8 +62,23 @@ OG, admin) inherits them.
   carta PDF): seeded into Payload with option groups (usucha/latte +1,40,
   milk, extras, mochi flavours). The public menu and home preview render it
   through `lib/carta.ts` (prices = base + option delta, same as the till).
-- **No payments yet** (Stripe is Phase 2). Public server code is
-  `/api/waitlist`, `/api/og`, and Payload's `/api/[...slug]`.
+- **Stripe over plain HTTPS** (`lib/stripe.ts`, no SDK): hosted Checkout for
+  web orders and the founding fee; `/api/stripe/webhook` (signature +
+  timestamp + amount checked) is the ONLY place anything becomes paid.
+  Public server code: `/api/waitlist`, `/api/og`, `/api/order-status/[token]`,
+  `/api/stripe/webhook`, `/api/members/{sign-in,unsubscribe}`, the server
+  actions in `pedir/` and `cuenta/`, and Payload's `/api/[...slug]`.
+- **Customer accounts are optional** (guest ordering always works). Members
+  sign in with an emailed signed link (`lib/members.ts`, 20 min, no
+  passwords, account created on first open); session cookie bound to
+  `sessionVersion` ("sign out everywhere"). Founding membership, event
+  bookings and email letters hang off `members`. Not Supabase Auth: one
+  auth system per audience (Payload for staff, PIN for the till, links for
+  customers).
+- **Content split**: events come from the CMS (bookable when they have a
+  date and capacity). The carta (`content/carta.ts`) and the story
+  (`content/story.ts`) stay in code on purpose: the till seed and the
+  design-tuned story page depend on their ids.
 - i18n via **next-intl**: routes `/es` (default) and `/en`, localized pathnames
   (`/historia`↔`/story`, `/eventos`↔`/events`, etc.). Zero hardcoded strings.
 - Custom components only on public pages. Motion is CSS + IntersectionObserver
@@ -182,6 +197,8 @@ NEXT_PUBLIC_SITE_URL    # canonical origin for metadata/OG/sitemap
 PAYLOAD_SECRET          # 32+ chars; signs admin + POS cookies (random per instance if missing)
 DATABASE_URL            # Supabase pooler :6543 in prod, PRODUCTION env only on Vercel
 FIRST_OWNER_EMAIL       # prod: only this email may create the first (owner) account
+STRIPE_SECRET_KEY       # web orders + founding fee (both unset = card payment hidden)
+STRIPE_WEBHOOK_SECRET   # events: checkout.session.completed, .async_payment_succeeded, .expired, .async_payment_failed
 ```
 
 ## Known audit findings (accepted risk, re-check each release)
@@ -196,6 +213,14 @@ reachable from public routes. Baseline security headers set in
 `next.config.ts`; a full script-src CSP (nonces) is still to do.
 Re-check on every Payload upgrade and remove the dompurify override once
 Payload ships a fixed Monaco.
+
+Security reviews 2026-11-06 (web ordering; accounts, founding, events,
+letters): SHIP, every BLOCKER/SHOULD fixed. Accepted: a sign-in link keeps
+working for its 20 minutes even after "sign out everywhere"; erasure does
+not remove the email from the Resend waitlist audience or from the Stripe
+customer records (say so in the privacy notice, remove by hand on
+request). A founding fee paid with no place left (or paid twice) is flagged
+"DEVOLVER" on the order and in the audit log: refund it in Stripe.
 
 ## Content editing
 
@@ -244,8 +269,8 @@ add chief-architect + cto-review before phase transitions.
   lockout, Postgres migrations, 48 tests). Remaining before prod: Supabase
   project, Vercel env (Production only), media storage, owner approval of
   the Phase 2 mocks (claude.ai artifact "maisha barra mocks").
-- **Phase 2 — Stripe founding membership**: paid founding tier, member accounts,
-  the "founding price" promise honored at checkout.
+- **Phase 2 — Stripe founding membership**: BUILT 2026-11-06 (`lib/founding.ts`).
+  Closed until the owner sets price, IVA, places and the switch in Empresa.
 - **Phase 3 — Recipe builder**: MVP SHIPPED without a database. `/crea`
   (`/create`): rebuilt 2026-11-05 on the real carta: tea (every item with a
   preparation group), usucha/solo or latte (+1,40), milk for lattes, extras
@@ -255,11 +280,11 @@ add chief-architect + cto-review before phase transitions.
   display code (NIS·LAT·AVE·CCL). On phones a sticky bar keeps the live
   price in reach. The recipe card shows a QR (qrcode-generator, dynamic
   import) encoding the share URL; redeem = show the card at the counter.
-  Remaining for full phase 3: accounts/persistence, named recipes, pre-order.
-- **Phase 4 — Events / RSVP**: real events + seat-limited RSVP (the "reservado a
-  socios fundadores" gating becomes functional).
-- **Phase 5 — Email campaigns**: broadcast beyond the confirmation email; the
-  Resend audience built here is the seed list.
+  Named recipes (device-only) and "order this recipe" BUILT 2026-11-05.
+- **Phase 4 — Events / RSVP**: BUILT 2026-11-06 (`lib/events.ts`, Rsvps).
+- **Phase 5 — Email campaigns**: BUILT 2026-11-06 (Campaigns collection,
+  owner approves, opted-in members only, one-click unsubscribe). The old
+  Resend waitlist audience is separate; Resend free = 100 emails a day.
 - **Phase 6 — Inventory ledger**: stock over an append-only stock-movements
   pattern. Collections exist (`InventoryItems` + `StockMovements` + cached
   stock hook); depletion wiring comes with Phase 7.

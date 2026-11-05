@@ -19,7 +19,7 @@ const field =
 const label = "text-eyebrow uppercase text-sumi/70";
 const quietButton =
   "inline-flex min-h-[44px] items-center justify-center rounded-[2px] border border-wood/50 px-5 text-sm font-medium text-sumi hover:border-sumi/60 disabled:opacity-40";
-const KNOWN = ["invalid", "rate-limited", "generic", "confirm", "closed", "already", "signed-out"];
+const KNOWN = ["invalid", "rate-limited", "generic", "confirm", "closed", "already", "pending", "signed-out"];
 
 function useError() {
   const t = useTranslations("account");

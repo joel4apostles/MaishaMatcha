@@ -7,6 +7,7 @@ import * as migration_20261105_223929_inventory_suppliers from './20261105_22392
 import * as migration_20261105_224951_online_orders from './20261105_224951_online_orders';
 import * as migration_20261105_231005_members_events_campaigns from './20261105_231005_members_events_campaigns';
 import * as migration_20261105_231006_members_tier_default from './20261105_231006_members_tier_default';
+import * as migration_20261105_231007_lowercase_order_emails from './20261105_231007_lowercase_order_emails';
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261105_231006_members_tier_default.up,
     down: migration_20261105_231006_members_tier_default.down,
     name: '20261105_231006_members_tier_default',
+  },
+  {
+    up: migration_20261105_231007_lowercase_order_emails.up,
+    down: migration_20261105_231007_lowercase_order_emails.down,
+    name: '20261105_231007_lowercase_order_emails',
   },
 ];

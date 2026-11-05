@@ -110,7 +110,7 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
     where: {
       and: [
         { channel: { equals: "online" } },
-        { customerEmail: { equals: input.email.trim() } },
+        { customerEmail: { equals: input.email.trim().toLowerCase() } },
         { status: { in: ["received", "preparing", "ready"] } },
         { pickupAt: { greater_than_equal: now.toISOString() } },
       ],
@@ -153,7 +153,7 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
         taxBreakdown: priced.taxBreakdown,
         note: input.note?.trim() || undefined,
         customerName: input.name.trim(),
-        customerEmail: input.email.trim(),
+        customerEmail: input.email.trim().toLowerCase(),
         customerPhone: input.phone?.trim() || undefined,
         pickupAt: input.pickupAt,
         statusChangedAt: now.toISOString(),

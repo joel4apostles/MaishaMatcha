@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { hiddenField, owner, ownerOrManager } from "../access";
+import { hiddenField, owner, ownerField, ownerOrManager } from "../access";
 
 /**
  * Customer accounts. Optional: nobody needs one to order. Signing in is by
@@ -32,6 +32,7 @@ export const Members: CollectionConfig = {
       required: true,
       defaultValue: "customer",
       label: "Tipo",
+      access: { update: ownerField },
       options: [
         { label: "Cliente", value: "customer" },
         { label: "Socio fundador", value: "founding" },
@@ -54,8 +55,8 @@ export const Members: CollectionConfig = {
     {
       type: "row",
       fields: [
-        { name: "foundingNumber", type: "number", label: "Nº de socio fundador", admin: { readOnly: true } },
-        { name: "foundingSince", type: "date", label: "Fundador desde", admin: { readOnly: true } },
+        { name: "foundingNumber", type: "number", label: "Nº de socio fundador", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+        { name: "foundingSince", type: "date", label: "Fundador desde", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
       ],
     },
     {
@@ -63,6 +64,8 @@ export const Members: CollectionConfig = {
       type: "checkbox",
       defaultValue: false,
       label: "Acepta cartas por email",
+      // Consent belongs to the member: only their own account page sets it.
+      access: { create: hiddenField, update: hiddenField },
       admin: { description: "Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó." },
     },
     {
