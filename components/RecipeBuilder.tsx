@@ -2,13 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { quietLinkClass } from "@/components/Button";
+import { inkButtonClass, quietLinkClass } from "@/components/Button";
+import { Link } from "@/i18n/navigation";
 import { PhotoDrink } from "@/components/PhotoDrink";
 import type { Locale } from "@/i18n/routing";
 import { itemSlug } from "@/lib/carta";
 import { formatEuro } from "@/lib/money";
 import {
   DEFAULT_RECIPE,
+  SAVED_KEY,
+  type SavedRecipe,
+  addSaved,
+  parseSaved,
   type RecipeIds,
   blendColor,
   builderExtras,
@@ -64,6 +69,9 @@ export function RecipeBuilder() {
   // on screen (never covers the card, the legal links or the locale switch).
   const [barHidden, setBarHidden] = useState(false);
   const [canShare, setCanShare] = useState(false);
+  const [saved, setSaved] = useState<SavedRecipe[]>([]);
+  const [recipeName, setRecipeName] = useState("");
+  const [savedNote, setSavedNote] = useState("");
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Only write to the URL after a real choice: a pristine visit or a shared
   // link must never have its address rewritten out from under it.
@@ -80,7 +88,26 @@ export function RecipeBuilder() {
     const param = new URLSearchParams(window.location.search).get("r");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL, an external system
     if (param) setIds(fromParam(param));
+    // Saved recipes live on this device only; storage may be blocked.
+    try {
+      setSaved(parseSaved(window.localStorage.getItem(SAVED_KEY)));
+    } catch {}
   }, []);
+
+  const persist = (next: SavedRecipe[]) => {
+    setSaved(next);
+    try {
+      window.localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    } catch {}
+  };
+
+  function saveRecipe(e: React.FormEvent) {
+    e.preventDefault();
+    if (!recipeName.trim()) return;
+    persist(addSaved(saved, recipeName, toParam(ids)));
+    setSavedNote(t("savedAs", { name: recipeName.trim() }));
+    setRecipeName("");
+  }
 
   useEffect(
     () => () => {
@@ -332,6 +359,73 @@ export function RecipeBuilder() {
         <p className="mt-4 text-eyebrow uppercase text-sumi/70">{t("priceNote")}</p>
 
         <div className="mt-6">
+          <Link href={{ pathname: "/pedir", query: { r: toParam(ids) } }} className={inkButtonClass}>
+            {t("orderThis", { price })}
+          </Link>
+        </div>
+
+        <section aria-labelledby="mis-recetas" className="mt-12 border-t border-wood/25 pt-8">
+          <h3 id="mis-recetas" className="text-eyebrow uppercase text-sumi/70">
+            {t("savedTitle")}
+          </h3>
+          <form onSubmit={saveRecipe} className="mt-4 flex items-end gap-3">
+            <div className="min-w-0 flex-1">
+              <label htmlFor="recipe-name" className="sr-only">
+                {t("savedName")}
+              </label>
+              <input
+                id="recipe-name"
+                value={recipeName}
+                onChange={(e) => setRecipeName(e.target.value)}
+                maxLength={40}
+                placeholder={t("savedName")}
+                enterKeyHint="done"
+                autoComplete="off"
+                className="block min-h-[48px] w-full border-b border-wood/40 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!recipeName.trim()}
+              className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-[2px] border border-wood/50 px-5 text-sm font-medium text-sumi hover:border-sumi/60 disabled:opacity-40"
+            >
+              {t("save")}
+            </button>
+          </form>
+          <p aria-live="polite" className="mt-2 min-h-[1.25rem] text-sm text-sumi/70">
+            {savedNote}
+          </p>
+          {saved.length ? (
+            <ul className="mt-2">
+              {saved.map((x) => (
+                <li key={x.name} className="flex items-center justify-between gap-2 border-b border-wood/25">
+                  <button
+                    type="button"
+                    onClick={() => choose(() => fromParam(x.r))}
+                    aria-current={x.r === toParam(ids) ? "true" : undefined}
+                    className="flex min-h-[48px] min-w-0 flex-1 items-center text-left aria-[current=true]:font-medium"
+                  >
+                    <span className="truncate">{x.name}</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={t("savedRemove", { name: x.name })}
+                    onClick={() => persist(saved.filter((y) => y.name !== x.name))}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center text-sumi/60"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                      <path d="M4 4l12 12M16 4L4 16" />
+                    </svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-sumi/70">{t("savedEmpty")}</p>
+          )}
+        </section>
+
+        <div className="mt-8">
           <a href={`/${locale}#socios`} className={quietLinkClass}>
             {cta("toWaitlist")}
           </a>

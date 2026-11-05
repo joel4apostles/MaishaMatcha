@@ -180,7 +180,14 @@
     "copied": "Link copied.",
     "priceNote": "Prices in euros, VAT included.",
     "viewCard": "See recipe",
-    "shareLink": "Share"
+    "shareLink": "Share",
+    "orderThis": "Order for pickup · {price}",
+    "savedTitle": "Your recipes",
+    "savedName": "Give it a name",
+    "save": "Save",
+    "savedAs": "Saved as {name}.",
+    "savedRemove": "Delete {name}",
+    "savedEmpty": "Kept on this device only."
   },
   "pos": {
     "title": "Counter",

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { placeOrderAction } from "@/app/[locale]/(site)/pedir/actions";
 import { formatEuro } from "@/lib/money";
-import { priceLine, type CatalogItem } from "@/lib/pos/pricing";
+import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
@@ -24,10 +24,25 @@ const field =
  * pickup time, details, and pay at pickup or by card (Stripe). Prices shown
  * are for the eye; the server prices the order again.
  */
-export function OnlineOrder({ catalog, slots, stripe }: { catalog: CatalogItem[]; slots: Slot[]; stripe: boolean }) {
+export function OnlineOrder({
+  catalog,
+  slots,
+  stripe,
+  initialLines = [],
+}: {
+  catalog: CatalogItem[];
+  slots: Slot[];
+  stripe: boolean;
+  initialLines?: LineInput[];
+}) {
   const t = useTranslations("order");
   const locale = useLocale() as "es" | "en";
-  const [lines, setLines] = useState<Line[]>([]);
+  const [lines, setLines] = useState<Line[]>(() =>
+    initialLines.flatMap((l, i) => {
+      const item = catalog.find((c) => c.id === l.menuItemId);
+      return item ? [{ uid: `recipe-${i}`, item, quantity: l.quantity, modifierKeys: l.modifierKeys }] : [];
+    }),
+  );
   const [sheet, setSheet] = useState<Line | null>(null);
   const [missing, setMissing] = useState<string | null>(null);
   const [slot, setSlot] = useState<string | null>(slots.find((s) => s.available)?.start ?? null);

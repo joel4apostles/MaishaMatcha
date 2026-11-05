@@ -124,3 +124,34 @@ export function blendColor(r: Recipe): string {
   );
   return `#${mix.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 }
+
+/** The carta modifier keys of a recipe: the same keys the till and the web order use. */
+export function recipeModifierKeys(r: Recipe): string[] {
+  return [r.prep.key, ...(r.milk ? [r.milk.key] : []), ...r.extras.map((e) => e.key)];
+}
+
+/** Recipes kept on this device only (localStorage), newest first. */
+export type SavedRecipe = { name: string; r: string };
+export const SAVED_KEY = "maisha:recipes:v1";
+export const MAX_SAVED = 12;
+
+export function parseSaved(raw: string | null): SavedRecipe[] {
+  try {
+    const list = JSON.parse(raw ?? "[]");
+    if (!Array.isArray(list)) return [];
+    return list
+      .filter((x): x is SavedRecipe => typeof x?.name === "string" && typeof x?.r === "string")
+      .map((x) => ({ name: x.name.trim().slice(0, 40), r: toParam(fromParam(x.r)) }))
+      .filter((x) => x.name)
+      .slice(0, MAX_SAVED);
+  } catch {
+    return [];
+  }
+}
+
+/** Save (or rename) a recipe: one entry per name, newest first. */
+export function addSaved(list: SavedRecipe[], name: string, r: string): SavedRecipe[] {
+  const clean = name.trim().slice(0, 40);
+  if (!clean) return list;
+  return [{ name: clean, r }, ...list.filter((x) => x.name.toLowerCase() !== clean.toLowerCase())].slice(0, MAX_SAVED);
+}

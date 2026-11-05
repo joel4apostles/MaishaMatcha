@@ -180,7 +180,14 @@
     "copied": "Enlace copiado.",
     "priceNote": "Precios en euros, IVA incluido.",
     "viewCard": "Ver receta",
-    "shareLink": "Compartir"
+    "shareLink": "Compartir",
+    "orderThis": "Pedir para recoger · {price}",
+    "savedTitle": "Tus recetas",
+    "savedName": "Ponle nombre",
+    "save": "Guardar",
+    "savedAs": "Guardada como {name}.",
+    "savedRemove": "Borrar {name}",
+    "savedEmpty": "Se guardan solo en este dispositivo."
   },
   "pos": {
     "title": "Barra",

@@ -9,6 +9,8 @@ import { QuietLink } from "@/components/Button";
 import { OnlineOrder } from "@/components/OnlineOrder";
 import { availableSlots } from "@/lib/online";
 import { loadCatalog } from "@/lib/pos/sales";
+import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
+import { fromParam, recipeModifierKeys, resolveRecipe } from "@/lib/recipe";
 import { stripeEnabled } from "@/lib/stripe";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -33,8 +35,25 @@ async function load(locale: "es" | "en") {
   }
 }
 
-export default async function OrderPage({ params }: { params: Promise<{ locale: string }> }) {
+/** A recipe from /crea (?r=...) arrives as the first line of the order. */
+function recipeLine(catalog: CatalogItem[], param: string | undefined): LineInput[] {
+  if (!param) return [];
+  const r = resolveRecipe(fromParam(param));
+  const item = catalog.find((i) => i.name.toLowerCase() === r.tea.name.toLowerCase());
+  if (!item) return [];
+  const line = { menuItemId: item.id, quantity: 1, modifierKeys: recipeModifierKeys(r) };
+  return priceLine(new Map([[item.id, item]]), line).ok ? [line] : [];
+}
+
+export default async function OrderPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ r?: string | string[] }>;
+}) {
   const { locale } = await params;
+  const { r } = await searchParams;
   setRequestLocale(locale as Locale);
   const t = await getTranslations({ locale: locale as Locale, namespace: "order" });
   const data = await load(locale as "es" | "en");
@@ -49,7 +68,12 @@ export default async function OrderPage({ params }: { params: Promise<{ locale: 
         <>
           <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
           <div className="mt-14">
-            <OnlineOrder catalog={data.catalog} slots={data.slots} stripe={stripeEnabled()} />
+            <OnlineOrder
+              catalog={data.catalog}
+              slots={data.slots}
+              stripe={stripeEnabled()}
+              initialLines={recipeLine(data.catalog, typeof r === "string" ? r : undefined)}
+            />
           </div>
         </>
       ) : (
