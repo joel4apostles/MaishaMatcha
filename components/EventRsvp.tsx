@@ -41,7 +41,7 @@ export function EventRsvp({
     });
 
   return (
-    <div className="mt-6 border-t border-wood/25 pt-5">
+    <div className="mt-6 border-t border-wood/25 pt-4">
       <p className="text-sm text-sumi/75">{mine ? t("reserved", { count: mine }) : t("remaining", { count: remaining })}</p>
       {!signedIn ? (
         <Link href={{ pathname: "/cuenta", query: { next: back } }} className={`${quietLinkClass} mt-2`}>
@@ -73,7 +73,7 @@ export function EventRsvp({
           ) : null}
         </div>
       )}
-      <p role="status" className="mt-2 min-h-[1.25rem] text-sm">
+      <p role="status" className={msg ? "mt-2 text-sm" : "sr-only"}>
         {msg}
       </p>
     </div>

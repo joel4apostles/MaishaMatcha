@@ -47,7 +47,7 @@ export async function startPremium(payload: Payload, member: MemberLike, locale:
   try {
     const session = await createSubscriptionCheckout({
       memberId: member.id,
-      name: locale === "es" ? "maisha matcha · suscripción premium" : "maisha matcha · premium subscription",
+      name: locale === "es" ? "maisha matcha · suscripción mensual" : "maisha matcha · monthly membership",
       monthlyCents: price,
       taxRateBasisPoints: s.rateBasisPoints,
       customerId: member.stripeCustomerId,
@@ -144,7 +144,7 @@ export async function onPremiumInvoicePaid(payload: Payload, inv: StripeInvoice)
     const rate = Number(meta?.taxBp ?? (await premiumSettings(payload)).rateBasisPoints);
     if (!Number.isInteger(rate)) throw new Error("premium invoice without an IVA rate");
     const breakdown = taxBreakdown([{ grossCents: inv.amount_paid, rateBasisPoints: rate }]);
-    const name = (m.locale ?? "es") === "en" ? "Premium subscription · month" : "Suscripción premium · mes";
+    const name = (m.locale ?? "es") === "en" ? "Monthly membership" : "Suscripción mensual";
     try {
       const order = await payload.create({
         collection: "orders",

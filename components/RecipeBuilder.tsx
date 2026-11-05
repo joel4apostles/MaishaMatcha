@@ -358,10 +358,13 @@ export function RecipeBuilder() {
 
         <p className="mt-4 text-eyebrow uppercase text-sumi/70">{t("priceNote")}</p>
 
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
           <Link href={{ pathname: "/pedir", query: { r: toParam(ids) } }} className={inkButtonClass}>
             {t("orderThis", { price })}
           </Link>
+          <a href={`/${locale}#socios`} className={quietLinkClass}>
+            {cta("toWaitlist")}
+          </a>
         </div>
 
         <section aria-labelledby="mis-recetas" className="mt-12 border-t border-wood/25 pt-8">
@@ -425,11 +428,6 @@ export function RecipeBuilder() {
           )}
         </section>
 
-        <div className="mt-8">
-          <a href={`/${locale}#socios`} className={quietLinkClass}>
-            {cta("toWaitlist")}
-          </a>
-        </div>
       </div>
 
       {/* Phones: the live price stays in reach while choosing. */}

@@ -12,7 +12,7 @@ const page = (body: string) =>
   new NextResponse(
     `<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>maisha matcha</title>
 <body style="background:#F5F1E8;color:#1C1B18;font-family:Helvetica,Arial,sans-serif;max-width:32rem;margin:0 auto;padding:4rem 1.5rem;line-height:1.6">
-<p style="font-family:Georgia,serif;letter-spacing:.08em">maisha matcha</p>${body}</body></html>`,
+<p style="font-weight:500;color:#786000">maisha matcha</p>${body}</body></html>`,
     { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },
   );
 

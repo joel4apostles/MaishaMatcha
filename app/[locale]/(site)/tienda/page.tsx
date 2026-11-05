@@ -46,7 +46,7 @@ export default async function ShopPage({ params }: { params: Promise<{ locale: s
 
   return (
     <Section>
-      <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[minmax(0,1fr)_20rem] md:gap-16">
+      <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-16">
         <div>
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <Headline as="h1" className="mt-5 text-display">
@@ -60,9 +60,9 @@ export default async function ShopPage({ params }: { params: Promise<{ locale: s
           ) : null}
         </div>
         {/* The salon's own still life: tins, chasen, chawan on the bar tiles. */}
-        <figure className="max-w-xs md:max-w-none">
+        <figure className="max-w-sm md:max-w-none">
           <div className="overflow-hidden rounded-[2px]">
-            <Image src={stillLife} alt={t("photoAlt")} sizes="(min-width: 768px) 320px, 80vw" placeholder="blur" className="h-auto w-full" priority />
+            <Image src={stillLife} alt={t("photoAlt")} sizes="(min-width: 768px) 420px, 90vw" placeholder="blur" className="h-auto w-full" priority />
           </div>
         </figure>
       </div>

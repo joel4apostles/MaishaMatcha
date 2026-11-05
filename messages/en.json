@@ -517,7 +517,9 @@
     "toCarta": "See the carta",
     "signedInAs": "Ordering as {name}.",
     "haveAccount": "Have an account? Sign in and we keep your orders.",
-    "addShort": "Add"
+    "addShort": "Add",
+    "less": "One less {name}",
+    "more": "One more {name}"
   },
   "account": {
     "eyebrow": "Your account",
@@ -563,17 +565,20 @@
       "signed-out": "Your session has ended. Sign in again.",
       "pending": "You already have a payment in progress. Finish it in the other tab or wait half an hour."
     },
-    "premiumTitle": "Premium subscription",
+    "premiumTitle": "Monthly membership",
     "premiumBody": "A monthly fee. Cancel whenever you like.",
     "premiumFoundingPrice": "As a founding member, you pay the founding price. Cancel whenever you like.",
-    "premiumCta": "Subscribe · {price} a month",
+    "premiumCta": "Join · {price} a month",
     "premiumClosed": "The subscription is not open yet.",
     "premiumThanks": "Thank you. Once Stripe confirms the payment your subscription appears here.",
     "premiumActive": "Active. Renews on {date}.",
     "premiumEnds": "Active until {date}. It will not renew.",
     "premiumPastDue": "A payment is pending. Check your card.",
     "premiumManage": "Manage the subscription",
-    "subscription": "Subscription"
+    "subscription": "Monthly membership",
+    "confirmAs": "You are signing in as {email}.",
+    "confirmCta": "Sign in",
+    "confirmNotYou": "If you did not ask for this, close this page."
   },
   "rsvp": {
     "seats": "Seats",

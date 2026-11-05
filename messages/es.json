@@ -517,7 +517,9 @@
     "toCarta": "Ver la carta",
     "signedInAs": "Pides como {name}.",
     "haveAccount": "¿Tienes cuenta? Entra y guardamos tus pedidos.",
-    "addShort": "Añadir"
+    "addShort": "Añadir",
+    "less": "Uno menos de {name}",
+    "more": "Uno más de {name}"
   },
   "account": {
     "eyebrow": "Tu cuenta",
@@ -563,7 +565,7 @@
       "signed-out": "Tu sesión ha terminado. Vuelve a entrar.",
       "pending": "Ya tienes un pago empezado. Termínalo en la otra pestaña o espera media hora."
     },
-    "premiumTitle": "Suscripción premium",
+    "premiumTitle": "Suscripción mensual",
     "premiumBody": "Una cuota al mes. La cancelas cuando quieras.",
     "premiumFoundingPrice": "Como socio fundador, pagas el precio fundador. La cancelas cuando quieras.",
     "premiumCta": "Suscribirme · {price} al mes",
@@ -573,7 +575,10 @@
     "premiumEnds": "Activa hasta el {date}. No se renovará.",
     "premiumPastDue": "Hay un pago pendiente. Revisa tu tarjeta.",
     "premiumManage": "Gestionar la suscripción",
-    "subscription": "Suscripción"
+    "subscription": "Suscripción mensual",
+    "confirmAs": "Vas a entrar como {email}.",
+    "confirmCta": "Entrar",
+    "confirmNotYou": "Si no lo pediste tú, cierra esta página."
   },
   "rsvp": {
     "seats": "Plazas",

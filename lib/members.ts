@@ -38,7 +38,7 @@ export function readSignInToken(token: string | null | undefined, now = nowS()) 
 }
 
 export async function sendSignInLink(email: string, locale: Loc, name?: string, next?: string) {
-  const url = `${site()}/api/members/sign-in?t=${encodeURIComponent(signInToken(email, locale, name, next))}`;
+  const url = `${site()}/${locale === "en" ? "en/account/sign-in" : "es/cuenta/entrar"}?t=${encodeURIComponent(signInToken(email, locale, name, next))}`;
   const es = locale === "es";
   return sendEmail(
     normEmail(email),

@@ -68,9 +68,7 @@ export default async function AccountPage({
       <Headline as="h1" className="mt-5 text-display">
         {t("hello", { name: member.name.split(" ")[0] })}
       </Headline>
-      <p className="mt-4 text-sumi/80">
-        {member.tier === "founding" ? t("tierFounding", { number: member.foundingNumber ?? "" }) : t("tierCustomer")}
-      </p>
+      {member.tier === "founding" ? <p className="mt-4 text-sumi/80">{t("tierFounding", { number: member.foundingNumber ?? "" })}</p> : null}
       <div className="mt-14">
         <AccountPanel
           member={{

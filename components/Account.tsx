@@ -210,7 +210,7 @@ export function AccountPanel({
                   ))}
                 </ul>
               ) : null}
-              <button type="button" disabled={pending} onClick={() => go(() => startPremiumAction(locale), setPremiumMsg)} className={`${inkButtonClass} mt-6 w-full sm:w-auto`}>
+              <button type="button" disabled={pending} onClick={() => go(() => startPremiumAction(locale), setPremiumMsg)} className={`${quietButton} mt-6 w-full sm:w-auto`}>
                 {t("premiumCta", { price: formatEuro(premium.priceCents, locale) })}
               </button>
             </>
@@ -308,7 +308,7 @@ export function AccountPanel({
         </section>
 
         <details className="border-t border-wood/25 pt-6">
-          <summary className="flex min-h-[44px] cursor-pointer items-center text-sm text-sumi/80">{t("deleteTitle")}</summary>
+          <summary className="flex min-h-[44px] w-fit cursor-pointer items-center text-sm text-sumi/70 underline decoration-wood/40 underline-offset-4">{t("deleteTitle")}</summary>
           <form
             action={(form) =>
               start(async () => {

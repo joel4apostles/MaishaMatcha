@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { placeOrderAction } from "@/app/[locale]/(site)/pedir/actions";
+import { BrandMark } from "@/components/BrandMark";
 import { formatEuro } from "@/lib/money";
 import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
@@ -155,7 +156,7 @@ export function OnlineOrder({
                   .filter((i) => i.category === c)
                   .map((item) => (
                     <li key={item.id} className="flex flex-col">
-                      <div className="relative aspect-[4/5] overflow-hidden rounded-[2px] bg-sumi/5">
+                      <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[2px] border border-wood/30">
                         {item.photo ? (
                           <Image
                             src={item.photo.url}
@@ -165,7 +166,9 @@ export function OnlineOrder({
                             sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 100vw"
                             className="object-cover"
                           />
-                        ) : null}
+                        ) : (
+                          <BrandMark className="w-10 text-wood/30" />
+                        )}
                       </div>
                       <div className="mt-4 flex items-baseline justify-between gap-4">
                         <h3 className="font-serif text-xl font-light">{item.name}</h3>
@@ -223,18 +226,36 @@ export function OnlineOrder({
                 </p>
                 {summaryOf(l) ? <p className="text-sm text-sumi/70">{summaryOf(l)}</p> : null}
               </div>
-              <div className="flex shrink-0 items-center">
+              <div className="flex shrink-0 flex-col items-end">
                 <span className="tabular-nums">{formatEuro(unitOf(l) * l.quantity, locale)}</span>
-                <button
-                  type="button"
-                  aria-label={t("remove", { name: l.item.name })}
-                  onClick={() => setLines((ls) => ls.filter((x) => x.uid !== l.uid))}
-                  className="flex h-11 w-11 items-center justify-center text-sumi/60"
-                >
-                  <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-                    <path d="M4 4l12 12M16 4L4 16" />
-                  </svg>
-                </button>
+                <div className="-mr-3 flex items-center">
+                  <button
+                    type="button"
+                    aria-label={l.quantity > 1 ? t("less", { name: l.item.name }) : t("remove", { name: l.item.name })}
+                    onClick={() =>
+                      setLines((ls) =>
+                        l.quantity > 1 ? ls.map((x) => (x.uid === l.uid ? { ...x, quantity: x.quantity - 1 } : x)) : ls.filter((x) => x.uid !== l.uid),
+                      )
+                    }
+                    className="flex h-11 w-11 items-center justify-center text-sumi/70"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                      <path d="M4 10h12" />
+                    </svg>
+                  </button>
+                  <span className="w-5 text-center text-sm tabular-nums" aria-hidden="true">{l.quantity}</span>
+                  <button
+                    type="button"
+                    aria-label={t("more", { name: l.item.name })}
+                    disabled={l.quantity >= 20}
+                    onClick={() => setLines((ls) => ls.map((x) => (x.uid === l.uid ? { ...x, quantity: x.quantity + 1 } : x)))}
+                    className="flex h-11 w-11 items-center justify-center text-sumi/70 disabled:opacity-40"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                      <path d="M4 10h12M10 4v12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </li>
           ))}
