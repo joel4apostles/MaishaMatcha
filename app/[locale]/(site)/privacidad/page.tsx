@@ -40,7 +40,7 @@ function PrivacyContent() {
       <Headline as="h1" className="mt-5">
         {t("privacy.title")}
       </Headline>
-      <p className="mt-5 inline-flex rounded-[2px] border border-wood/40 px-2.5 py-1 text-eyebrow uppercase text-sumi/70">
+      <p className="mt-5 inline-flex rounded-[2px] border border-wood/40 px-2.5 py-1 text-sm text-sumi/75">
         {t("provisional")}
       </p>
       <div className="measure mt-8 space-y-5 text-sumi/80">

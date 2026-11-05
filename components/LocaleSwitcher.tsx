@@ -26,10 +26,10 @@ export function LocaleSwitcher({ tone = "dark" }: { tone?: "light" | "dark" }) {
     <div
       role="group"
       aria-label={t("switcherAria")}
-      className="flex items-center gap-2 text-eyebrow uppercase"
+      className="flex items-center gap-0.5 text-eyebrow uppercase"
     >
       {routing.locales.map((locale, index) => (
-        <span key={locale} className="flex items-center gap-2">
+        <span key={locale} className="flex items-center gap-0.5">
           <Link
             href={pathname}
             locale={locale}
@@ -43,7 +43,7 @@ export function LocaleSwitcher({ tone = "dark" }: { tone?: "light" | "dark" }) {
               window.location.assign(target);
             }}
             aria-current={locale === active ? "true" : undefined}
-            className={`inline-flex items-center px-1 py-3 -my-3 ${locale === active ? activeClass : idleClass}`}
+            className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center ${locale === active ? activeClass : idleClass}`}
           >
             {locale}
           </Link>

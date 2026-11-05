@@ -15,9 +15,11 @@ const NAV: { href: AppPathname; key: "menu" | "story" | "events" }[] = [
 ];
 
 /**
- * Sticky header, single 64px row on all viewports. Over the home hero it is
- * transparent with light text; once scrolled (or on any inner page) it gains
- * the washi background. Colors only transition — no layout shift.
+ * Sticky header, single 64px row on all viewports. Over the home hero it
+ * sits on a flat sumi/50 band (measured: washi text clears 4.6:1 against the
+ * hero's brightest pixels); once scrolled, or on any inner page, it turns
+ * washi. Colors only transition, no layout shift. Aligned to the page grid
+ * (same gutter and 1100px container as Section).
  */
 export function SiteHeader() {
   const t = useTranslations("nav");
@@ -36,33 +38,35 @@ export function SiteHeader() {
 
   // Slide-in underline (flat pseudo-element); stays open on the active page.
   const linkBase =
-    "relative inline-flex items-center py-2.5 -my-2.5 text-[13px] transition-colors sm:text-sm " +
-    "after:absolute after:bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left " +
+    "relative -mx-1.5 inline-flex min-h-[44px] min-w-[44px] items-center justify-center px-1.5 text-[13px] transition-colors sm:text-sm " +
+    "after:absolute after:bottom-2.5 after:left-1.5 after:right-1.5 after:h-px after:origin-left " +
     "after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out " +
     "hover:after:scale-x-100 aria-[current=page]:after:scale-x-100";
   const linkTone = overlay
-    ? "text-washi/85 hover:text-washi"
+    ? "text-washi hover:text-washi"
     : "text-sumi/80 hover:text-sumi";
 
   return (
     <header
-      className={`${overlay ? "dark-band border-b border-transparent bg-transparent" : "border-b border-wood/20 bg-washi"} sticky top-0 z-40 transition-colors duration-300`}
+      data-site-header=""
+      className={`${overlay ? "dark-band border-b border-transparent bg-sumi/50" : "border-b border-wood/20 bg-washi"} sticky top-0 z-40 px-6 transition-colors duration-300 sm:px-8`}
     >
       <nav
         aria-label={t("aria")}
-        className="mx-auto flex h-16 max-w-[1100px] items-center justify-between gap-3 px-4 sm:px-8"
+        className="mx-auto flex h-16 max-w-[1100px] items-center justify-between gap-3"
       >
         <Link
           href="/"
           aria-current={isHome ? "page" : undefined}
           aria-label="maisha matcha"
-          className={`flex items-center gap-2.5 ${overlay ? "text-washi" : "text-matcha"}`}
+          className={`-ml-2 flex min-h-[44px] min-w-[44px] items-center gap-2.5 pl-2 ${overlay ? "text-washi" : "text-matcha"}`}
         >
-          <BrandMark className="h-5 w-auto shrink-0 sm:h-6" />
-          <BrandWordmark className="h-7 w-auto shrink-0 sm:h-8" />
+          {/* Phones: the mark alone, so every target can be 44px. */}
+          <BrandMark className="h-6 w-auto shrink-0" />
+          <BrandWordmark className="hidden h-8 w-auto shrink-0 sm:block" />
         </Link>
         <div className="flex items-center gap-4 sm:gap-7">
-          <ul className="flex items-center gap-4 sm:gap-6">
+          <ul className="flex items-center gap-3 sm:gap-6">
             {NAV.map((item) => (
               <li key={item.key}>
                 <Link
@@ -78,6 +82,9 @@ export function SiteHeader() {
           <LocaleSwitcher tone={overlay ? "light" : "dark"} />
         </div>
       </nav>
+      {/* Without JavaScript the header can't turn opaque on scroll: let it
+          scroll away with the hero instead of floating unreadable over washi. */}
+      <noscript dangerouslySetInnerHTML={{ __html: "<style>[data-site-header]{position:static}</style>" }} />
     </header>
   );
 }

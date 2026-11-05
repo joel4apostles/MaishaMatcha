@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { site, siteHours, siteMapsUrl } from "@/content/site";
 import salonEstantes from "@/public/images/salon-estantes.jpg";
 import salonBarra from "@/public/images/salon-barra.jpg";
 import salonArbol from "@/public/images/salon-arbol.jpg";
@@ -10,6 +11,8 @@ import { Reveal } from "@/components/Reveal";
 
 export function TheSpace() {
   const t = useTranslations("home.space");
+  const footer = useTranslations("footer");
+  const locale = useLocale();
   const details = [
     { src: salonEstantes, alt: t("alt1"), caption: t("caption1") },
     { src: salonBarra, alt: t("alt2"), caption: t("caption2") },
@@ -48,6 +51,22 @@ export function TheSpace() {
             ))}
           </div>
         </div>
+      </Reveal>
+
+      {/* Where and when, two screens from the hero on a phone. */}
+      <Reveal className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-wood/25 pt-6 text-sm text-sumi/80">
+        <span>
+          {site.address} · {site.city}
+        </span>
+        <span>{siteHours(locale)}</span>
+        <a
+          href={siteMapsUrl}
+          rel="noreferrer"
+          target="_blank"
+          className="inline-flex min-h-[44px] items-center text-sumi underline decoration-wood/50 underline-offset-4 hover:decoration-sumi/70"
+        >
+          {footer("directions")}
+        </a>
       </Reveal>
     </Section>
   );

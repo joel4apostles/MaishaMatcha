@@ -1,117 +1,126 @@
-import {
-  RECIPE_BASE_PRICE_CENTS,
-  MATCHA_HUE,
-  intensities,
-  bases,
-  fruits,
-  temps,
-  type Intensity,
-  type Base,
-  type Fruit,
-  type Temp,
-} from "@/content/recipe";
+import { carta, type CartaItem, type CartaOption } from "@/content/carta";
+import { cartaGroup, itemSlug } from "@/lib/carta";
+
+/**
+ * The recipe builder's logic, built on the real carta: the same teas,
+ * preparations, milks and extras (and the same prices) as the menu page and
+ * the counter. Pure functions, unit tested in tests/unit/recipe.test.ts.
+ */
+export type RecipeIds = {
+  /** Tea slug: uji, nishio, kagoshima, hojicha, black-tea. */
+  tea: string;
+  /** "base" = usucha (matcha) or solo (tea); "latte" adds milk. */
+  prep: "base" | "latte";
+  /** Milk key suffix (vaca, avena); only used for lattes. */
+  milk: string;
+  /** Extra key suffixes, in carta order. */
+  extras: string[];
+};
 
 export type Recipe = {
-  intensity: Intensity;
-  base: Base;
-  fruit: Fruit | null;
-  temp: Temp;
+  tea: CartaItem;
+  prep: CartaOption;
+  milk: CartaOption | null;
+  extras: CartaOption[];
 };
 
-export type RecipeIds = {
-  intensity: Intensity["id"];
-  base: Base["id"];
-  fruit: Fruit["id"] | null;
-  temp: Temp["id"];
+/** Teas the builder offers: every carta item with a preparation choice. */
+export const builderTeas: CartaItem[] = carta
+  .flatMap((c) => c.items)
+  .filter((i) => i.groups.some((g) => g.startsWith("preparacion")));
+
+const prepGroupOf = (tea: CartaItem) =>
+  cartaGroup(tea.groups.find((g) => g.startsWith("preparacion"))!);
+
+/** [usucha or solo, latte] for a tea, straight from its carta group. */
+export const prepOptionsFor = (tea: CartaItem) => {
+  const [base, latte] = prepGroupOf(tea).options;
+  return { base, latte };
 };
+
+export const builderMilks = cartaGroup("leche").options;
+export const builderExtras = cartaGroup("extras").options;
+
+const suffix = (o: CartaOption) => o.key.slice(o.key.indexOf(".") + 1);
 
 export const DEFAULT_RECIPE: RecipeIds = {
-  intensity: "clasico",
-  base: "agua",
-  fruit: null,
-  temp: "frio",
+  tea: "nishio",
+  prep: "latte",
+  milk: suffix(builderMilks[0]),
+  extras: [],
 };
 
 export function resolveRecipe(ids: RecipeIds): Recipe {
-  return {
-    intensity:
-      intensities.find((i) => i.id === ids.intensity) ?? intensities[1],
-    base: bases.find((b) => b.id === ids.base) ?? bases[0],
-    fruit: ids.fruit ? (fruits.find((f) => f.id === ids.fruit) ?? null) : null,
-    temp: temps.find((t) => t.id === ids.temp) ?? temps[0],
-  };
+  const tea = builderTeas.find((t) => itemSlug(t) === ids.tea) ?? builderTeas[0];
+  const [base, latte] = prepGroupOf(tea).options;
+  const prep = ids.prep === "latte" ? latte : base;
+  const milk =
+    ids.prep === "latte"
+      ? (builderMilks.find((m) => suffix(m) === ids.milk) ?? builderMilks[0])
+      : null;
+  const extras = builderExtras.filter((e) => ids.extras.includes(suffix(e)));
+  return { tea, prep, milk, extras };
 }
 
-/** Total in cents: matcha base + intensity + base liquid + fruit. */
-export function priceCents(recipe: Recipe): number {
+/** IVA-included cents: the carta price, the preparation and every extra. */
+export function priceCents(r: Recipe): number {
   return (
-    RECIPE_BASE_PRICE_CENTS +
-    recipe.intensity.surchargeCents +
-    recipe.base.surchargeCents +
-    (recipe.fruit?.surchargeCents ?? 0)
+    r.tea.priceCents +
+    r.prep.priceDeltaCents +
+    (r.milk?.priceDeltaCents ?? 0) +
+    r.extras.reduce((sum, e) => sum + e.priceDeltaCents, 0)
   );
 }
 
-export function formatPrice(cents: number): string {
-  return `${(cents / 100).toFixed(2).replace(".", ",")} €`;
-}
+const teaCode = (tea: CartaItem) =>
+  tea.name.normalize("NFD").replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase();
 
-/** "2 g : 200 ml · 1:100" — the craft, stated plainly. */
-export function ratioLabel(recipe: Recipe): string {
-  const { grams } = recipe.intensity;
-  const { ml } = recipe.base;
-  const ratio = Math.round(ml / grams);
-  const g = grams % 1 === 0 ? String(grams) : grams.toFixed(1).replace(".", ",");
-  return `${g} g : ${ml} ml · 1:${ratio}`;
-}
-
-/** Human-readable recipe code, e.g. "CLA·TON·YUZ·F". */
-export function displayCode(recipe: Recipe): string {
-  return [
-    recipe.intensity.code,
-    recipe.base.code,
-    recipe.fruit?.code,
-    recipe.temp.code,
-  ]
+/** What the barista reads at the counter, e.g. "NIS·LAT·AVE·CCL". */
+export function displayCode(r: Recipe): string {
+  return [teaCode(r.tea), r.prep.code, r.milk?.code, ...r.extras.map((e) => e.code)]
     .filter(Boolean)
     .join("·");
 }
 
-/** Compact URL param, e.g. "clasico.tonica.yuzu.frio" (fruit "no" if none). */
+/** Share-link parameter, e.g. "nishio.latte.avena.coconut-cloud~ube" (~ survives URLs; + would decode to a space). */
 export function toParam(ids: RecipeIds): string {
-  return [ids.intensity, ids.base, ids.fruit ?? "no", ids.temp].join(".");
+  const r = resolveRecipe(ids);
+  return [
+    itemSlug(r.tea),
+    ids.prep,
+    r.milk ? suffix(r.milk) : "no",
+    r.extras.length ? r.extras.map(suffix).join("~") : "no",
+  ].join(".");
 }
 
+/** Lenient parse: anything unknown falls back to the default, never throws. */
 export function fromParam(param: string | null): RecipeIds {
   if (!param) return DEFAULT_RECIPE;
-  const [i, b, f, t] = param.split(".");
+  const [tea, prep, milk, extras] = param.split(".");
+  const known = new Set(builderExtras.map(suffix));
   return {
-    intensity: intensities.some((x) => x.id === i)
-      ? (i as Intensity["id"])
-      : DEFAULT_RECIPE.intensity,
-    base: bases.some((x) => x.id === b) ? (b as Base["id"]) : DEFAULT_RECIPE.base,
-    fruit: fruits.some((x) => x.id === f) ? (f as Fruit["id"]) : null,
-    temp: temps.some((x) => x.id === t) ? (t as Temp["id"]) : DEFAULT_RECIPE.temp,
+    tea: builderTeas.some((t) => itemSlug(t) === tea) ? tea : DEFAULT_RECIPE.tea,
+    prep: prep === "latte" ? "latte" : prep === "base" ? "base" : DEFAULT_RECIPE.prep,
+    milk: builderMilks.some((m) => suffix(m) === milk) ? milk : DEFAULT_RECIPE.milk,
+    extras: (extras ?? "")
+      .split("~")
+      .filter((e, i, all) => known.has(e) && all.indexOf(e) === i),
   };
 }
 
-/** The drink's color: matcha blended with its base and fruit. Flat, no gradients. */
-export function blendColor(recipe: Recipe): string {
-  const hex = (h: string): [number, number, number] => [
-    parseInt(h.slice(1, 3), 16),
-    parseInt(h.slice(3, 5), 16),
-    parseInt(h.slice(5, 7), 16),
-  ];
-  const matcha = hex(MATCHA_HUE);
-  const base = hex(recipe.base.hue);
-  const fruit = recipe.fruit ? hex(recipe.fruit.hue) : null;
+export function optionSuffix(o: CartaOption): string {
+  return suffix(o);
+}
 
-  // Matcha leads; base softens; fruit tints.
-  const weights = fruit ? [0.5, 0.25, 0.25] : [0.62, 0.38, 0];
-  const mix = matcha.map((m, ch) =>
-    Math.round(
-      m * weights[0] + base[ch] * weights[1] + (fruit ? fruit[ch] : 0) * weights[2],
-    ),
+/** The drink's colour: the tea, softened by milk, touched by extras. Flat. */
+export function blendColor(r: Recipe): string {
+  const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const layers: [number[], number][] = [[hex(r.tea.color), 1]];
+  if (r.milk?.hue) layers.push([hex(r.milk.hue), 0.8]);
+  for (const e of r.extras) if (e.hue) layers.push([hex(e.hue), 0.35]);
+  const total = layers.reduce((s, [, w]) => s + w, 0);
+  const mix = [0, 1, 2].map((ch) =>
+    Math.round(layers.reduce((s, [c, w]) => s + c[ch] * w, 0) / total),
   );
   return `#${mix.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 }

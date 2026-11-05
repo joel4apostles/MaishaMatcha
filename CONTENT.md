@@ -1,9 +1,9 @@
 # CONTENT.md — editing the carta and the recipe builder (for the team)
 
-Everything customers see comes from two files. Edit them on GitHub (no code
+Everything customers see on the menu and in the builder comes from one file. Edit them on GitHub (no code
 setup needed) and the site redeploys automatically in about a minute.
 
-> GitHub → `content/carta.ts` or `content/recipe.ts` → pencil icon (Edit) →
+> GitHub → `content/carta.ts` → pencil icon (Edit) →
 > make the change → "Commit changes". Vercel deploys on save.
 
 ## 1. The carta — `content/carta.ts`
@@ -36,31 +36,14 @@ one file, so a price changed here is the same everywhere. Each item:
 - Once the admin is live, the counter's copy of the carta is edited at
   /admin (Carta, Opciones). This file then only seeds new installs.
 
-## 2. The recipe builder — `content/recipe.ts`
+## 2. The recipe builder — reads the carta
 
-Four option lists. Every option the team adds appears in `/crea` instantly,
-with pricing, ratio and QR handled automatically.
-
-```ts
-// intensity: grams drive the ratio; surchargeCents drives the price
-{ id: "intenso", code: "INT", grams: 3, surchargeCents: 100,
-  label: { es: "Intenso", en: "Intense" },
-  note:  { es: "Denso, para detenerse", en: "Dense, made to pause over" } },
-
-// base: ml drives the ratio; hue tints the blended drink color
-{ id: "tonica", code: "TON", ml: 200, surchargeCents: 100, hue: "#DCE0C8",
-  label: { es: "Tónica", en: "Tonic" } },
-
-// fruit: hue tints the color; surcharge adds to price
-{ id: "yuzu", code: "YUZ", surchargeCents: 100, hue: "#C0B056",
-  label: { es: "Yuzu", en: "Yuzu" } },
-```
-
-- `RECIPE_BASE_PRICE_CENTS` (top of file) is the starting price: 400 = 4,00 €.
-- Prices are in CENTS (150 = 1,50 €). The ratio label ("2 g : 200 ml · 1:100")
-  computes itself from grams and ml.
-- `code` builds the counter code (CLA·TON·YUZ·F) — keep 2-3 letters, unique.
-- Always fill BOTH `es` and `en` labels.
+`/crea` builds from `content/carta.ts` too: every item with a preparation
+choice (the matchas and the teas), the `leche` group for lattes and the
+`extras` group. Add a milk or an extra there and it appears in the
+builder, the menu and the counter at once, with the same price. Each option
+can carry a three-letter `code` (shown at the counter, e.g. NIS·LAT·AVE)
+and a `hue` (tints the drink photo).
 
 ## 3. What the counter needs to know
 

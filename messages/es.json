@@ -30,7 +30,7 @@
     },
     "menuPreview": {
       "eyebrow": "La carta",
-      "title": "Cuatro tés de Japón",
+      "title": "Tés de Japón",
       "createEyebrow": "A tu manera"
     },
     "space": {
@@ -49,8 +49,7 @@
     "founding": {
       "eyebrow": "Socios fundadores",
       "title": "Los primeros cincuenta",
-      "scarcity": "Cincuenta plazas. Ni una más.",
-      "body": "Los primeros cincuenta socios conservan los privilegios de apertura.",
+      "body": "Conservan los privilegios de apertura.",
       "privilege1": "Primera invitación a cata",
       "privilege2": "Acceso anticipado a los eventos",
       "privilege3": "Precio fundador en la futura membresía"
@@ -78,7 +77,8 @@
     "intro": "Usucha en agua o matcha latte. Los lattes, con la leche que prefieras, también vegetal de avena.",
     "closing": "Cincuenta socios fundadores estrenarán esta carta.",
     "priceNote": "Precios en euros, IVA incluido. 100 % té japonés de origen.",
-    "price": "Precio"
+    "price": "Precio",
+    "sectionsAria": "Secciones de la carta"
   },
   "story": {
     "eyebrow": "Historia",
@@ -117,7 +117,9 @@
     "legalNotice": "Aviso legal",
     "privacy": "Privacidad",
     "switcherAria": "Cambiar idioma",
-    "rights": "maisha matcha · Murcia"
+    "rights": "maisha matcha · Murcia",
+    "directions": "Cómo llegar",
+    "legalAria": "Legal"
   },
   "meta": {
     "home": {
@@ -146,7 +148,7 @@
     },
     "create": {
       "title": "Crea tu bebida · maisha matcha",
-      "description": "Compón tu propio matcha: intensidad, base y fruta. La preparamos en el salón."
+      "description": "Compón tu bebida con el matcha de Uji, Nishio o Kagoshima: usucha o latte, la leche y los extras. La preparamos en el salón."
     }
   },
   "notFound": {
@@ -157,21 +159,22 @@
   "create": {
     "eyebrow": "A tu manera",
     "title": "Crea tu bebida",
-    "intro": "Elige el matcha, la base y la fruta. Nosotros la preparamos en la barra.",
-    "stepIntensity": "El matcha",
-    "stepBase": "La base",
-    "stepFruit": "La fruta",
-    "stepFruitNote": "Opcional",
-    "noFruit": "Sin fruta",
-    "stepTemp": "La temperatura",
+    "intro": "Elige el té, cómo lo quieres y tus extras. Nosotros lo preparamos en la barra.",
+    "stepTea": "El té",
+    "stepPrep": "La preparación",
+    "latteNote": "con la leche que prefieras",
+    "stepMilk": "La leche",
+    "stepExtras": "Los extras",
+    "stepExtrasNote": "Opcionales, puedes elegir varios",
     "cardTitle": "Tu receta",
     "cardHint": "Enséñala en la barra y la preparamos al momento.",
-    "ratioLabel": "Proporción",
     "priceLabel": "Precio",
     "codeLabel": "Código",
     "copyLink": "Copiar enlace",
     "copied": "Enlace copiado.",
-    "priceNote": "Precios de apertura, por confirmar."
+    "priceNote": "Precios en euros, IVA incluido.",
+    "viewCard": "Ver receta",
+    "shareLink": "Compartir"
   },
   "pos": {
     "title": "Barra",

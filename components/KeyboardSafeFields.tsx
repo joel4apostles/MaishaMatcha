@@ -23,9 +23,14 @@ export function KeyboardSafeFields() {
       if (!(el instanceof HTMLElement) || !el.matches(FIELD)) return;
       const rect = el.getBoundingClientRect();
       const top = vv ? vv.offsetTop : 0;
-      const bottom = top + (vv ? vv.height : window.innerHeight);
-      if (rect.top < top + MARGIN || rect.bottom > bottom - MARGIN) {
-        el.scrollIntoView({ block: "center", behavior: reduce.matches ? "auto" : "smooth" });
+      const height = vv ? vv.height : window.innerHeight;
+      if (rect.top < top + MARGIN || rect.bottom > top + height - MARGIN) {
+        // Centre the field in what is actually visible. On iOS the layout
+        // viewport does not shrink for the keyboard, so scrollIntoView would
+        // centre it behind the keyboard; scrolling by the visual-viewport
+        // offset works on both iOS and Android.
+        const delta = rect.top - top - (height - rect.height) / 2;
+        window.scrollBy({ top: delta, behavior: reduce.matches ? "auto" : "smooth" });
       }
     };
 

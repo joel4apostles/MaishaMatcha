@@ -4,7 +4,6 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { ScrollInk } from "@/components/ScrollInk";
-import { BrandMark } from "@/components/BrandMark";
 
 export function Manifesto() {
   const t = useTranslations("home.manifesto");
@@ -16,10 +15,6 @@ export function Manifesto() {
         <Reveal>
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>
-          {/* The brand icon inhabits the column's quiet — a watermark. */}
-          <BrandMark
-            className="mt-12 hidden h-36 w-auto text-matcha/20 md:block"
-          />
         </Reveal>
         <div className="space-y-8">
           <ScrollInk text={t("p1")} className={inkClass} />
@@ -41,4 +36,3 @@ export function Manifesto() {
   );
 }
 
-/** The four pivotal chapters told on the front page; the rest live in /historia. */

@@ -8,11 +8,14 @@ import { BrandMark } from "@/components/BrandMark";
 export function PosFrame({ aside, children }: { aside?: ReactNode; children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex min-h-[64px] items-center justify-between gap-4 border-b border-wood/30 px-4 sm:px-8">
+      <header className="flex min-h-[64px] items-center justify-between gap-4 border-b border-wood/30 px-6 sm:px-8">
         <BrandMark className="h-8 w-auto text-matcha" />
         {aside}
       </header>
-      <main className="flex flex-1 flex-col px-4 py-10 sm:px-8 sm:py-14">{children}</main>
+      {/* Tablets: the work sits centred in a calm column, not in a corner. */}
+      <main className="flex flex-1 flex-col px-6 py-10 sm:px-8 sm:py-14 md:items-center md:justify-center">
+        <div className="w-full max-w-3xl">{children}</div>
+      </main>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { StoryVisual } from "@/components/StoryVisual";
 import { story } from "@/content/story";
 import { stageDelay } from "./motion";
 
+/** The four pivotal chapters told on the front page; the rest live in /historia. */
 const TEASER_CHAPTERS = ["tang", "eisai", "rikyu", "murcia"];
 
 export function StoryTeaser() {

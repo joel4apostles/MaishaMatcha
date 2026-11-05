@@ -41,20 +41,39 @@ function clientIp(request: Request): string {
 }
 
 export async function POST(request: Request) {
+  // No-JavaScript fallback: the form POSTs form-encoded data and the visitor
+  // is sent back to the founding section (303) instead of seeing JSON.
+  const isForm = /application\/x-www-form-urlencoded|multipart\/form-data/.test(
+    request.headers.get("content-type") ?? "",
+  );
+  let formLocale: "es" | "en" = "es";
+  const reply = (body: Record<string, unknown>, status = 200) => {
+    if (!isForm) return NextResponse.json(body, { status });
+    const outcome = status < 300 ? "ok" : "error";
+    return NextResponse.redirect(new URL(`/${formLocale}?waitlist=${outcome}#socios`, request.url), 303);
+  };
+
   if (!rateLimit(clientIp(request))) {
-    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+    return reply({ error: "rate_limited" }, 429);
   }
 
   let json: unknown;
   try {
-    json = await request.json();
+    if (isForm) {
+      const form = await request.formData();
+      formLocale = form.get("locale") === "en" ? "en" : "es";
+      if (form.get("consent") !== "on") return reply({ error: "consent_required" }, 400);
+      json = { name: form.get("name"), email: form.get("email"), locale: formLocale };
+    } else {
+      json = await request.json();
+    }
   } catch {
-    return NextResponse.json({ error: "invalid_json" }, { status: 400 });
+    return reply({ error: "invalid_body" }, 400);
   }
 
   const parsed = schema.safeParse(json);
   if (!parsed.success) {
-    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+    return reply({ error: "invalid_input" }, 400);
   }
   const { name, email, locale } = parsed.data;
 
@@ -68,7 +87,7 @@ export async function POST(request: Request) {
     } else {
       console.info("[waitlist] no Resend env; skipped send", { locale });
     }
-    return NextResponse.json({ ok: true, degraded: true });
+    return reply({ ok: true, degraded: true });
   }
 
   try {
@@ -88,9 +107,9 @@ export async function POST(request: Request) {
       react: createElement(WaitlistConfirmation, { locale, name }),
     });
 
-    return NextResponse.json({ ok: true });
+    return reply({ ok: true });
   } catch (error) {
     console.error("[waitlist] Resend error:", error);
-    return NextResponse.json({ error: "send_failed" }, { status: 502 });
+    return reply({ error: "send_failed" }, 502);
   }
 }

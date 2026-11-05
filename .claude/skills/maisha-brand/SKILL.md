@@ -41,8 +41,8 @@ Reduced palette, 2–3 colors maximum, much negative space.
   matcha green on washi, washi over the hero image. Logos are exempt from
   text contrast rules; body text never is.
 - Matcha powder texture (public/images/matcha-powder.jpg, from the kit):
-  the material of the green bands — always UNDER a bg-matcha/80 veil
-  (20% powder show-through is the AA ceiling: sumi worst-case 4.55:1).
+  the material of the green bands — always UNDER a bg-matcha/85 veil
+  (raised from /80 on 2026-11-05: /80 was exactly the AA ceiling at 4.55:1).
   Never place text on raw powder.
 
 ## Layout

@@ -15,6 +15,10 @@ type L = Record<Locale, string>;
 
 export type CartaOption = {
   key: string;
+  /** Three letters for the recipe code shown at the counter (LAT, AVE). */
+  code?: string;
+  /** The ingredient's natural colour, for the builder's live drink tint. */
+  hue?: string;
   label: L;
   note?: L;
   priceDeltaCents: number;
@@ -49,8 +53,8 @@ export const cartaGroups: CartaGroup[] = [
     selection: "single",
     required: true,
     options: [
-      { key: "prep.usucha", label: { es: "Usucha", en: "Usucha" }, note: { es: "En agua", en: "In water" }, priceDeltaCents: 0 },
-      { key: "prep.latte", label: { es: "Latte", en: "Latte" }, priceDeltaCents: LATTE_CENTS },
+      { key: "prep.usucha", code: "USU", label: { es: "Usucha", en: "Usucha" }, note: { es: "En agua", en: "In water" }, priceDeltaCents: 0 },
+      { key: "prep.latte", code: "LAT", label: { es: "Latte", en: "Latte" }, priceDeltaCents: LATTE_CENTS },
     ],
   },
   {
@@ -59,8 +63,8 @@ export const cartaGroups: CartaGroup[] = [
     selection: "single",
     required: true,
     options: [
-      { key: "prep.solo", label: { es: "Solo", en: "On its own" }, priceDeltaCents: 0 },
-      { key: "prep.te-latte", label: { es: "Latte", en: "Latte" }, priceDeltaCents: LATTE_CENTS },
+      { key: "prep.solo", code: "SOL", label: { es: "Solo", en: "On its own" }, priceDeltaCents: 0 },
+      { key: "prep.te-latte", code: "LAT", label: { es: "Latte", en: "Latte" }, priceDeltaCents: LATTE_CENTS },
     ],
   },
   {
@@ -69,8 +73,8 @@ export const cartaGroups: CartaGroup[] = [
     selection: "single",
     required: false,
     options: [
-      { key: "leche.vaca", label: { es: "Leche", en: "Milk" }, priceDeltaCents: 0, allergens: ["milk"] },
-      { key: "leche.avena", label: { es: "Avena", en: "Oat" }, note: { es: "Vegetal", en: "Plant-based" }, priceDeltaCents: 0, allergens: ["gluten"] },
+      { key: "leche.vaca", code: "LEC", hue: "#F1EADB", label: { es: "Leche", en: "Milk" }, priceDeltaCents: 0, allergens: ["milk"] },
+      { key: "leche.avena", code: "AVE", hue: "#E6D9BC", label: { es: "Avena", en: "Oat" }, note: { es: "Vegetal", en: "Plant-based" }, priceDeltaCents: 0, allergens: ["gluten"] },
     ],
   },
   {
@@ -79,11 +83,11 @@ export const cartaGroups: CartaGroup[] = [
     selection: "multiple",
     required: false,
     options: [
-      { key: "extra.pure-mango", label: { es: "Puré de mango", en: "Mango purée" }, priceDeltaCents: 150 },
-      { key: "extra.pure-fresa", label: { es: "Puré de fresa", en: "Strawberry purée" }, priceDeltaCents: 150 },
-      { key: "extra.pure-maracuya", label: { es: "Puré de fruta de la pasión", en: "Passion fruit purée" }, priceDeltaCents: 150 },
-      { key: "extra.coconut-cloud", label: { es: "Coconut Cloud", en: "Coconut Cloud" }, note: { es: "Capa ligera de crema de coco", en: "A light layer of coconut cream" }, priceDeltaCents: 150 },
-      { key: "extra.ube", label: { es: "Ube", en: "Ube" }, note: { es: "Ñame púrpura, dulce y antioxidante", en: "Purple yam, sweet and antioxidant" }, priceDeltaCents: 200 },
+      { key: "extra.pure-mango", code: "MAN", hue: "#E8A33D", label: { es: "Puré de mango", en: "Mango purée" }, priceDeltaCents: 150 },
+      { key: "extra.pure-fresa", code: "FRE", hue: "#D9707A", label: { es: "Puré de fresa", en: "Strawberry purée" }, priceDeltaCents: 150 },
+      { key: "extra.pure-maracuya", code: "MAR", hue: "#E2B23C", label: { es: "Puré de fruta de la pasión", en: "Passion fruit purée" }, priceDeltaCents: 150 },
+      { key: "extra.coconut-cloud", code: "CCL", hue: "#F4EFE3", label: { es: "Coconut Cloud", en: "Coconut Cloud" }, note: { es: "Capa ligera de crema de coco", en: "A light layer of coconut cream" }, priceDeltaCents: 150 },
+      { key: "extra.ube", code: "UBE", hue: "#8C6BB1", label: { es: "Ube", en: "Ube" }, note: { es: "Ñame púrpura, dulce y antioxidante", en: "Purple yam, sweet and antioxidant" }, priceDeltaCents: 200 },
     ],
   },
   {
@@ -133,8 +137,8 @@ export const carta: CartaCategory[] = [
         color: "#5F7A2C",
         signature: true,
         description: {
-          es: "Ceremonial premium. Dulzor natural, umami profundo y textura sedosa, sin amargor.",
-          en: "Premium ceremonial. Natural sweetness, deep umami and a silken texture, without bitterness.",
+          es: "Ceremonial. Dulzor natural, umami profundo y textura sedosa, sin amargor.",
+          en: "Ceremonial. Natural sweetness, deep umami and a silken texture, without bitterness.",
         },
         groups: MATCHA_GROUPS,
       },

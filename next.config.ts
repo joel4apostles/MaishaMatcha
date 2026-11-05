@@ -30,6 +30,8 @@ const nextConfig: NextConfig = {
   // This project lives inside a parent folder that also has a lockfile;
   // pin the tracing root so Next resolves files from this app only.
   outputFileTracingRoot: process.cwd(),
+  // Next 16 only serves listed qualities: 50 for textures under a veil.
+  images: { qualities: [50, 75] },
   async headers() {
     return [
       {

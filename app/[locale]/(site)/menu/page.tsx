@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import { Section } from "@/components/Section";
+import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { buttonClass, QuietLink } from "@/components/Button";
@@ -44,11 +45,26 @@ function MenuContent() {
   return (
     <Section>
       <Reveal>
-        <Headline as="h1" className="text-display">{t("title")}</Headline>
+        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <Headline as="h1" className="mt-5 text-display">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
         <div className="mt-6">
           <QuietLink href="/crea">{cta("create")}</QuietLink>
         </div>
+        {/* A long page on a phone: jump straight to a section. */}
+        <nav aria-label={t("sectionsAria")} className="mt-8 flex flex-wrap gap-x-5 border-t border-wood/25 pt-2">
+          {[...carta.map((c) => ({ id: c.slug, label: c.title[locale] })), { id: "extras", label: cartaGroup("extras").label[locale] }].map(
+            (s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className="inline-flex min-h-[44px] items-center text-sm text-sumi/80 underline decoration-wood/40 underline-offset-4 hover:text-sumi hover:decoration-sumi/70"
+              >
+                {s.label}
+              </a>
+            ),
+          )}
+        </nav>
       </Reveal>
 
       <div className="mt-16 max-w-3xl space-y-16">
@@ -77,16 +93,20 @@ function MenuContent() {
                         {/* The drink, seen from above. */}
                         <span
                           aria-hidden="true"
-                          className="h-3.5 w-3.5 shrink-0 rounded-full ring-1 ring-sumi/10"
+                          className="h-3.5 w-3.5 shrink-0 rounded-full ring-1 ring-sumi/20"
                           style={{ backgroundColor: item.color }}
                         />
                         {item.name}
                       </p>
                       <p className="mt-1.5 max-w-xl text-sumi/75">{item.description[locale]}</p>
                     </div>
-                    <dl className="flex shrink-0 flex-wrap gap-x-6 gap-y-1 sm:justify-end">
-                      {priceLines(item, locale).map((line) => (
-                        <div key={line.label ?? "price"} className="flex items-baseline gap-2">
+                    {/* Two fixed price columns so every row lines up on wide screens. */}
+                    <dl className="flex shrink-0 flex-wrap gap-x-6 gap-y-1 sm:grid sm:w-[17rem] sm:grid-cols-2">
+                      {priceLines(item, locale).map((line, index, all) => (
+                        <div
+                          key={line.label ?? index}
+                          className={`flex items-baseline gap-2 sm:justify-between ${all.length === 1 ? "sm:col-start-2" : ""}`}
+                        >
                           {line.label ? (
                             <dt className="text-eyebrow uppercase text-sumi/70">{line.label}</dt>
                           ) : (

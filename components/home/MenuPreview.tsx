@@ -28,17 +28,18 @@ export function MenuPreview() {
         <Headline className="mt-5">{t("title")}</Headline>
       </Reveal>
       <Reveal className="mt-12">
-        <ul className="group/menu grid grid-cols-1 gap-4 sm:grid-cols-12">
+        {/* Phones: hairline rows like the carta page. sm+: the bento of cards. */}
+        <ul className="group/menu grid grid-cols-1 border-t border-wood/30 sm:grid-cols-12 sm:gap-4 sm:border-t-0">
           {items.map(({ item, category }, i) => (
             <li key={itemSlug(item)} className={`${bentoSpans[i]} flex`}>
               {/* Whole cell is a real link — the hover affordance is honest. */}
               <Link
                 href="/menu"
                 style={{ "--drink": item.color } as CSSProperties}
-                className="flex min-h-[160px] w-full flex-col justify-between rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-[color-mix(in_srgb,var(--drink)_55%,transparent)] hover:bg-[color-mix(in_srgb,var(--drink)_10%,transparent)] hover:opacity-100! sm:min-h-[200px] sm:p-9"
+                className="flex w-full flex-col justify-between border-b border-wood/30 py-5 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-[color-mix(in_srgb,var(--drink)_55%,transparent)] hover:bg-[color-mix(in_srgb,var(--drink)_10%,transparent)] hover:opacity-100! sm:min-h-[200px] sm:rounded-[2px] sm:border sm:border-wood/40 sm:p-9"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="hidden items-center justify-between gap-4 sm:flex">
                     <p className="text-eyebrow uppercase text-sumi/70">
                       {category.title[locale]}
                     </p>
@@ -49,14 +50,19 @@ export function MenuPreview() {
                       style={{ backgroundColor: item.color }}
                     />
                   </div>
-                  <p className="mt-3 font-serif text-3xl font-light text-sumi">
+                  <p className="flex items-center gap-3 font-serif text-2xl font-light text-sumi sm:mt-3 sm:text-3xl">
+                    <span
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5 shrink-0 rounded-full ring-1 ring-sumi/15 sm:hidden"
+                      style={{ backgroundColor: item.color }}
+                    />
                     {item.name}
                   </p>
-                  <p className="mt-3 max-w-md text-sumi/75">
+                  <p className="mt-3 hidden max-w-md text-sumi/75 sm:block">
                     {item.description[locale]}
                   </p>
                 </div>
-                <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-wood/25 pt-4">
+                <div className="mt-2 flex flex-wrap items-baseline gap-x-6 gap-y-1 sm:mt-8 sm:justify-between sm:border-t sm:border-wood/25 sm:pt-4">
                   {priceLines(item, locale).map((line) => (
                     <p key={line.label ?? "price"} className="flex items-baseline gap-2">
                       {line.label ? (
@@ -73,13 +79,13 @@ export function MenuPreview() {
           <li className="flex sm:col-span-12">
             <Link
               href="/crea"
-              className="flex w-full flex-wrap items-center justify-between gap-4 rounded-[2px] border border-wood/40 p-7 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-matcha/50 hover:bg-matcha/[0.06] hover:opacity-100! sm:p-9"
+              className="flex w-full flex-wrap items-center justify-between gap-4 border-b border-wood/30 py-5 transition-[opacity,background-color,border-color] duration-300 ease-out group-hover/menu:opacity-90 hover:border-matcha/50 hover:bg-matcha/[0.06] hover:opacity-100! sm:rounded-[2px] sm:border sm:border-wood/40 sm:p-9"
             >
               <div>
                 <p className="text-eyebrow uppercase text-sumi/70">
                   {t("createEyebrow")}
                 </p>
-                <p className="mt-3 font-serif text-3xl font-light text-sumi">
+                <p className="mt-2 font-serif text-2xl font-light text-sumi sm:mt-3 sm:text-3xl">
                   {cta("create")}
                 </p>
               </div>

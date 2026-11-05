@@ -18,10 +18,11 @@ export function Founding() {
         aria-hidden="true"
         fill
         sizes="100vw"
+        quality={50}
         placeholder="blur"
         className="object-cover"
       />
-      <div aria-hidden="true" className="absolute inset-0 bg-matcha/80" />
+      <div aria-hidden="true" className="absolute inset-0 bg-matcha/85" />
       <Reveal className="relative grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         <div>
           <p className="text-eyebrow font-medium uppercase text-sumi/85">
@@ -30,10 +31,7 @@ export function Founding() {
           <h2 className="mt-5 text-balance font-serif text-title font-light text-sumi">
             {t("title")}
           </h2>
-          <p className="mt-6 font-serif text-2xl font-light text-sumi sm:text-3xl">
-            {t("scarcity")}
-          </p>
-          <p className="measure mt-4 text-lg text-sumi/85">{t("body")}</p>
+          <p className="measure mt-6 text-lg text-sumi/85">{t("body")}</p>
           <ul className="mt-8 space-y-3">
             {privileges.map((p) => (
               <li key={p} className="flex items-start gap-3 text-sumi/85">

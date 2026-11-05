@@ -30,7 +30,7 @@
     },
     "menuPreview": {
       "eyebrow": "The menu",
-      "title": "Four teas from Japan",
+      "title": "Teas from Japan",
       "createEyebrow": "Your way"
     },
     "space": {
@@ -49,8 +49,7 @@
     "founding": {
       "eyebrow": "Founding members",
       "title": "The first fifty",
-      "scarcity": "Fifty places. Not one more.",
-      "body": "The first fifty members hold the opening privileges.",
+      "body": "They keep the opening privileges.",
       "privilege1": "First tasting invitation",
       "privilege2": "Early access to events",
       "privilege3": "Founding price on the future membership"
@@ -78,7 +77,8 @@
     "intro": "Usucha in water or matcha latte. Lattes with the milk you prefer, oat included.",
     "closing": "Fifty founding members will taste this menu first.",
     "priceNote": "Prices in euros, VAT included. 100 % Japanese tea of origin.",
-    "price": "Price"
+    "price": "Price",
+    "sectionsAria": "Menu sections"
   },
   "story": {
     "eyebrow": "Story",
@@ -117,7 +117,9 @@
     "legalNotice": "Legal notice",
     "privacy": "Privacy",
     "switcherAria": "Change language",
-    "rights": "maisha matcha · Murcia"
+    "rights": "maisha matcha · Murcia",
+    "directions": "Get directions",
+    "legalAria": "Legal"
   },
   "meta": {
     "home": {
@@ -146,7 +148,7 @@
     },
     "create": {
       "title": "Create your drink · maisha matcha",
-      "description": "Compose your own matcha: intensity, base and fruit. We prepare it at the salon."
+      "description": "Compose your drink with matcha from Uji, Nishio or Kagoshima: usucha or latte, the milk and the extras. We prepare it at the salon."
     }
   },
   "notFound": {
@@ -157,21 +159,22 @@
   "create": {
     "eyebrow": "Your way",
     "title": "Create your drink",
-    "intro": "Choose the matcha, the base and the fruit. We prepare it at the counter.",
-    "stepIntensity": "The matcha",
-    "stepBase": "The base",
-    "stepFruit": "The fruit",
-    "stepFruitNote": "Optional",
-    "noFruit": "No fruit",
-    "stepTemp": "The temperature",
+    "intro": "Choose the tea, how you take it and your extras. We prepare it at the counter.",
+    "stepTea": "The tea",
+    "stepPrep": "The preparation",
+    "latteNote": "with the milk you prefer",
+    "stepMilk": "The milk",
+    "stepExtras": "The extras",
+    "stepExtrasNote": "Optional, choose as many as you like",
     "cardTitle": "Your recipe",
     "cardHint": "Show it at the counter and we will make it on the spot.",
-    "ratioLabel": "Ratio",
     "priceLabel": "Price",
     "codeLabel": "Code",
     "copyLink": "Copy link",
     "copied": "Link copied.",
-    "priceNote": "Opening prices, to be confirmed."
+    "priceNote": "Prices in euros, VAT included.",
+    "viewCard": "See recipe",
+    "shareLink": "Share"
   },
   "pos": {
     "title": "Counter",

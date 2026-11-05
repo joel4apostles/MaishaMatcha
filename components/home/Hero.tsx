@@ -32,17 +32,18 @@ export function Hero() {
           className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10"
           style={riseDelay(100)}
         >
-          {/* Real matcha powder under a green veil (contrast-safe at 20%). */}
+          {/* Real matcha powder under a green veil (15% show-through, AA-safe). */}
           <Image
             src={matchaPowder}
             alt=""
             aria-hidden="true"
             fill
-            sizes="672px"
+            sizes="(min-width: 768px) 672px, calc(100vw - 48px)"
+            quality={50}
             placeholder="blur"
             className="object-cover"
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-matcha/80" />
+          <div aria-hidden="true" className="absolute inset-0 bg-matcha/85" />
           <div className="relative">
           <p className="text-eyebrow uppercase text-sumi/85">{t("eyebrow")}</p>
           <h1 className="mt-6 text-sumi">
@@ -64,7 +65,7 @@ export function Hero() {
       {/* Quiet non-text scroll cue. */}
       <span
         aria-hidden="true"
-        className="anim-rise absolute bottom-6 left-1/2 h-10 w-px -translate-x-1/2 bg-washi/60"
+        className="anim-rise absolute bottom-6 left-1/2 hidden h-10 w-px -translate-x-1/2 bg-washi/60 sm:block"
         style={riseDelay(1200)}
       />
 
