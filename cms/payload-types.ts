@@ -68,6 +68,8 @@ export interface Config {
   blocks: {};
   collections: {
     orders: Order;
+    payments: Payment;
+    shifts: Shift;
     'pos-devices': PosDevice;
     'menu-items': MenuItem;
     'menu-categories': MenuCategory;
@@ -81,7 +83,9 @@ export interface Config {
     events: Event;
     'story-chapters': StoryChapter;
     media: Media;
+    invoices: Invoice;
     'audit-log': AuditLog;
+    sequences: Sequence;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +94,8 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    payments: PaymentsSelect<false> | PaymentsSelect<true>;
+    shifts: ShiftsSelect<false> | ShiftsSelect<true>;
     'pos-devices': PosDevicesSelect<false> | PosDevicesSelect<true>;
     'menu-items': MenuItemsSelect<false> | MenuItemsSelect<true>;
     'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
@@ -103,7 +109,9 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     'story-chapters': StoryChaptersSelect<false> | StoryChaptersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    invoices: InvoicesSelect<false> | InvoicesSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    sequences: SequencesSelect<false> | SequencesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -113,8 +121,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('es' | 'en') | ('es' | 'en')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    business: Business;
+  };
+  globalsSelect: {
+    business: BusinessSelect<false> | BusinessSelect<true>;
+  };
   locale: 'es' | 'en';
   widgets: {
     collections: CollectionsWidget;
@@ -144,106 +156,62 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Se crean desde la barra o la web. Aquí se consultan; no se editan.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
   id: number;
   /**
-   * Drink name or composed summary
+   * Número visible: 0042
    */
-  summary: string;
-  /**
-   * Recipe code from the builder card, if custom
-   */
-  code?: string | null;
-  /**
-   * The subscriber who ordered, if a member
-   */
-  member?: (number | null) | Member;
-  customerName?: string | null;
-  priceCents?: number | null;
-  status: 'nueva' | 'preparando' | 'lista' | 'entregada' | 'cancelada';
-  note?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members".
- */
-export interface Member {
-  id: number;
-  name: string;
-  email: string;
-  tier: 'founding' | 'premium' | 'waitlist';
-  status: 'active' | 'paused' | 'cancelled';
-  /**
-   * Their saved drink code (CLA·TON·YUZ·F)
-   */
-  favoriteRecipeCode?: string | null;
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Desactiva un dispositivo perdido para revocarlo al instante.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pos-devices".
- */
-export interface PosDevice {
-  id: number;
-  name: string;
-  active?: boolean | null;
-  tokenHash: string;
-  registeredBy?: (number | null) | User;
-  lastSeenAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  name: string;
-  role: 'owner' | 'manager' | 'barista';
-  /**
-   * Desactiva en lugar de borrar: el historial conserva su nombre.
-   */
-  active?: boolean | null;
-  /**
-   * Devoluciones por encima de esta cantidad necesitan a un encargado. 500 = 5,00 €.
-   */
-  refundLimitCents?: number | null;
-  /**
-   * De 4 a 6 cifras. Se guarda cifrado; nadie puede leerlo después.
-   */
-  pin?: string | null;
-  pinHash?: string | null;
-  pinFailedCount?: number | null;
-  pinLockedUntil?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
+  label?: string | null;
+  channel: 'counter' | 'online' | 'table';
+  service: 'here' | 'takeaway';
+  status: 'received' | 'preparing' | 'ready' | 'collected' | 'cancelled';
+  paymentStatus: 'unpaid' | 'paid' | 'partially_refunded' | 'refunded';
+  lines?:
     | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
+        menuItem?: (number | null) | MenuItem;
+        name: string;
+        quantity: number;
+        unitCents: number;
+        taxRateBasisPoints: number;
+        modifiers?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        grams?: number | null;
+        note?: string | null;
+        id?: string | null;
       }[]
     | null;
-  password?: string | null;
-  collection: 'users';
+  totalCents: number;
+  taxBreakdown?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  note?: string | null;
+  customerName?: string | null;
+  member?: (number | null) | Member;
+  staff?: (number | null) | User;
+  device?: (number | null) | PosDevice;
+  shift?: (number | null) | Shift;
+  statusChangedAt?: string | null;
+  idempotencyKey: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -262,6 +230,10 @@ export interface MenuItem {
    */
   onlinePriceCents?: number | null;
   taxRate: number | TaxRate;
+  /**
+   * La barra lo propone y el barista lo ajusta a lo que pesa de verdad. Vacío = no se pesa.
+   */
+  defaultGrams?: number | null;
   /**
    * Desmarca para "agotado" en la web y en la barra.
    */
@@ -399,6 +371,131 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members".
+ */
+export interface Member {
+  id: number;
+  name: string;
+  email: string;
+  tier: 'founding' | 'premium' | 'waitlist';
+  status: 'active' | 'paused' | 'cancelled';
+  /**
+   * Their saved drink code (CLA·TON·YUZ·F)
+   */
+  favoriteRecipeCode?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  name: string;
+  role: 'owner' | 'manager' | 'barista';
+  /**
+   * Desactiva en lugar de borrar: el historial conserva su nombre.
+   */
+  active?: boolean | null;
+  /**
+   * Devoluciones por encima de esta cantidad necesitan a un encargado. 500 = 5,00 €.
+   */
+  refundLimitCents?: number | null;
+  /**
+   * De 4 a 6 cifras. Se guarda cifrado; nadie puede leerlo después.
+   */
+  pin?: string | null;
+  pinHash?: string | null;
+  pinFailedCount?: number | null;
+  pinLockedUntil?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * Desactiva un dispositivo perdido para revocarlo al instante.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pos-devices".
+ */
+export interface PosDevice {
+  id: number;
+  name: string;
+  active?: boolean | null;
+  tokenHash: string;
+  registeredBy?: (number | null) | User;
+  lastSeenAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shifts".
+ */
+export interface Shift {
+  id: number;
+  label?: string | null;
+  device: number | PosDevice;
+  status: 'open' | 'closed';
+  openedBy?: (number | null) | User;
+  openedAt: string;
+  floatCents: number;
+  closedBy?: (number | null) | User;
+  closedAt?: string | null;
+  expectedCashCents?: number | null;
+  countedCashCents?: number | null;
+  differenceCents?: number | null;
+  report?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Solo se añaden. Una devolución es un registro aparte.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments".
+ */
+export interface Payment {
+  id: number;
+  order: number | Order;
+  shift?: (number | null) | Shift;
+  method: 'cash' | 'card_terminal' | 'card_stripe' | 'online';
+  amountCents: number;
+  tenderedCents?: number | null;
+  changeCents?: number | null;
+  providerRef?: string | null;
+  staff?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "modifiers".
  */
 export interface Modifier {
@@ -519,6 +616,39 @@ export interface StoryChapter {
   createdAt: string;
 }
 /**
+ * Registro inalterable. Las correcciones son facturas rectificativas.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: number;
+  fullNumber: string;
+  series: string;
+  number: number;
+  type: 'F2' | 'F1' | 'R5';
+  order: number | Order;
+  issuedAt: string;
+  issuerNif?: string | null;
+  totalCents: number;
+  taxCents: number;
+  taxBreakdown?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  hash: string;
+  previousHash?: string | null;
+  qrUrl?: string | null;
+  aeatStatus: 'pending' | 'accepted' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Solo lectura. Cada acción sensible deja aquí su rastro.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -555,6 +685,18 @@ export interface AuditLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sequences".
+ */
+export interface Sequence {
+  id: number;
+  key: string;
+  value: number;
+  lastHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -580,6 +722,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'payments';
+        value: number | Payment;
+      } | null)
+    | ({
+        relationTo: 'shifts';
+        value: number | Shift;
       } | null)
     | ({
         relationTo: 'pos-devices';
@@ -634,8 +784,16 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'invoices';
+        value: number | Invoice;
+      } | null)
+    | ({
         relationTo: 'audit-log';
         value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'sequences';
+        value: number | Sequence;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -684,13 +842,70 @@ export interface PayloadMigration {
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
-  summary?: T;
-  code?: T;
-  member?: T;
-  customerName?: T;
-  priceCents?: T;
+  label?: T;
+  channel?: T;
+  service?: T;
   status?: T;
+  paymentStatus?: T;
+  lines?:
+    | T
+    | {
+        menuItem?: T;
+        name?: T;
+        quantity?: T;
+        unitCents?: T;
+        taxRateBasisPoints?: T;
+        modifiers?: T;
+        grams?: T;
+        note?: T;
+        id?: T;
+      };
+  totalCents?: T;
+  taxBreakdown?: T;
   note?: T;
+  customerName?: T;
+  member?: T;
+  staff?: T;
+  device?: T;
+  shift?: T;
+  statusChangedAt?: T;
+  idempotencyKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments_select".
+ */
+export interface PaymentsSelect<T extends boolean = true> {
+  order?: T;
+  shift?: T;
+  method?: T;
+  amountCents?: T;
+  tenderedCents?: T;
+  changeCents?: T;
+  providerRef?: T;
+  staff?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shifts_select".
+ */
+export interface ShiftsSelect<T extends boolean = true> {
+  label?: T;
+  device?: T;
+  status?: T;
+  openedBy?: T;
+  openedAt?: T;
+  floatCents?: T;
+  closedBy?: T;
+  closedAt?: T;
+  expectedCashCents?: T;
+  countedCashCents?: T;
+  differenceCents?: T;
+  report?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -717,6 +932,7 @@ export interface MenuItemsSelect<T extends boolean = true> {
   priceCents?: T;
   onlinePriceCents?: T;
   taxRate?: T;
+  defaultGrams?: T;
   available?: T;
   allergens?: T;
   modifierGroups?: T;
@@ -937,6 +1153,28 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices_select".
+ */
+export interface InvoicesSelect<T extends boolean = true> {
+  fullNumber?: T;
+  series?: T;
+  number?: T;
+  type?: T;
+  order?: T;
+  issuedAt?: T;
+  issuerNif?: T;
+  totalCents?: T;
+  taxCents?: T;
+  taxBreakdown?: T;
+  hash?: T;
+  previousHash?: T;
+  qrUrl?: T;
+  aeatStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log_select".
  */
 export interface AuditLogSelect<T extends boolean = true> {
@@ -948,6 +1186,17 @@ export interface AuditLogSelect<T extends boolean = true> {
   reason?: T;
   before?: T;
   after?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sequences_select".
+ */
+export interface SequencesSelect<T extends boolean = true> {
+  key?: T;
+  value?: T;
+  lastHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -990,6 +1239,39 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business".
+ */
+export interface Business {
+  id: number;
+  legalName?: string | null;
+  tradeName?: string | null;
+  nif?: string | null;
+  address?: string | null;
+  /**
+   * Prefijo de las facturas simplificadas. Cámbialo solo con tu gestor.
+   */
+  invoiceSeries?: string | null;
+  receiptFooter?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business_select".
+ */
+export interface BusinessSelect<T extends boolean = true> {
+  legalName?: T;
+  tradeName?: T;
+  nif?: T;
+  address?: T;
+  invoiceSeries?: T;
+  receiptFooter?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

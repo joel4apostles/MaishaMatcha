@@ -15,6 +15,11 @@ import { Modifiers } from "./cms/collections/Modifiers";
 import { TaxRates } from "./cms/collections/TaxRates";
 import { PosDevices } from "./cms/collections/PosDevices";
 import { AuditLog } from "./cms/collections/AuditLog";
+import { Shifts } from "./cms/collections/Shifts";
+import { Payments } from "./cms/collections/Payments";
+import { Invoices } from "./cms/collections/Invoices";
+import { Sequences } from "./cms/collections/Sequences";
+import { Business } from "./cms/globals/Business";
 import { Events } from "./cms/collections/Events";
 import { StoryChapters } from "./cms/collections/StoryChapters";
 import { InventoryItems } from "./cms/collections/InventoryItems";
@@ -91,6 +96,8 @@ export default buildConfig({
   // Dashboard order and groups follow how the salon works, not the schema.
   collections: inSalonOrder([
     [Orders, "Barra"],
+    [Payments, "Barra"],
+    [Shifts, "Barra"],
     [PosDevices, "Barra"],
     [MenuItems, "Carta"],
     [MenuCategories, "Carta"],
@@ -104,8 +111,11 @@ export default buildConfig({
     [Events, "Web"],
     [StoryChapters, "Web"],
     [Media, "Web"],
+    [Invoices, "Control"],
     [AuditLog, "Control"],
+    [Sequences, "Control"],
   ]),
+  globals: [Business],
   typescript: {
     outputFile: path.resolve(dirname, "cms/payload-types.ts"),
   },

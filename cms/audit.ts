@@ -13,7 +13,10 @@ export type AuditAction =
   | "pos.login"
   | "pos.login.failed"
   | "pos.login.locked"
-  | "pos.logout";
+  | "pos.logout"
+  | "shift.cash-difference"
+  | "order.void"
+  | "order.refund";
 
 type Entry = {
   action: AuditAction;

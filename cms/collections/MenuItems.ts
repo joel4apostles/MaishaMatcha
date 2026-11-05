@@ -58,6 +58,16 @@ export const MenuItems: CollectionConfig = {
       label: "IVA",
     },
     {
+      name: "defaultGrams",
+      type: "number",
+      min: 0,
+      max: 20,
+      label: "Gramos de matcha (receta)",
+      admin: {
+        description: "La barra lo propone y el barista lo ajusta a lo que pesa de verdad. Vacío = no se pesa.",
+      },
+    },
+    {
       name: "available",
       type: "checkbox",
       defaultValue: true,

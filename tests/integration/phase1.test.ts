@@ -134,12 +134,22 @@ describe("menu", () => {
 });
 
 describe("financial and audit records", () => {
-  it("never deletes an order, not even as owner", async () => {
+  it("never creates, edits or deletes an order through the API, not even as owner", async () => {
+    await expect(
+      payload.create({
+        collection: "orders",
+        data: { totalCents: 1, idempotencyKey: "api-attempt" } as never,
+        ...asUser(owner),
+      }),
+    ).rejects.toThrow();
     const order = await payload.create({
       collection: "orders",
-      data: { summary: "Matcha", priceCents: 450, status: "nueva" },
-      ...asUser(barista),
+      overrideAccess: true,
+      data: { label: "9999", totalCents: 450, idempotencyKey: "test-order-1" } as never,
     });
+    await expect(
+      payload.update({ collection: "orders", id: order.id, data: { totalCents: 1 }, ...asUser(owner) }),
+    ).rejects.toThrow();
     await expect(payload.delete({ collection: "orders", id: order.id, ...asUser(owner) })).rejects.toThrow();
   });
 
