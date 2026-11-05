@@ -3,6 +3,7 @@ import * as migration_20261105_212901_schema_hardening from './20261105_212901_s
 import * as migration_20261105_221949_pos_sales_a from './20261105_221949_pos_sales_a';
 import * as migration_20261105_221955_pos_sales_b from './20261105_221955_pos_sales_b';
 import * as migration_20261105_223038_refunds from './20261105_223038_refunds';
+import * as migration_20261105_223929_inventory_suppliers from './20261105_223929_inventory_suppliers';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261105_223038_refunds.up,
     down: migration_20261105_223038_refunds.down,
-    name: '20261105_223038_refunds'
+    name: '20261105_223038_refunds',
+  },
+  {
+    up: migration_20261105_223929_inventory_suppliers.up,
+    down: migration_20261105_223929_inventory_suppliers.down,
+    name: '20261105_223929_inventory_suppliers'
   },
 ];

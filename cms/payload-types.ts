@@ -78,7 +78,13 @@ export interface Config {
     modifiers: Modifier;
     'tax-rates': TaxRate;
     'inventory-items': InventoryItem;
+    'recipe-lines': RecipeLine;
     'stock-movements': StockMovement;
+    'stock-counts': StockCount;
+    batches: Batch;
+    'purchase-orders': PurchaseOrder;
+    suppliers: Supplier;
+    'supplier-products': SupplierProduct;
     members: Member;
     users: User;
     events: Event;
@@ -105,7 +111,13 @@ export interface Config {
     modifiers: ModifiersSelect<false> | ModifiersSelect<true>;
     'tax-rates': TaxRatesSelect<false> | TaxRatesSelect<true>;
     'inventory-items': InventoryItemsSelect<false> | InventoryItemsSelect<true>;
+    'recipe-lines': RecipeLinesSelect<false> | RecipeLinesSelect<true>;
     'stock-movements': StockMovementsSelect<false> | StockMovementsSelect<true>;
+    'stock-counts': StockCountsSelect<false> | StockCountsSelect<true>;
+    batches: BatchesSelect<false> | BatchesSelect<true>;
+    'purchase-orders': PurchaseOrdersSelect<false> | PurchaseOrdersSelect<true>;
+    suppliers: SuppliersSelect<false> | SuppliersSelect<true>;
+    'supplier-products': SupplierProductsSelect<false> | SupplierProductsSelect<true>;
     members: MembersSelect<false> | MembersSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
@@ -606,9 +618,73 @@ export interface InventoryItem {
    */
   stock?: number | null;
   /**
-   * Avisar cuando el stock baje de esta cantidad.
+   * Al bajar de aquí se prepara un pedido al proveedor.
    */
   lowStockAt?: number | null;
+  /**
+   * Vacío = hasta el nivel ideal.
+   */
+  reorderQuantity?: number | null;
+  parLevel?: number | null;
+  /**
+   * Matcha a 300 €/kg con unidad g: 30000. Leche a 1,20 €/l con unidad ml: 120.
+   */
+  costCentsPer1000?: number | null;
+  supplier?: (number | null) | Supplier;
+  /**
+   * Para perecederos: los lotes avisan antes de caducar.
+   */
+  shelfLifeDays?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suppliers".
+ */
+export interface Supplier {
+  id: number;
+  name: string;
+  contactName?: string | null;
+  email: string;
+  phone?: string | null;
+  country?: string | null;
+  leadTimeDays?: number | null;
+  minOrderCents?: number | null;
+  /**
+   * Apagado: cada pedido espera tu aprobación. Recomendado.
+   */
+  autoSend?: boolean | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Qué gasta cada bebida y cada opción. Cada venta lo descuenta del inventario.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recipe-lines".
+ */
+export interface RecipeLine {
+  id: number;
+  target:
+    | {
+        relationTo: 'menu-items';
+        value: number | MenuItem;
+      }
+    | {
+        relationTo: 'modifiers';
+        value: number | Modifier;
+      };
+  ingredient: number | InventoryItem;
+  /**
+   * En la unidad del ingrediente (g, ml, uds).
+   */
+  quantity: number;
+  /**
+   * Para el matcha: descuenta lo que el barista pesó en esa venta.
+   */
+  usesMeasuredGrams?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -627,7 +703,86 @@ export interface StockMovement {
   delta: number;
   reason: 'purchase' | 'sale' | 'usage' | 'waste' | 'count' | 'adjustment';
   note?: string | null;
+  order?: (number | null) | Order;
+  purchaseOrder?: (number | null) | PurchaseOrder;
   createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Borradores automáticos: revisa, aprueba y se envían al proveedor.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "purchase-orders".
+ */
+export interface PurchaseOrder {
+  id: number;
+  label?: string | null;
+  supplier: number | Supplier;
+  status: 'draft' | 'sent' | 'partially_received' | 'received' | 'cancelled';
+  lines?:
+    | {
+        ingredient: number | InventoryItem;
+        packs: number;
+        packSize: number;
+        unitPriceCents?: number | null;
+        receivedPacks?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  totalCents?: number | null;
+  note?: string | null;
+  approvedBy?: (number | null) | User;
+  sentAt?: string | null;
+  emailStatus?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Escribe lo que hay de verdad: el sistema crea el ajuste por la diferencia.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock-counts".
+ */
+export interface StockCount {
+  id: number;
+  ingredient: number | InventoryItem;
+  countedQuantity: number;
+  difference?: number | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Lotes recibidos de perecederos, con su caducidad.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "batches".
+ */
+export interface Batch {
+  id: number;
+  ingredient: number | InventoryItem;
+  lot?: string | null;
+  quantity: number;
+  expiresOn?: string | null;
+  purchaseOrder?: (number | null) | PurchaseOrder;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supplier-products".
+ */
+export interface SupplierProduct {
+  id: number;
+  supplier: number | Supplier;
+  ingredient: number | InventoryItem;
+  sku?: string | null;
+  /**
+   * En la unidad del ingrediente: una lata de 100 g = 100.
+   */
+  packSize: number;
+  priceCents: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -784,8 +939,32 @@ export interface PayloadLockedDocument {
         value: number | InventoryItem;
       } | null)
     | ({
+        relationTo: 'recipe-lines';
+        value: number | RecipeLine;
+      } | null)
+    | ({
         relationTo: 'stock-movements';
         value: number | StockMovement;
+      } | null)
+    | ({
+        relationTo: 'stock-counts';
+        value: number | StockCount;
+      } | null)
+    | ({
+        relationTo: 'batches';
+        value: number | Batch;
+      } | null)
+    | ({
+        relationTo: 'purchase-orders';
+        value: number | PurchaseOrder;
+      } | null)
+    | ({
+        relationTo: 'suppliers';
+        value: number | Supplier;
+      } | null)
+    | ({
+        relationTo: 'supplier-products';
+        value: number | SupplierProduct;
       } | null)
     | ({
         relationTo: 'members';
@@ -1049,6 +1228,23 @@ export interface InventoryItemsSelect<T extends boolean = true> {
   unit?: T;
   stock?: T;
   lowStockAt?: T;
+  reorderQuantity?: T;
+  parLevel?: T;
+  costCentsPer1000?: T;
+  supplier?: T;
+  shelfLifeDays?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recipe-lines_select".
+ */
+export interface RecipeLinesSelect<T extends boolean = true> {
+  target?: T;
+  ingredient?: T;
+  quantity?: T;
+  usesMeasuredGrams?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1061,7 +1257,90 @@ export interface StockMovementsSelect<T extends boolean = true> {
   delta?: T;
   reason?: T;
   note?: T;
+  order?: T;
+  purchaseOrder?: T;
   createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock-counts_select".
+ */
+export interface StockCountsSelect<T extends boolean = true> {
+  ingredient?: T;
+  countedQuantity?: T;
+  difference?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "batches_select".
+ */
+export interface BatchesSelect<T extends boolean = true> {
+  ingredient?: T;
+  lot?: T;
+  quantity?: T;
+  expiresOn?: T;
+  purchaseOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "purchase-orders_select".
+ */
+export interface PurchaseOrdersSelect<T extends boolean = true> {
+  label?: T;
+  supplier?: T;
+  status?: T;
+  lines?:
+    | T
+    | {
+        ingredient?: T;
+        packs?: T;
+        packSize?: T;
+        unitPriceCents?: T;
+        receivedPacks?: T;
+        id?: T;
+      };
+  totalCents?: T;
+  note?: T;
+  approvedBy?: T;
+  sentAt?: T;
+  emailStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suppliers_select".
+ */
+export interface SuppliersSelect<T extends boolean = true> {
+  name?: T;
+  contactName?: T;
+  email?: T;
+  phone?: T;
+  country?: T;
+  leadTimeDays?: T;
+  minOrderCents?: T;
+  autoSend?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supplier-products_select".
+ */
+export interface SupplierProductsSelect<T extends boolean = true> {
+  supplier?: T;
+  ingredient?: T;
+  sku?: T;
+  packSize?: T;
+  priceCents?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1296,6 +1575,10 @@ export interface Business {
    */
   invoiceSeries?: string | null;
   receiptFooter?: string | null;
+  /**
+   * Avisa de las bebidas cuyo margen baje de aquí.
+   */
+  targetMarginPercent?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1310,6 +1593,7 @@ export interface BusinessSelect<T extends boolean = true> {
   address?: T;
   invoiceSeries?: T;
   receiptFooter?: T;
+  targetMarginPercent?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

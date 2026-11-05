@@ -18,6 +18,8 @@ import { AuditLog } from "./cms/collections/AuditLog";
 import { Shifts } from "./cms/collections/Shifts";
 import { Payments } from "./cms/collections/Payments";
 import { Refunds } from "./cms/collections/Refunds";
+import { Batches, RecipeLines, StockCounts } from "./cms/collections/RecipeLines";
+import { PurchaseOrders, SupplierProducts, Suppliers } from "./cms/collections/Suppliers";
 import { Invoices } from "./cms/collections/Invoices";
 import { Sequences } from "./cms/collections/Sequences";
 import { Business } from "./cms/globals/Business";
@@ -107,7 +109,13 @@ export default buildConfig({
     [Modifiers, "Carta"],
     [TaxRates, "Carta"],
     [InventoryItems, "Inventario"],
+    [RecipeLines, "Inventario"],
     [StockMovements, "Inventario"],
+    [StockCounts, "Inventario"],
+    [Batches, "Inventario"],
+    [PurchaseOrders, "Proveedores"],
+    [Suppliers, "Proveedores"],
+    [SupplierProducts, "Proveedores"],
     [Members, "Personas"],
     [Users, "Personas"],
     [Events, "Web"],

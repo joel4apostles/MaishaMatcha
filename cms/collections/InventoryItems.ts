@@ -1,12 +1,13 @@
 import type { CollectionConfig } from "payload";
 import { anyStaff, nobody, ownerOrManager } from "../access";
+import { integerCents } from "../validators";
 
 export const InventoryItems: CollectionConfig = {
   slug: "inventory-items",
   labels: { singular: "Ingrediente", plural: "Inventario" },
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "stock", "unit", "lowStockAt"],
+    defaultColumns: ["name", "stock", "unit", "lowStockAt", "supplier"],
     description: "El stock solo cambia con movimientos: el registro es la verdad.",
   },
   // Never deleted: movements and recipes point at these rows.
@@ -34,10 +35,45 @@ export const InventoryItems: CollectionConfig = {
       },
     },
     {
-      name: "lowStockAt",
+      type: "row",
+      fields: [
+        {
+          name: "lowStockAt",
+          type: "number",
+          min: 0,
+          label: "Punto de pedido",
+          admin: { description: "Al bajar de aquí se prepara un pedido al proveedor." },
+        },
+        {
+          name: "reorderQuantity",
+          type: "number",
+          min: 0,
+          label: "Cantidad a pedir",
+          admin: { description: "Vacío = hasta el nivel ideal." },
+        },
+        {
+          name: "parLevel",
+          type: "number",
+          min: 0,
+          label: "Nivel ideal",
+        },
+      ],
+    },
+    {
+      name: "costCentsPer1000",
       type: "number",
-      label: "Aviso de stock bajo",
-      admin: { description: "Avisar cuando el stock baje de esta cantidad." },
+      min: 0,
+      label: "Coste por 1000 unidades (céntimos)",
+      admin: { description: "Matcha a 300 €/kg con unidad g: 30000. Leche a 1,20 €/l con unidad ml: 120." },
+      validate: integerCents,
+    },
+    { name: "supplier", type: "relationship", relationTo: "suppliers", label: "Proveedor habitual" },
+    {
+      name: "shelfLifeDays",
+      type: "number",
+      min: 0,
+      label: "Vida útil (días)",
+      admin: { description: "Para perecederos: los lotes avisan antes de caducar." },
     },
   ],
 };

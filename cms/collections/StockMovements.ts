@@ -61,6 +61,8 @@ export const StockMovements: CollectionConfig = {
           ? "Explica el motivo de la merma o del ajuste."
           : true,
     },
+    { name: "order", type: "relationship", relationTo: "orders", label: "Pedido", admin: { readOnly: true } },
+    { name: "purchaseOrder", type: "relationship", relationTo: "purchase-orders", label: "Pedido a proveedor", admin: { readOnly: true } },
     {
       name: "createdBy",
       type: "relationship",

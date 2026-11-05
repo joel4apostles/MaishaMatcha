@@ -8,6 +8,7 @@ import {
 } from "payload";
 import { writeAudit } from "@/cms/audit";
 import { attemptPin } from "./core";
+import { deductForOrder, draftReorders } from "@/lib/inventory";
 import { query, sql, table } from "@/cms/db";
 import {
   cashChange,
@@ -274,7 +275,8 @@ export async function payOrder(
   const shift = await currentShift(payload, actor.deviceId);
   if (!shift) return { ok: false, error: "no-shift" };
 
-  return inTransaction(payload, actor.staffId, async (req) => {
+  let touched: number[] = [];
+  const result = await inTransaction(payload, actor.staffId, async (req) => {
     // Lock the order row: two taps on "Cobrar" can never pay twice.
     const orders = table(payload, "orders");
     const rows = await query(payload, sql`select id from ${orders} where id = ${input.orderId} for update`, req);
@@ -304,6 +306,8 @@ export async function payOrder(
       },
     });
     const invoice = await issueInvoice(req, order);
+    // Stock leaves with the sale, in the same transaction.
+    touched = await deductForOrder(req, order);
     await payload.update({
       collection: "orders",
       id: order.id,
@@ -313,6 +317,11 @@ export async function payOrder(
     });
     return { ok: true as const, invoiceNumber: invoice.fullNumber, changeCents: change };
   });
+  // Reorder drafts after commit: never slows down or fails a sale.
+  if (result.ok && touched.length) {
+    await draftReorders(payload, touched).catch((err) => console.error("[inventory] reorder draft failed", err));
+  }
+  return result;
 }
 
 // ------------------------------------------------------------ close shift

@@ -180,6 +180,39 @@ export async function seedDatabase(payload: Payload, log: Log = console.log) {
     }
   }
 
+  // --- inventory links the carta makes certain: one ingredient per tea,
+  // and a recipe line that deducts the barista's MEASURED grams on each
+  // sale. No fixed quantities or costs are invented: the owner sets
+  // recipe grams (menu item) and costs (ingredient) in the admin.
+  const teaIngredients: Record<string, string> = {
+    Uji: "Matcha Uji",
+    Nishio: "Matcha Nishio",
+    Kagoshima: "Matcha Kagoshima",
+    Hojicha: "Hojicha en polvo",
+    "Black Tea": "Wakōcha en polvo",
+  };
+  for (const [itemName, ingredientName] of Object.entries(teaIngredients)) {
+    const item = (await payload.find({ collection: "menu-items", overrideAccess: true, limit: 1, where: { name: { equals: itemName } } })).docs[0];
+    if (!item) continue;
+    let ingredient = (await payload.find({ collection: "inventory-items", overrideAccess: true, limit: 1, where: { name: { equals: ingredientName } } })).docs[0];
+    if (!ingredient) {
+      ingredient = await payload.create({ collection: "inventory-items", overrideAccess: true, data: { name: ingredientName, unit: "g" } });
+      log(`seeded ingredient ${ingredientName}`);
+    }
+    const linked = await payload.count({
+      collection: "recipe-lines",
+      overrideAccess: true,
+      where: { and: [{ "target.value": { equals: item.id } }, { ingredient: { equals: ingredient.id } }] },
+    });
+    if (linked.totalDocs === 0) {
+      await payload.create({
+        collection: "recipe-lines",
+        overrideAccess: true,
+        data: { target: { relationTo: "menu-items", value: item.id }, ingredient: ingredient.id, quantity: 0, usesMeasuredGrams: true },
+      });
+    }
+  }
+
   // --- events
   if (!(await has("events"))) {
     for (const [i, ev] of events.entries()) {

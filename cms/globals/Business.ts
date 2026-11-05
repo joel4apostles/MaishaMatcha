@@ -26,5 +26,14 @@ export const Business: GlobalConfig = {
       admin: { description: "Prefijo de las facturas simplificadas. Cámbialo solo con tu gestor." },
     },
     { name: "receiptFooter", type: "textarea", label: "Pie del ticket", localized: true },
+    {
+      name: "targetMarginPercent",
+      type: "number",
+      min: 0,
+      max: 100,
+      defaultValue: 65,
+      label: "Margen objetivo (%)",
+      admin: { description: "Avisa de las bebidas cuyo margen baje de aquí." },
+    },
   ],
 };
