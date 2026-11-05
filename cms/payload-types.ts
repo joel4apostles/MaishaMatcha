@@ -419,6 +419,7 @@ export interface Member {
   cancelAtPeriodEnd?: boolean | null;
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
+  subscriptionEventAt?: number | null;
   /**
    * Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó.
    */
@@ -1453,6 +1454,7 @@ export interface MembersSelect<T extends boolean = true> {
   cancelAtPeriodEnd?: T;
   stripeCustomerId?: T;
   stripeSubscriptionId?: T;
+  subscriptionEventAt?: T;
   emailOptIn?: T;
   locale?: T;
   favoriteRecipeCode?: T;

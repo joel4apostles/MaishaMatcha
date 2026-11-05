@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import type { Payload, Where } from "payload";
 import { taxBreakdown } from "@/lib/money";
 import { markOnlinePaid } from "@/lib/online";
-import { createPortalSession, createSubscriptionCheckout, stripeEnabled } from "@/lib/stripe";
+import { createPortalSession, createSubscriptionCheckout, liveSubscriptions, stripeEnabled } from "@/lib/stripe";
 
 /**
  * Premium subscription: monthly, through Stripe. Founding members pay the
@@ -45,6 +45,8 @@ export async function startPremium(payload: Payload, member: MemberLike, locale:
   if (!s.open || !price || s.rateBasisPoints == null) return { ok: false as const, error: "closed" };
   const account = `${baseUrl}/${locale}/${locale === "es" ? "cuenta" : "account"}`;
   try {
+    // Stripe is the truth: never open a second subscription for one customer.
+    if (member.stripeCustomerId && (await liveSubscriptions(member.stripeCustomerId)) > 0) return { ok: false as const, error: "already" };
     const session = await createSubscriptionCheckout({
       memberId: member.id,
       name: locale === "es" ? "maisha matcha · suscripción mensual" : "maisha matcha · monthly membership",
@@ -100,7 +102,9 @@ export async function onPremiumCheckout(
     collection: "members",
     id: m.id,
     overrideAccess: true,
-    data: { stripeCustomerId: session.customer ?? undefined, stripeSubscriptionId: session.subscription ?? undefined, subscriptionStatus: "active" },
+    // Ids only: the status comes from customer.subscription.* events (a
+    // delayed payment method must not read as paid).
+    data: { stripeCustomerId: session.customer ?? undefined, stripeSubscriptionId: session.subscription ?? undefined },
   });
   return true;
 }
@@ -120,21 +124,10 @@ type StripeInvoice = {
 export async function onPremiumInvoicePaid(payload: Payload, inv: StripeInvoice) {
   const meta = inv.parent?.subscription_details?.metadata ?? inv.subscription_details?.metadata;
   const subscriptionId = inv.subscription ?? inv.parent?.subscription_details?.subscription ?? null;
-  if (meta?.kind && meta.kind !== "premium") return false;
+  // Only our own membership invoices (manual dashboard invoices are not).
+  if (meta?.kind !== "premium") return false;
   const m = await findMember(payload, meta, subscriptionId, inv.customer);
   if (!m) return false;
-  const periodEnd = inv.lines?.data?.[0]?.period?.end;
-  await payload.update({
-    collection: "members",
-    id: m.id,
-    overrideAccess: true,
-    data: {
-      subscriptionStatus: "active",
-      ...(periodEnd ? { subscriptionPeriodEnd: new Date(periodEnd * 1000).toISOString() } : {}),
-      ...(inv.customer ? { stripeCustomerId: inv.customer } : {}),
-      ...(subscriptionId ? { stripeSubscriptionId: subscriptionId } : {}),
-    },
-  });
   if (!inv.amount_paid || inv.amount_paid <= 0) return true;
 
   const key = `stripe-invoice:${inv.id}`;
@@ -201,10 +194,17 @@ const STATUS: Record<string, "active" | "past_due" | "cancelled"> = {
 };
 
 /** customer.subscription.updated / .deleted: mirror Stripe's status. */
-export async function onPremiumSubscription(payload: Payload, sub: StripeSubscription, deleted = false) {
-  if (sub.metadata?.kind && sub.metadata.kind !== "premium") return false;
+export async function onPremiumSubscription(payload: Payload, sub: StripeSubscription, deleted = false, eventCreated?: number) {
+  if (sub.metadata?.kind !== "premium") return false;
   const m = await findMember(payload, sub.metadata, sub.id, sub.customer);
   if (!m) return false;
+  // Stripe does not deliver in order: an older event never overwrites a newer one.
+  if (eventCreated && m.subscriptionEventAt && eventCreated < m.subscriptionEventAt) return false;
+  // While one subscription is live, events about a different one (an old or
+  // duplicate subscription) must not flip this member. A new one after a
+  // cancellation is fine.
+  const live = m.subscriptionStatus === "active" || m.subscriptionStatus === "past_due";
+  if (live && m.stripeSubscriptionId && m.stripeSubscriptionId !== sub.id) return false;
   const end = sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end;
   await payload.update({
     collection: "members",
@@ -215,6 +215,7 @@ export async function onPremiumSubscription(payload: Payload, sub: StripeSubscri
       cancelAtPeriodEnd: Boolean(sub.cancel_at_period_end),
       ...(end ? { subscriptionPeriodEnd: new Date(end * 1000).toISOString() } : {}),
       stripeSubscriptionId: sub.id,
+      ...(eventCreated ? { subscriptionEventAt: eventCreated } : {}),
     },
   });
   return true;

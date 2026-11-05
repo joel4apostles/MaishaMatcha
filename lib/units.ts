@@ -1,4 +1,4 @@
-import type { Payload, PayloadRequest } from "payload";
+import { commitTransaction, createLocalReq, initTransaction, killTransaction, type Payload, type PayloadRequest } from "payload";
 import { query, sql, table } from "@/cms/db";
 import type { CatalogItem } from "@/lib/pos/pricing";
 
@@ -36,5 +36,38 @@ export async function returnUnits(payload: Payload, lines: Line[], req?: Payload
   const items = table(payload, "menu_items");
   for (const [id, q] of units(lines, () => true)) {
     await query(payload, sql`update ${items} set stock = stock + ${q} where id = ${id} and stock is not null`, req);
+  }
+}
+
+/**
+ * Cancel an order and give its units back, exactly once. One conditional
+ * update decides who cancels (a Stripe expiry and a staff void racing each
+ * other: only one gets the row), and the units go back in the same
+ * transaction. Returns false if it was already cancelled (or paid, when
+ * onlyUnpaid).
+ */
+export async function cancelOrderOnce(payload: Payload, orderId: number, opts: { onlyUnpaid: boolean }) {
+  const req = await createLocalReq({}, payload);
+  await initTransaction(req);
+  try {
+    const orders = table(payload, "orders");
+    const rows = await query(
+      payload,
+      opts.onlyUnpaid
+        ? sql`update ${orders} set status = 'cancelled', status_changed_at = now() where id = ${orderId} and status <> 'cancelled' and payment_status = 'unpaid' returning id`
+        : sql`update ${orders} set status = 'cancelled', status_changed_at = now() where id = ${orderId} and status <> 'cancelled' returning id`,
+      req,
+    );
+    if (rows.length === 0) {
+      await commitTransaction(req);
+      return false;
+    }
+    const order = await payload.findByID({ collection: "orders", id: orderId, req, depth: 0, overrideAccess: true });
+    await returnUnits(payload, (order.lines ?? []) as Line[], req);
+    await commitTransaction(req);
+    return true;
+  } catch (err) {
+    await killTransaction(req);
+    throw err;
   }
 }

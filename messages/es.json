@@ -497,7 +497,9 @@
       "missing-required": "Falta elegir una opción obligatoria.",
       "unavailable-item": "Un producto se ha agotado.",
       "unavailable-option": "Una opción se ha agotado.",
-      "too-many": "Ya tienes varios pedidos abiertos. Espera a recoger uno."
+      "too-many": "Ya tienes varios pedidos abiertos. Espera a recoger uno.",
+      "too-many-units": "Como mucho cinco unidades de cada producto.",
+      "pay-online": "Los productos de la tienda se pagan al pedir."
     },
     "status": {
       "eyebrow": "Tu pedido",
@@ -519,7 +521,8 @@
     "haveAccount": "¿Tienes cuenta? Entra y guardamos tus pedidos.",
     "addShort": "Añadir",
     "less": "Uno menos de {name}",
-    "more": "Uno más de {name}"
+    "more": "Uno más de {name}",
+    "shopPaysOnline": "Los productos de la tienda se pagan con tarjeta al pedir."
   },
   "account": {
     "eyebrow": "Tu cuenta",

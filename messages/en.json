@@ -497,7 +497,9 @@
       "missing-required": "A required option is missing.",
       "unavailable-item": "An item has sold out.",
       "unavailable-option": "An option has sold out.",
-      "too-many": "You already have several open orders. Collect one first."
+      "too-many": "You already have several open orders. Collect one first.",
+      "too-many-units": "At most five of each product.",
+      "pay-online": "Shop products are paid when ordering."
     },
     "status": {
       "eyebrow": "Your order",
@@ -519,7 +521,8 @@
     "haveAccount": "Have an account? Sign in and we keep your orders.",
     "addShort": "Add",
     "less": "One less {name}",
-    "more": "One more {name}"
+    "more": "One more {name}",
+    "shopPaysOnline": "Shop products are paid by card when ordering."
   },
   "account": {
     "eyebrow": "Your account",

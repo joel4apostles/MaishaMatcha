@@ -19,7 +19,7 @@ import {
   type PriceError,
 } from "./pricing";
 import { fingerprint, fullInvoiceNumber, qrUrl, type InvoiceType } from "./verifactu";
-import { returnUnits, takeUnits } from "@/lib/units";
+import { cancelOrderOnce, takeUnits } from "@/lib/units";
 
 class SoldOut extends Error {}
 
@@ -521,12 +521,17 @@ export async function advanceOrder(payload: Payload, actor: Actor, orderId: numb
   const order = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true }).catch(() => null);
   if (!order) return { ok: false, error: "not-found" };
   if (order.status === "cancelled" || order.status === "collected") return { ok: false, error: "cancelled" };
-  await payload.update({
-    collection: "orders",
-    id: orderId,
-    overrideAccess: true,
-    data: { status: to, statusChangedAt: new Date().toISOString() },
-  });
+  if (to === "cancelled") {
+    // Shop units come back exactly once, even if another cancel races this one.
+    if (!(await cancelOrderOnce(payload, orderId, { onlyUnpaid: false }))) return { ok: false, error: "cancelled" };
+  } else {
+    await payload.update({
+      collection: "orders",
+      id: orderId,
+      overrideAccess: true,
+      data: { status: to, statusChangedAt: new Date().toISOString() },
+    });
+  }
   if (to === "cancelled") {
     await writeAudit({ payload }, { action: "order.void", entity: "orders", entityId: orderId, actorId: actor.staffId, deviceId: actor.deviceId });
   }
@@ -547,13 +552,7 @@ export async function voidOrder(payload: Payload, actor: Actor, orderId: number,
   if (!order) return { ok: false, error: "not-found" };
   if (order.paymentStatus !== "unpaid") return { ok: false, error: "paid" };
   if (order.status === "cancelled") return { ok: false, error: "cancelled" };
-  await payload.update({
-    collection: "orders",
-    id: orderId,
-    overrideAccess: true,
-    data: { status: "cancelled", statusChangedAt: new Date().toISOString() },
-  });
-  await returnUnits(payload, (order.lines ?? []) as never);
+  if (!(await cancelOrderOnce(payload, orderId, { onlyUnpaid: true }))) return { ok: false, error: "cancelled" };
   await writeAudit({ payload }, {
     action: "order.void",
     entity: "orders",

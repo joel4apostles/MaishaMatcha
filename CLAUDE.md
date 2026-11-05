@@ -75,6 +75,14 @@ OG, admin) inherits them.
   bookings and email letters hang off `members`. Not Supabase Auth: one
   auth system per audience (Payload for staff, PIN for the till, links for
   customers).
+- **Shop**: products are menu items in a category marked "Tienda" (photo,
+  web price, `stock` units). /tienda reuses the pickup checkout; units are
+  taken atomically (`lib/units.ts`), max 5 per product per order, paid
+  online when cards are on, and returned exactly once on cancel/void/expiry.
+- **Monthly membership** (`lib/premium.ts`; the word "premium" is internal
+  only, customers read "suscripción mensual"): Stripe subscription, founding
+  price for founders, one invoiced order per paid month (invoice.paid),
+  status ONLY from customer.subscription.* events, applied in event order.
 - **Content split**: events come from the CMS (bookable when they have a
   date and capacity). The carta (`content/carta.ts`) and the story
   (`content/story.ts`) stay in code on purpose: the till seed and the
@@ -198,7 +206,8 @@ PAYLOAD_SECRET          # 32+ chars; signs admin + POS cookies (random per insta
 DATABASE_URL            # Supabase pooler :6543 in prod, PRODUCTION env only on Vercel
 FIRST_OWNER_EMAIL       # prod: only this email may create the first (owner) account
 STRIPE_SECRET_KEY       # web orders + founding fee (both unset = card payment hidden)
-STRIPE_WEBHOOK_SECRET   # events: checkout.session.completed, .async_payment_succeeded, .expired, .async_payment_failed
+STRIPE_WEBHOOK_SECRET   # events: checkout.session.{completed,async_payment_succeeded,expired,async_payment_failed},
+                        # invoice.paid, customer.subscription.{created,updated,deleted}. Enable the customer portal in Stripe.
 ```
 
 ## Known audit findings (accepted risk, re-check each release)

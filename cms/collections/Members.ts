@@ -87,6 +87,8 @@ export const Members: CollectionConfig = {
         // Stripe references: server only, never shown or editable.
         { name: "stripeCustomerId", type: "text", index: true, access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
         { name: "stripeSubscriptionId", type: "text", index: true, access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
+        // Time of the last subscription event applied: older events are ignored.
+        { name: "subscriptionEventAt", type: "number", access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
       ],
     },
     {

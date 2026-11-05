@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "bad signature" }, { status: 400 });
   }
   // Shapes vary across Stripe API versions: read defensively.
-  const event = JSON.parse(raw) as { type: string; data: { object: Record<string, unknown> & { id: string } } };
+  const event = JSON.parse(raw) as { type: string; created?: number; data: { object: Record<string, unknown> & { id: string } } };
   const obj = event.data.object as never as {
     id: string;
     mode?: string;
@@ -55,11 +55,12 @@ export async function POST(request: Request) {
     case "invoice.paid":
       await onPremiumInvoicePaid(payload, event.data.object as never);
       break;
+    case "customer.subscription.created":
     case "customer.subscription.updated":
-      await onPremiumSubscription(payload, event.data.object as never);
+      await onPremiumSubscription(payload, event.data.object as never, false, event.created);
       break;
     case "customer.subscription.deleted":
-      await onPremiumSubscription(payload, event.data.object as never, true);
+      await onPremiumSubscription(payload, event.data.object as never, true, event.created);
       break;
   }
   return NextResponse.json({ received: true });

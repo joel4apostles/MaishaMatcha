@@ -13,7 +13,8 @@ import { formatEuro } from "@/lib/money";
 import { priceOrder, type LineInput } from "@/lib/pos/pricing";
 import { issueInvoiceFor, loadCatalog } from "@/lib/pos/sales";
 import { isBookable, pickupSlots, type SlotSettings } from "@/lib/slots";
-import { returnUnits, takeUnits } from "@/lib/units";
+import { cancelOrderOnce, takeUnits } from "@/lib/units";
+import { stripeEnabled } from "@/lib/stripe";
 
 /**
  * Web orders: pickup slots, server pricing, pay at pickup or online
@@ -34,6 +35,8 @@ export async function onlineSettings(payload: Payload) {
 
 /** An unpaid card checkout stops holding its slot after this long. */
 export const CHECKOUT_HOLD_MINUTES = 30;
+/** Most units of one shop product per order. */
+export const MAX_SHOP_UNITS = 5;
 /** Most open web orders one email may hold at once. */
 export const MAX_OPEN_PER_EMAIL = 3;
 
@@ -120,6 +123,12 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
   if (open.totalDocs >= MAX_OPEN_PER_EMAIL) return { ok: false, error: "too-many" };
 
   const catalog = new Map((await loadCatalog(payload, "es", "online")).map((i) => [i.id, i]));
+  // Shop units are scarce: a few per order, and held only by orders that pay
+  // online (an unpaid card checkout lets them go after 30 minutes).
+  const shopUnits = new Map<number, number>();
+  for (const l of input.lines) if (catalog.get(l.menuItemId)?.shop) shopUnits.set(l.menuItemId, (shopUnits.get(l.menuItemId) ?? 0) + l.quantity);
+  if ([...shopUnits.values()].some((q) => q > MAX_SHOP_UNITS)) return { ok: false, error: "too-many-units" };
+  if (shopUnits.size && !input.payOnline && stripeEnabled()) return { ok: false, error: "pay-online" };
   // Measured grams are a barista input, never a customer one.
   const priced = priceOrder(catalog, input.lines.map((l) => ({ ...l, grams: null })));
   if (!priced.ok) return { ok: false, error: priced.error };
@@ -187,9 +196,7 @@ export async function cancelUnpaidOnline(payload: Payload, orderId: number) {
   const o = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true }).catch(() => null);
   if (!o || o.channel !== "online" || o.paymentStatus !== "unpaid" || !o.payOnline) return false;
   if (o.status !== "received" && o.kind !== "membership") return false;
-  await payload.update({ collection: "orders", id: orderId, overrideAccess: true, data: { status: "cancelled", statusChangedAt: new Date().toISOString() } });
-  await returnUnits(payload, (o.lines ?? []) as never);
-  return true;
+  return cancelOrderOnce(payload, orderId, { onlyUnpaid: true });
 }
 
 /** Stripe confirmed payment: record it, invoice, deduct stock. Idempotent. */
@@ -207,7 +214,8 @@ export async function markOnlinePaid(
     const orders = table(payload, "orders");
     await query(payload, sql`select id from ${orders} where id = ${orderId} for update`, req);
     const order = await payload.findByID({ collection: "orders", id: orderId, req, depth: 0, overrideAccess: true }).catch(() => null);
-    if (!order || order.paymentStatus !== "unpaid" || (amountCents !== undefined && amountCents !== order.totalCents)) {
+    // A cancelled order (its units already returned) never becomes paid late.
+    if (!order || order.paymentStatus !== "unpaid" || order.status === "cancelled" || (amountCents !== undefined && amountCents !== order.totalCents)) {
       await commitTransaction(req);
       return false;
     }

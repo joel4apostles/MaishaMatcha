@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, early morning (Opus 5.5 session)
+Last updated: 2026-11-06, ~01:00 (Opus 5.5 session)
 
 ## Where things stand
 
@@ -13,7 +13,7 @@ Last updated: 2026-11-06, early morning (Opus 5.5 session)
   `main` is 28 commits ahead of origin, NOT pushed. Pushing deploys: run
   the `security-audit` skill, then the go-live checklist in `POS-PLAN.md`
   section 7 (Supabase + Vercel env first).
-- **Built locally, tested (119 tests, `npm test`):** counter POS (PIN sign-in,
+- **Built locally, tested (125 tests, `npm test`):** counter POS (PIN sign-in,
   shifts, Z report, cash/card-on-terminal, tickets with AEAT QR, invoice hash
   chain, KDS, refunds/voids with manager PIN, offline cash queue), inventory
   and suppliers (gram deduction, counts, batches, reorder drafts, approve to
@@ -29,6 +29,15 @@ Last updated: 2026-11-06, early morning (Opus 5.5 session)
   email letters (Campaigns: owner approves, opted-in only, one-click
   unsubscribe). Security review: SHIP, all SHOULDs fixed (9334a8e).
   Carta and story stay in code on purpose (see CLAUDE.md "Content split").
+- **Shop + monthly membership (2026-11-06):** /es/tienda sells products the
+  team uploads in /admin (category marked Tienda; photo, price, stock
+  units); monthly membership via Stripe subscriptions with the founding
+  price. Privacy notice rewritten (provisional, needs legal review).
+  Design review SHIP; security review SHIP with all SHOULDs fixed.
+- **Founder photos (2026-11-03 / 10-25/26)** in ~/Downloads: real bar,
+  shopfront, product still lifes. One still life is on /tienda
+  (public/images/shop-still-life.jpg). The salon photos show construction
+  (cardboard on windows); use them for the Space section once finished.
 - Online ordering is OFF until the owner ticks it in /admin > Empresa.
   Security review of web ordering: SHIP; all findings fixed (44ea242).
   Every flow browser-verified at 390 and 1440, both locales.
@@ -42,9 +51,12 @@ Last updated: 2026-11-06, early morning (Opus 5.5 session)
   DATABASE_URL, PAYLOAD_SECRET, FIRST_OWNER_EMAIL, NEXT_PUBLIC_SITE_URL,
   RESEND_API_KEY/RESEND_AUDIENCE_ID, STRIPE_SECRET_KEY/STRIPE_WEBHOOK_SECRET
   (webhook events: checkout.session.completed, .async_payment_succeeded,
-  .expired, .async_payment_failed). NIF + legal name in Empresa. For the
+  .expired, .async_payment_failed, invoice.paid, customer.subscription.*;
+  enable the customer portal). NIF + legal name in Empresa. For the
   founding membership: price, IVA rate, number of places, perks. Real
-  event dates and capacities in /admin > Eventos. Confirm
+  event dates and capacities in /admin > Eventos. Monthly membership: price,
+  founding price, IVA, perks (ES and EN). Shop: products with photos and
+  stock, in both languages. Confirm
   prices (OJ 9,50, Yuzu 9,80), milks, allergens, open days, recipe grams
   and costs, map pin.
 - Blocked on founder: Stripe Terminal (2i), AEAT submission (2j),

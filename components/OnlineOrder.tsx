@@ -10,7 +10,7 @@ import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
-const KNOWN = ["closed", "too-many", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option"];
+const KNOWN = ["closed", "too-many", "too-many-units", "pay-online", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option"];
 
 const unitOf = (l: Line) =>
   l.item.priceCents +
@@ -71,6 +71,8 @@ export function OnlineOrder({
 
   const categories = useMemo(() => [...new Set(catalog.map((i) => i.category))], [catalog]);
   const total = lines.reduce((s, l) => s + unitOf(l) * l.quantity, 0);
+  // Shop products are paid online whenever card payment is on.
+  const hasShopItem = stripe && lines.some((l) => l.item.shop);
   const days = useMemo(() => [...new Set(slots.map((s) => s.day))], [slots]);
   const todayMadrid = useMemo(() => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(new Date()), []);
 
@@ -82,7 +84,7 @@ export function OnlineOrder({
       setLines((ls) => {
         // The same plain product twice is one line with quantity 2.
         const same = ls.find((l) => l.item.id === item.id && l.modifierKeys.length === 0);
-        return same ? ls.map((l) => (l === same ? { ...l, quantity: Math.min(l.quantity + 1, 20) } : l)) : [...ls, draft];
+        return same ? ls.map((l) => (l === same ? { ...l, quantity: Math.min(l.quantity + 1, item.shop ? 5 : 20) } : l)) : [...ls, draft];
       });
     else {
       setMissing(null);
@@ -132,7 +134,7 @@ export function OnlineOrder({
           phone: String(form.get("phone") ?? "") || null,
           note: String(form.get("note") ?? "") || null,
           pickupAt: slot,
-          payOnline,
+          payOnline: payOnline || hasShopItem,
           lines: lines.map((l) => ({ menuItemId: l.item.id, quantity: l.quantity, modifierKeys: l.modifierKeys })),
         });
         if (r.ok) window.location.assign(r.redirect);
@@ -247,7 +249,7 @@ export function OnlineOrder({
                   <button
                     type="button"
                     aria-label={t("more", { name: l.item.name })}
-                    disabled={l.quantity >= 20}
+                    disabled={l.quantity >= (l.item.shop ? 5 : 20)}
                     onClick={() => setLines((ls) => ls.map((x) => (x.uid === l.uid ? { ...x, quantity: x.quantity + 1 } : x)))}
                     className="flex h-11 w-11 items-center justify-center text-sumi/80 disabled:opacity-40"
                   >
@@ -331,10 +333,18 @@ export function OnlineOrder({
                     { v: false, label: t("payAtPickup") },
                   ].map((o) => (
                     <label key={String(o.v)} className="flex min-h-[44px] cursor-pointer items-center gap-3">
-                      <input type="radio" name="pay" checked={payOnline === o.v} onChange={() => setPayOnline(o.v)} className="size-5 accent-sumi" />
+                      <input
+                        type="radio"
+                        name="pay"
+                        checked={(payOnline || hasShopItem) === o.v}
+                        disabled={!o.v && hasShopItem}
+                        onChange={() => setPayOnline(o.v)}
+                        className="size-5 accent-sumi"
+                      />
                       {o.label}
                     </label>
                   ))}
+                  {hasShopItem ? <p className="text-sm text-sumi/70">{t("shopPaysOnline")}</p> : null}
                 </fieldset>
               ) : null}
 
@@ -346,7 +356,7 @@ export function OnlineOrder({
                 disabled={pending || !slot}
                 className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[2px] bg-sumi px-7 text-sm font-medium tracking-wide text-washi disabled:opacity-40"
               >
-                {pending ? t("sending") : payOnline && stripe ? t("submitPay", { total: formatEuro(total, locale) }) : t("submitPickup")}
+                {pending ? t("sending") : (payOnline || hasShopItem) && stripe ? t("submitPay", { total: formatEuro(total, locale) }) : t("submitPickup")}
               </button>
               <p className="text-sm text-sumi/70">{t("legal")}</p>
             </form>

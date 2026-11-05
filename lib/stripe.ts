@@ -33,6 +33,8 @@ export async function createCheckoutSession(input: {
     "payment_intent_data[metadata][orderId]": input.orderId,
     client_reference_id: String(input.orderId),
     "metadata[kind]": input.kind ?? "order",
+    // Expire with the 30-minute hold (Stripe's minimum), not after 24 hours.
+    expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
   };
   if (input.email) data.customer_email = input.email;
   input.lines.forEach((l, i) => {
@@ -81,6 +83,18 @@ export function verifyStripeSignature(rawBody: string, header: string | null, se
   });
 }
 
+async function stripeGet(path: string) {
+  const res = await fetch(`https://api.stripe.com/v1/${path}`, { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } });
+  if (!res.ok) throw new Error(`stripe ${res.status}`);
+  return res.json();
+}
+
+/** Subscriptions this customer still has (anything not ended). */
+export async function liveSubscriptions(customerId: string): Promise<number> {
+  const r = (await stripeGet(`subscriptions?customer=${encodeURIComponent(customerId)}&status=all&limit=20`)) as { data?: { status: string }[] };
+  return (r.data ?? []).filter((s) => !["canceled", "incomplete_expired"].includes(s.status)).length;
+}
+
 async function stripePost(path: string, data: Record<string, string | number>, idempotencyKey?: string) {
   const res = await fetch(`https://api.stripe.com/v1/${path}`, {
     method: "POST",
@@ -125,7 +139,8 @@ export async function createSubscriptionCheckout(input: {
   };
   if (input.customerId) data.customer = input.customerId;
   else data.customer_email = input.email;
-  return stripePost("checkout/sessions", data);
+  // Two clicks in the same minute reuse one Checkout session, never two subscriptions.
+  return stripePost("checkout/sessions", data, `premium:${input.memberId}:${input.monthlyCents}:${Math.floor(Date.now() / 60000)}`);
 }
 
 /** Stripe's hosted page where a subscriber changes card or cancels. */

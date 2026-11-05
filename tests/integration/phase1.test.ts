@@ -29,7 +29,8 @@ describe("seed", () => {
     expect(latte.docs[0]?.priceDeltaCents).toBe(140);
     const oat = await payload.find({ collection: "modifiers", where: { key: { equals: "leche.avena" } } });
     expect(oat.docs[0]?.allergens).toEqual(["gluten"]);
-    const items = await payload.count({ collection: "menu-items" });
+    // The carta only (other test files may add shop products to this database).
+    const items = await payload.count({ collection: "menu-items", where: { "category.shop": { not_equals: true } } });
     expect(items.totalDocs).toBe(9);
   });
 
