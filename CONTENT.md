@@ -3,34 +3,38 @@
 Everything customers see comes from two files. Edit them on GitHub (no code
 setup needed) and the site redeploys automatically in about a minute.
 
-> GitHub → `content/menu.ts` or `content/recipe.ts` → pencil icon (Edit) →
+> GitHub → `content/carta.ts` or `content/recipe.ts` → pencil icon (Edit) →
 > make the change → "Commit changes". Vercel deploys on save.
 
-## 1. The carta — `content/menu.ts`
+## 1. The carta — `content/carta.ts`
 
-Each drink looks like this:
+The website menu, the home page preview and the counter's seed all read this
+one file, so a price changed here is the same everywhere. Each item:
 
 ```ts
 {
-  id: "matcha-mango",          // unique, lowercase, no spaces
-  color: "#D69A3F",            // the drink's natural color (swatch + hover)
-  name: "Matcha Mango",        // shown as written (Spanish names everywhere)
-  price: "6,00 €",
-  signature: true,             // true = appears on the home page (max 4)
-  origin: "Uji, Kioto",        // optional
+  name: "Nishio",              // shown as written
+  priceCents: 740,             // the base price in cents, IVA included (7,40 €)
+  color: "#748A38",            // the drink's natural color (swatch + hover)
+  signature: true,             // true = on the home page (keep it to 4)
   description: {
-    es: "Mango batido, leche de coco.",
-    en: "Blended mango, coconut milk.",
+    es: "Ceremonial tradicional. Aromático, fresco y equilibrado.",
+    en: "Traditional ceremonial. Aromatic, fresh and balanced.",
   },
+  groups: ["preparacion-matcha", "leche", "extras"],
 },
 ```
 
-- To ADD a drink: copy a block, change every field, place it inside the right
-  category (`El matcha`, `Con burbujas`, `Con fruta`, `Sin matcha`).
-- To ADD a category: copy a whole category block; the menu page renders it
-  automatically with its own anchor.
-- Keep descriptions one line, sober, no exclamation marks (see the brand law
+- `groups` are the choices that item offers, defined once at the top of the
+  file in `cartaGroups`. "Latte" is an option worth +1,40 €, so the menu
+  shows "Usucha 7,40 € · Latte 8,80 €" by itself.
+- Extras (purés, Coconut Cloud, Ube) live in the `extras` group and get
+  their own section on the menu page.
+- Prices are in CENTS (150 = 1,50 €). Always fill BOTH `es` and `en`.
+- Keep descriptions short and sober, no exclamation marks (see the brand law
   in `.claude/skills/maisha-brand/SKILL.md`).
+- Once the admin is live, the counter's copy of the carta is edited at
+  /admin (Carta, Opciones). This file then only seeds new installs.
 
 ## 2. The recipe builder — `content/recipe.ts`
 

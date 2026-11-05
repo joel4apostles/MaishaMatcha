@@ -17,8 +17,8 @@ export const site = {
 } as const;
 
 const hours: Record<Locale, string> = {
-  es: "Mar a Dom · 9:00 a 20:00 (provisional)",
-  en: "Tue to Sun · 9:00 to 20:00 (provisional)",
+  es: "Mar a Dom · 8:00 a 18:00 (días por confirmar)",
+  en: "Tue to Sun · 8:00 to 18:00 (days to be confirmed)",
 };
 
 export function siteHours(locale: Locale): string {

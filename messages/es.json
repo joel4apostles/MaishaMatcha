@@ -32,7 +32,7 @@
     },
     "menuPreview": {
       "eyebrow": "La carta",
-      "title": "Cuatro preparaciones",
+      "title": "Cuatro tés de Japón",
       "createEyebrow": "A tu manera"
     },
     "space": {
@@ -77,10 +77,10 @@
   "menu": {
     "eyebrow": "La carta",
     "title": "Carta",
-    "intro": "Matcha molido en piedra, burbujas y fruta. Todo puede servirse frío.",
-    "originPrefix": "Origen",
+    "intro": "Usucha en agua o matcha latte. Los lattes, con la leche que prefieras, también vegetal de avena.",
     "closing": "Cincuenta socios fundadores estrenarán esta carta.",
-    "priceNote": "Precios de apertura, por confirmar."
+    "priceNote": "Precios en euros, IVA incluido. 100 % té japonés de origen.",
+    "price": "Precio"
   },
   "story": {
     "eyebrow": "Historia",
@@ -128,7 +128,7 @@
     },
     "menu": {
       "title": "Carta · maisha matcha",
-      "description": "Matcha ceremonial, burbujas y fruta. La carta del salón de matcha en Murcia."
+      "description": "Matcha ceremonial de Uji, Nishio y Kagoshima, hojicha, té negro japonés y mochis. La carta del salón de matcha en Murcia."
     },
     "story": {
       "title": "Historia · maisha matcha",

@@ -51,8 +51,8 @@ OG, admin) inherits them.
   cannot password-login at all (`beforeLogin`); owner/manager use `/admin`.
 - **The carta** source of truth is `content/carta.ts` (from the founder's
   carta PDF): seeded into Payload with option groups (usucha/latte +1,40,
-  milk, extras, mochi flavours). Public pages still read the older draft
-  `content/menu.ts`: switching them to the carta is pending.
+  milk, extras, mochi flavours). The public menu and home preview render it
+  through `lib/carta.ts` (prices = base + option delta, same as the till).
 - **No payments yet** (Stripe is Phase 2). Public server code is
   `/api/waitlist`, `/api/og`, and Payload's `/api/[...slug]`.
 - i18n via **next-intl**: routes `/es` (default) and `/en`, localized pathnames
@@ -183,7 +183,7 @@ public visitors or the counter. Re-check on every Payload upgrade.
 ## Content editing
 
 Until public pages read from the CMS, `CONTENT.md` remains the team guide:
-carta drinks in `content/menu.ts`, recipe-builder options/prices/ratios in
+carta in `content/carta.ts`, recipe-builder options/prices/ratios in
 `content/recipe.ts`; editing on GitHub auto-deploys. The Payload admin at
 `/admin` holds the same content as collections (via `npm run seed`) plus
 inventory/orders/members — it becomes the single source of truth once the

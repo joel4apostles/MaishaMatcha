@@ -23,7 +23,7 @@ import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
 import { TimelineRail } from "@/components/TimelineRail";
 import { StoryVisual } from "@/components/StoryVisual";
-import { signatureItems } from "@/content/menu";
+import { itemSlug, priceLines, signatureItems } from "@/lib/carta";
 import { story } from "@/content/story";
 import { site } from "@/content/site";
 import { pageMetadata, SITE_URL } from "@/lib/seo";
@@ -290,7 +290,7 @@ const bentoSpans = [
 function MenuPreview() {
   const t = useTranslations("home.menuPreview");
   const cta = useTranslations("cta");
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
   const items = signatureItems();
   return (
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
@@ -301,7 +301,7 @@ function MenuPreview() {
       <Reveal className="mt-12">
         <ul className="group/menu grid grid-cols-1 gap-4 sm:grid-cols-12">
           {items.map(({ item, category }, i) => (
-            <li key={item.id} className={`${bentoSpans[i]} flex`}>
+            <li key={itemSlug(item)} className={`${bentoSpans[i]} flex`}>
               {/* Whole cell is a real link — the hover affordance is honest. */}
               <Link
                 href="/menu"
@@ -328,12 +328,14 @@ function MenuPreview() {
                   </p>
                 </div>
                 <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-wood/25 pt-4">
-                  <p className="font-serif text-xl text-sumi/85">{item.price}</p>
-                  {item.origin ? (
-                    <p className="text-eyebrow uppercase text-sumi/70">
-                      {item.origin[locale]}
+                  {priceLines(item, locale).map((line) => (
+                    <p key={line.label ?? "price"} className="flex items-baseline gap-2">
+                      {line.label ? (
+                        <span className="text-eyebrow uppercase text-sumi/70">{line.label}</span>
+                      ) : null}
+                      <span className="font-serif text-xl text-sumi/85 tabular-nums">{line.price}</span>
                     </p>
-                  ) : null}
+                  ))}
                 </div>
               </Link>
             </li>

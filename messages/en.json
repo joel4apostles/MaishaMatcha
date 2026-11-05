@@ -32,7 +32,7 @@
     },
     "menuPreview": {
       "eyebrow": "The menu",
-      "title": "Four preparations",
+      "title": "Four teas from Japan",
       "createEyebrow": "Your way"
     },
     "space": {
@@ -77,10 +77,10 @@
   "menu": {
     "eyebrow": "The menu",
     "title": "Menu",
-    "intro": "Stone-ground matcha, bubbles and fruit. Everything can be served cold.",
-    "originPrefix": "Origin",
+    "intro": "Usucha in water or matcha latte. Lattes with the milk you prefer, oat included.",
     "closing": "Fifty founding members will taste this menu first.",
-    "priceNote": "Opening prices, to be confirmed."
+    "priceNote": "Prices in euros, VAT included. 100 % Japanese tea of origin.",
+    "price": "Price"
   },
   "story": {
     "eyebrow": "Story",
@@ -128,7 +128,7 @@
     },
     "menu": {
       "title": "Menu · maisha matcha",
-      "description": "Ceremonial matcha, bubbles and fruit. The menu of the matcha salon in Murcia."
+      "description": "Ceremonial matcha from Uji, Nishio and Kagoshima, hojicha, Japanese black tea and mochis. The menu of the matcha salon in Murcia."
     },
     "story": {
       "title": "Story · maisha matcha",
