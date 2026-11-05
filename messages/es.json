@@ -106,9 +106,54 @@
     },
     "privacy": {
       "title": "Privacidad",
-      "p1": "Guardamos tu nombre y tu correo con un único fin: avisarte antes de la apertura y, si lo aceptas, enviarte noticias ocasionales.",
-      "p2": "No compartimos tus datos con terceros ajenos al envío del correo. Puedes darte de baja cuando quieras escribiendo a hola@maishamatcha.es.",
-      "p3": "La analítica del sitio es anónima y no usa cookies."
+      "intro": "Qué datos guardamos, para qué, cuánto tiempo y cómo puedes pedir que los borremos. Lo escribimos claro a propósito.",
+      "updated": "Actualizado el 6 de noviembre de 2026.",
+      "sections": [
+        {
+          "title": "Quién es responsable",
+          "body": "El responsable del tratamiento es el titular de maisha matcha, Plaza Cetina, 3, Murcia. Sus datos fiscales completos figuran en el aviso legal. Para cualquier cuestión de privacidad, escribe a hola@maishamatcha.es."
+        },
+        {
+          "title": "Lista de espera",
+          "body": "Tu nombre y tu correo, para avisarte antes de la apertura y, si lo aceptaste, enviarte noticias ocasionales. Base: tu consentimiento. Puedes retirarlo cuando quieras."
+        },
+        {
+          "title": "Pedidos por la web",
+          "body": "Nombre, correo, teléfono si lo das, lo que pides, la hora de recogida y una nota para la barra. Los usamos para preparar el pedido y avisarte cuando está listo. Base: el contrato que haces al pedir. Los tickets y facturas se conservan el tiempo que exige la ley mercantil y fiscal (hasta seis años)."
+        },
+        {
+          "title": "Pagos",
+          "body": "Los pagos con tarjeta los procesa Stripe. Nunca vemos ni guardamos los datos de tu tarjeta: solo el importe, la fecha y una referencia del pago."
+        },
+        {
+          "title": "Tu cuenta",
+          "body": "La cuenta es opcional. Guarda tu nombre, tu correo, tu idioma, tus pedidos, tus reservas y, si eres socio, tu número y tu suscripción. Entras con un enlace que te enviamos, sin contraseñas. Base: el contrato de la cuenta."
+        },
+        {
+          "title": "Cartas por email",
+          "body": "Solo si marcas la casilla en tu cuenta. Cada carta lleva un enlace para darte de baja en un clic. Base: tu consentimiento."
+        },
+        {
+          "title": "Eventos",
+          "body": "Si reservas, guardamos la reserva y las plazas para preparar la sala. Base: el contrato de la reserva."
+        },
+        {
+          "title": "En la barra",
+          "body": "Los tickets de la barra no guardan datos personales salvo que pidas factura completa con tus datos fiscales."
+        },
+        {
+          "title": "Con quién trabajamos",
+          "body": "Supabase (base de datos, en la Unión Europea), Vercel (alojamiento de la web), Stripe (pagos) y Resend (envío de correos). Algunos tienen servidores fuera de la Unión Europea; las transferencias se amparan en el Marco de Privacidad de Datos UE y EE. UU. o en cláusulas contractuales tipo. No vendemos datos ni los cedemos a nadie más."
+        },
+        {
+          "title": "Cookies",
+          "body": "Solo usamos cookies imprescindibles: la de tu sesión si entras en tu cuenta y las del personal en la barra. No usamos cookies de publicidad ni de seguimiento. La analítica del sitio es anónima y no usa cookies."
+        },
+        {
+          "title": "Tus derechos",
+          "body": "Puedes pedir acceso, corrección, borrado, limitación, portabilidad u oponerte. Desde tu cuenta puedes borrarla tú mismo: borramos tu cuenta y tus reservas, y los tickets se quedan sin tus datos de contacto. Tu correo en la lista de espera y en los registros de Stripe se borra a petición, escribiéndonos. Si crees que no lo hemos hecho bien, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es)."
+        }
+      ]
     },
     "eyebrow": "Legal"
   },

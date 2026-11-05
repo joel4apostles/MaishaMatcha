@@ -34,20 +34,26 @@ export default async function PrivacyPage({
 
 function PrivacyContent() {
   const t = useTranslations("legal");
+  const sections = t.raw("privacy.sections") as { title: string; body: string }[];
   return (
     <Section>
       <Eyebrow>{t("eyebrow")}</Eyebrow>
       <Headline as="h1" className="mt-5">
         {t("privacy.title")}
       </Headline>
+      <p className="measure mt-6 text-lg text-sumi/80">{t("privacy.intro")}</p>
       <p className="mt-5 inline-flex rounded-[2px] border border-wood/40 px-2.5 py-1 text-sm text-sumi/75">
         {t("provisional")}
       </p>
-      <div className="measure mt-8 space-y-5 text-sumi/80">
-        <p>{t("privacy.p1")}</p>
-        <p>{t("privacy.p2")}</p>
-        <p>{t("privacy.p3")}</p>
+      <div className="measure mt-12 space-y-10">
+        {sections.map((s) => (
+          <section key={s.title}>
+            <h2 className="font-serif text-2xl font-light">{s.title}</h2>
+            <p className="mt-3 text-sumi/80">{s.body}</p>
+          </section>
+        ))}
       </div>
+      <p className="mt-12 text-sm text-sumi/70">{t("privacy.updated")}</p>
     </Section>
   );
 }

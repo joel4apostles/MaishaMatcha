@@ -106,9 +106,54 @@
     },
     "privacy": {
       "title": "Privacy",
-      "p1": "We keep your name and email for one purpose: to let you know before the opening and, if you agree, to send occasional news.",
-      "p2": "We do not share your data with third parties beyond sending the email. You can unsubscribe at any time by writing to hola@maishamatcha.es.",
-      "p3": "Site analytics are anonymous and use no cookies."
+      "intro": "What data we keep, why, for how long, and how to ask us to delete it. Written plainly on purpose.",
+      "updated": "Updated 6 November 2026.",
+      "sections": [
+        {
+          "title": "Who is responsible",
+          "body": "The controller is the owner of maisha matcha, Plaza Cetina, 3, Murcia. Full company details are in the legal notice. For any privacy question, write to hola@maishamatcha.es."
+        },
+        {
+          "title": "Waiting list",
+          "body": "Your name and email, to tell you before the opening and, if you agreed, to send occasional news. Basis: your consent. You can withdraw it at any time."
+        },
+        {
+          "title": "Web orders",
+          "body": "Name, email, phone if you give it, what you order, the pickup time and a note for the bar. We use them to prepare the order and tell you when it is ready. Basis: the contract you make when ordering. Receipts and invoices are kept as long as commercial and tax law requires (up to six years)."
+        },
+        {
+          "title": "Payments",
+          "body": "Card payments are processed by Stripe. We never see or keep your card details: only the amount, the date and a payment reference."
+        },
+        {
+          "title": "Your account",
+          "body": "The account is optional. It keeps your name, email, language, orders, bookings and, if you are a member, your number and subscription. You sign in with a link we email you, without passwords. Basis: the account contract."
+        },
+        {
+          "title": "Email letters",
+          "body": "Only if you tick the box in your account. Every letter has a one-click unsubscribe link. Basis: your consent."
+        },
+        {
+          "title": "Events",
+          "body": "If you book, we keep the booking and the seats to prepare the room. Basis: the booking contract."
+        },
+        {
+          "title": "At the bar",
+          "body": "Counter receipts keep no personal data unless you ask for a full invoice with your tax details."
+        },
+        {
+          "title": "Who we work with",
+          "body": "Supabase (database, in the European Union), Vercel (website hosting), Stripe (payments) and Resend (email delivery). Some have servers outside the European Union; transfers rely on the EU and US Data Privacy Framework or standard contractual clauses. We do not sell data or pass it to anyone else."
+        },
+        {
+          "title": "Cookies",
+          "body": "Only essential cookies: your session if you sign in, and the staff ones at the bar. No advertising or tracking cookies. Site analytics are anonymous and cookieless."
+        },
+        {
+          "title": "Your rights",
+          "body": "You can ask for access, correction, deletion, restriction, portability, or object. You can delete your account yourself from the account page: we delete the account and bookings, and receipts stay without your contact details. Your email on the waiting list and in Stripe records is deleted on request by writing to us. If you think we got it wrong, you can complain to the Spanish Data Protection Agency (aepd.es)."
+        }
+      ]
     },
     "eyebrow": "Legal"
   },
