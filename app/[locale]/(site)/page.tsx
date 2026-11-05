@@ -16,7 +16,7 @@ import { WordReveal } from "@/components/WordReveal";
 import { ScrollInk } from "@/components/ScrollInk";
 import { StageReveal } from "@/components/StageReveal";
 import { StageWords } from "@/components/StageWords";
-import { QuietLink, buttonClass, inkButtonClass } from "@/components/Button";
+import { QuietLink, inkButtonClass } from "@/components/Button";
 import { Link } from "@/i18n/navigation";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { BrandWordmark } from "@/components/BrandWordmark";

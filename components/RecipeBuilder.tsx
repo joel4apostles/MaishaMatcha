@@ -50,9 +50,11 @@ export function RecipeBuilder() {
     setIds(updater);
   };
 
-  // Prefill from a shared link (?r=...).
+  // Prefill from a shared link (?r=...). Read after hydration on purpose:
+  // the page is statically rendered, so the server never sees the query.
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("r");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL, an external system
     if (param) setIds(fromParam(param));
   }, []);
 
