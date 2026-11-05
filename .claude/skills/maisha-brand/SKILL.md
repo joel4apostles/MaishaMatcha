@@ -54,8 +54,8 @@ Reduced palette, 2–3 colors maximum, much negative space.
 - NO gradients anywhere in the DESIGN. Flat color fields only (backgrounds,
   buttons, placeholders, OG image). Depth comes from whitespace and
   hairlines, not from blends.
-- FOUNDER EXEMPTION (2026-09-07): the DrinkGlass product visualization in
-  the recipe builder is treated like a photograph — it may use gradients
+- FOUNDER EXEMPTION (2026-09-07): the drink visualization in the recipe
+  builder (today PhotoDrink; the Phase 6 live drink later) is treated like a photograph — it may use gradients
   (liquid depth, glass shine) and quiet ambient loops (rising bubbles,
   steam) because it depicts the physical drink. The exemption covers ONLY
   this component; ambient loops must die under prefers-reduced-motion.

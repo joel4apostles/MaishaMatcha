@@ -32,13 +32,13 @@ const DEVICE_COOKIE = "maisha_device";
 const SESSION_COOKIE = "maisha_pos";
 const DEVICE_SECONDS = 400 * 24 * 60 * 60;
 
-export type { PinResult, PosDevice, PosStaff };
+export type { PinResult };
 
 const sessionKey = () => deriveKey(appSecret(), "pos-session");
 const cookieBase = () =>
   ({ httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/" }) as const;
 
-export const payloadClient = (): Promise<Payload> => getPayload({ config });
+const payloadClient = (): Promise<Payload> => getPayload({ config });
 
 /** The owner signed in to /admin in this browser, or null. */
 export async function backOfficeOwner() {
@@ -53,7 +53,7 @@ export const currentDevice = cache(async (): Promise<PosDevice | null> => {
   return findDevice(await payloadClient(), token);
 });
 
-export type RegisterResult = { ok: true; device: PosDevice } | { ok: false; reason: "not-owner" | "name" };
+type RegisterResult = { ok: true; device: PosDevice } | { ok: false; reason: "not-owner" | "name" };
 
 export async function registerDevice(name: string): Promise<RegisterResult> {
   const clean = name.trim().slice(0, 60);

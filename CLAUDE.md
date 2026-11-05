@@ -108,7 +108,7 @@ restart dev. And after ANY `npm install`, repair the lockfile:
 - `content/*.ts` — structured localized data: `menu.ts`, `story.ts`,
   `events.ts`, `site.ts`. Fields that vary by language use `Record<Locale, …>`.
 - `components/` — primitives: `Section`, `Eyebrow`, `Headline`, `Button`
-  (+ `buttonClass`/`quietLinkClass`), `Reveal`, `KigumiGrid`, `PlaceholderImage`,
+  (+ `buttonClass`/`quietLinkClass`), `Reveal`,
   `WaitlistForm`, `SiteHeader`, `SiteFooter`, `LocaleSwitcher`.
 - Motion primitives (all hand-rolled, no animation deps): `WordReveal`
   (CSS-only staggered word entrance, hero), `ScrollInk` (scroll-linked
@@ -130,10 +130,11 @@ restart dev. And after ANY `npm install`, repair the lockfile:
   visual: the kit's real drink photograph (`public/images/drink-real.jpg`,
   the 736×1308 image inside the brand identity PDF) re-tinted live to
   `blendColor(recipe)` via `mix-blend-color`, plus a warm veil that lifts
-  when the drink is frío. `DrinkGlass.tsx` (animated SVG pour) is kept in
-  the repo but unused.
+  when the drink is frío. The old animated SVG glass (`DrinkGlass.tsx`)
+  was removed 2026-11-05; recover it from git history (before commit
+  "Code hygiene") if Phase 6 wants it.
 - `cms/` — Payload: `collections/` (Users, Media, MenuCategories, MenuItems,
-  RecipeOptions, Events, StoryChapters, InventoryItems, StockMovements
+  ModifierGroups, Modifiers, TaxRates, PosDevices, AuditLog, Events, StoryChapters, InventoryItems, StockMovements
   append-only ledger + cached-stock hook, Orders, Members), `seed.ts`,
   `components/AdminLogo|AdminIcon`. Admin theme in `app/(payload)/custom.scss`
   (washi/sumi elevation ramps, matcha success ramp, theme forced light).

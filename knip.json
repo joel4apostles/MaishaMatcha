@@ -1,0 +1,30 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/**/{page,layout,route,error,not-found,loading,icon,apple-icon,robots,sitemap}.{ts,tsx}",
+    "app/**/actions.ts",
+    "proxy.ts",
+    "payload.config.ts",
+    "cms/components/*.tsx",
+    "migrations/index.ts",
+    "scripts/*.mjs",
+    "tests/**/*.ts",
+    "vitest.config.ts",
+    "next.config.ts",
+    "eslint.config.mjs"
+  ],
+  "project": [
+    "**/*.{ts,tsx,mjs,js}"
+  ],
+  "ignore": [
+    "cms/payload-types.ts"
+  ],
+  "next": false,
+  "vitest": false,
+  "eslint": false,
+  "payload": false,
+  "ignoreDependencies": [
+    "tailwindcss",
+    "postcss"
+  ]
+}

@@ -25,7 +25,7 @@ export type PinResult =
 type SessionPayload = { uid: number; did: number; pv: string; exp: number };
 
 /** Short fingerprint of the stored PIN hash: changing a PIN ends sessions. */
-export const pinVersion = (pinHash: string) => sha256(pinHash).slice(0, 16);
+const pinVersion = (pinHash: string) => sha256(pinHash).slice(0, 16);
 
 export async function findDevice(payload: Payload, token: string | undefined): Promise<PosDevice | null> {
   if (!token) return null;
