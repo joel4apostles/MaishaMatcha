@@ -3,6 +3,7 @@ import { editorialAccess } from "../access";
 
 export const MenuCategories: CollectionConfig = {
   slug: "menu-categories",
+  labels: { singular: "Categoría", plural: "Categorías" },
   admin: { useAsTitle: "title", defaultColumns: ["title", "order"] },
   access: editorialAccess,
   defaultSort: "order",

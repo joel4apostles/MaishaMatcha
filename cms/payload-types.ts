@@ -67,20 +67,20 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    media: Media;
-    'menu-categories': MenuCategory;
+    orders: Order;
+    'pos-devices': PosDevice;
     'menu-items': MenuItem;
-    'tax-rates': TaxRate;
+    'menu-categories': MenuCategory;
     'modifier-groups': ModifierGroup;
     modifiers: Modifier;
-    events: Event;
-    'story-chapters': StoryChapter;
+    'tax-rates': TaxRate;
     'inventory-items': InventoryItem;
     'stock-movements': StockMovement;
-    orders: Order;
     members: Member;
-    'pos-devices': PosDevice;
+    users: User;
+    events: Event;
+    'story-chapters': StoryChapter;
+    media: Media;
     'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -89,20 +89,20 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'pos-devices': PosDevicesSelect<false> | PosDevicesSelect<true>;
     'menu-items': MenuItemsSelect<false> | MenuItemsSelect<true>;
-    'tax-rates': TaxRatesSelect<false> | TaxRatesSelect<true>;
+    'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
     'modifier-groups': ModifierGroupsSelect<false> | ModifierGroupsSelect<true>;
     modifiers: ModifiersSelect<false> | ModifiersSelect<true>;
-    events: EventsSelect<false> | EventsSelect<true>;
-    'story-chapters': StoryChaptersSelect<false> | StoryChaptersSelect<true>;
+    'tax-rates': TaxRatesSelect<false> | TaxRatesSelect<true>;
     'inventory-items': InventoryItemsSelect<false> | InventoryItemsSelect<true>;
     'stock-movements': StockMovementsSelect<false> | StockMovementsSelect<true>;
-    orders: OrdersSelect<false> | OrdersSelect<true>;
     members: MembersSelect<false> | MembersSelect<true>;
-    'pos-devices': PosDevicesSelect<false> | PosDevicesSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    'story-chapters': StoryChaptersSelect<false> | StoryChaptersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -142,6 +142,65 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  /**
+   * Drink name or composed summary
+   */
+  summary: string;
+  /**
+   * Recipe code from the builder card, if custom
+   */
+  code?: string | null;
+  /**
+   * The subscriber who ordered, if a member
+   */
+  member?: (number | null) | Member;
+  customerName?: string | null;
+  priceCents?: number | null;
+  status: 'nueva' | 'preparando' | 'lista' | 'entregada' | 'cancelada';
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members".
+ */
+export interface Member {
+  id: number;
+  name: string;
+  email: string;
+  tier: 'founding' | 'premium' | 'waitlist';
+  status: 'active' | 'paused' | 'cancelled';
+  /**
+   * Their saved drink code (CLA·TON·YUZ·F)
+   */
+  favoriteRecipeCode?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Desactiva un dispositivo perdido para revocarlo al instante.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pos-devices".
+ */
+export interface PosDevice {
+  id: number;
+  name: string;
+  active?: boolean | null;
+  tokenHash: string;
+  registeredBy?: (number | null) | User;
+  lastSeenAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -185,66 +244,6 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumb?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    wide?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "menu-categories".
- */
-export interface MenuCategory {
-  id: number;
-  /**
-   * URL anchor, e.g. burbujas
-   */
-  slug: string;
-  title: string;
-  order: number;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -305,6 +304,21 @@ export interface MenuItem {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-categories".
+ */
+export interface MenuCategory {
+  id: number;
+  /**
+   * URL anchor, e.g. burbujas
+   */
+  slug: string;
+  title: string;
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Confirma los tipos con tu gestor antes de vender.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -337,6 +351,51 @@ export interface ModifierGroup {
   order?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    wide?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -383,43 +442,6 @@ export interface Modifier {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events".
- */
-export interface Event {
-  id: number;
-  title: string;
-  when: string;
-  description: string;
-  membersOnly?: boolean | null;
-  photo?: (number | null) | Media;
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "story-chapters".
- */
-export interface StoryChapter {
-  id: number;
-  chapterId: string;
-  /**
-   * Calligraphic emblem for the era rail (茶, 禅…). Empty = brand icon.
-   */
-  glyph?: string | null;
-  era: string;
-  title: string;
-  body: string;
-  /**
-   * Shown in the home story teaser (pick 4)
-   */
-  teaser?: boolean | null;
-  order: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * El stock solo cambia con movimientos: el registro es la verdad.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -461,60 +483,38 @@ export interface StockMovement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
+ * via the `definition` "events".
  */
-export interface Order {
+export interface Event {
   id: number;
-  /**
-   * Drink name or composed summary
-   */
-  summary: string;
-  /**
-   * Recipe code from the builder card, if custom
-   */
-  code?: string | null;
-  /**
-   * The subscriber who ordered, if a member
-   */
-  member?: (number | null) | Member;
-  customerName?: string | null;
-  priceCents?: number | null;
-  status: 'nueva' | 'preparando' | 'lista' | 'entregada' | 'cancelada';
-  note?: string | null;
+  title: string;
+  when: string;
+  description: string;
+  membersOnly?: boolean | null;
+  photo?: (number | null) | Media;
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members".
+ * via the `definition` "story-chapters".
  */
-export interface Member {
+export interface StoryChapter {
   id: number;
-  name: string;
-  email: string;
-  tier: 'founding' | 'premium' | 'waitlist';
-  status: 'active' | 'paused' | 'cancelled';
+  chapterId: string;
   /**
-   * Their saved drink code (CLA·TON·YUZ·F)
+   * Calligraphic emblem for the era rail (茶, 禅…). Empty = brand icon.
    */
-  favoriteRecipeCode?: string | null;
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Desactiva un dispositivo perdido para revocarlo al instante.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pos-devices".
- */
-export interface PosDevice {
-  id: number;
-  name: string;
-  active?: boolean | null;
-  tokenHash: string;
-  registeredBy?: (number | null) | User;
-  lastSeenAt?: string | null;
+  glyph?: string | null;
+  era: string;
+  title: string;
+  body: string;
+  /**
+   * Shown in the home story teaser (pick 4)
+   */
+  teaser?: boolean | null;
+  order: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -578,24 +578,20 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'orders';
+        value: number | Order;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'menu-categories';
-        value: number | MenuCategory;
+        relationTo: 'pos-devices';
+        value: number | PosDevice;
       } | null)
     | ({
         relationTo: 'menu-items';
         value: number | MenuItem;
       } | null)
     | ({
-        relationTo: 'tax-rates';
-        value: number | TaxRate;
+        relationTo: 'menu-categories';
+        value: number | MenuCategory;
       } | null)
     | ({
         relationTo: 'modifier-groups';
@@ -606,12 +602,8 @@ export interface PayloadLockedDocument {
         value: number | Modifier;
       } | null)
     | ({
-        relationTo: 'events';
-        value: number | Event;
-      } | null)
-    | ({
-        relationTo: 'story-chapters';
-        value: number | StoryChapter;
+        relationTo: 'tax-rates';
+        value: number | TaxRate;
       } | null)
     | ({
         relationTo: 'inventory-items';
@@ -622,16 +614,24 @@ export interface PayloadLockedDocument {
         value: number | StockMovement;
       } | null)
     | ({
-        relationTo: 'orders';
-        value: number | Order;
-      } | null)
-    | ({
         relationTo: 'members';
         value: number | Member;
       } | null)
     | ({
-        relationTo: 'pos-devices';
-        value: number | PosDevice;
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'story-chapters';
+        value: number | StoryChapter;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -681,6 +681,150 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  summary?: T;
+  code?: T;
+  member?: T;
+  customerName?: T;
+  priceCents?: T;
+  status?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pos-devices_select".
+ */
+export interface PosDevicesSelect<T extends boolean = true> {
+  name?: T;
+  active?: T;
+  tokenHash?: T;
+  registeredBy?: T;
+  lastSeenAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-items_select".
+ */
+export interface MenuItemsSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  priceCents?: T;
+  onlinePriceCents?: T;
+  taxRate?: T;
+  available?: T;
+  allergens?: T;
+  modifierGroups?: T;
+  color?: T;
+  description?: T;
+  origin?: T;
+  signature?: T;
+  photo?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-categories_select".
+ */
+export interface MenuCategoriesSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modifier-groups_select".
+ */
+export interface ModifierGroupsSelect<T extends boolean = true> {
+  slug?: T;
+  label?: T;
+  selection?: T;
+  required?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modifiers_select".
+ */
+export interface ModifiersSelect<T extends boolean = true> {
+  group?: T;
+  key?: T;
+  code?: T;
+  label?: T;
+  note?: T;
+  priceDeltaCents?: T;
+  grams?: T;
+  ml?: T;
+  hue?: T;
+  allergens?: T;
+  available?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tax-rates_select".
+ */
+export interface TaxRatesSelect<T extends boolean = true> {
+  name?: T;
+  rateBasisPoints?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inventory-items_select".
+ */
+export interface InventoryItemsSelect<T extends boolean = true> {
+  name?: T;
+  unit?: T;
+  stock?: T;
+  lowStockAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock-movements_select".
+ */
+export interface StockMovementsSelect<T extends boolean = true> {
+  item?: T;
+  delta?: T;
+  reason?: T;
+  note?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members_select".
+ */
+export interface MembersSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  tier?: T;
+  status?: T;
+  favoriteRecipeCode?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -709,6 +853,35 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  when?: T;
+  description?: T;
+  membersOnly?: T;
+  photo?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "story-chapters_select".
+ */
+export interface StoryChaptersSelect<T extends boolean = true> {
+  chapterId?: T;
+  glyph?: T;
+  era?: T;
+  title?: T;
+  body?: T;
+  teaser?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -761,179 +934,6 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "menu-categories_select".
- */
-export interface MenuCategoriesSelect<T extends boolean = true> {
-  slug?: T;
-  title?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "menu-items_select".
- */
-export interface MenuItemsSelect<T extends boolean = true> {
-  name?: T;
-  category?: T;
-  priceCents?: T;
-  onlinePriceCents?: T;
-  taxRate?: T;
-  available?: T;
-  allergens?: T;
-  modifierGroups?: T;
-  color?: T;
-  description?: T;
-  origin?: T;
-  signature?: T;
-  photo?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tax-rates_select".
- */
-export interface TaxRatesSelect<T extends boolean = true> {
-  name?: T;
-  rateBasisPoints?: T;
-  active?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "modifier-groups_select".
- */
-export interface ModifierGroupsSelect<T extends boolean = true> {
-  slug?: T;
-  label?: T;
-  selection?: T;
-  required?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "modifiers_select".
- */
-export interface ModifiersSelect<T extends boolean = true> {
-  group?: T;
-  key?: T;
-  code?: T;
-  label?: T;
-  note?: T;
-  priceDeltaCents?: T;
-  grams?: T;
-  ml?: T;
-  hue?: T;
-  allergens?: T;
-  available?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events_select".
- */
-export interface EventsSelect<T extends boolean = true> {
-  title?: T;
-  when?: T;
-  description?: T;
-  membersOnly?: T;
-  photo?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "story-chapters_select".
- */
-export interface StoryChaptersSelect<T extends boolean = true> {
-  chapterId?: T;
-  glyph?: T;
-  era?: T;
-  title?: T;
-  body?: T;
-  teaser?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "inventory-items_select".
- */
-export interface InventoryItemsSelect<T extends boolean = true> {
-  name?: T;
-  unit?: T;
-  stock?: T;
-  lowStockAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "stock-movements_select".
- */
-export interface StockMovementsSelect<T extends boolean = true> {
-  item?: T;
-  delta?: T;
-  reason?: T;
-  note?: T;
-  createdBy?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders_select".
- */
-export interface OrdersSelect<T extends boolean = true> {
-  summary?: T;
-  code?: T;
-  member?: T;
-  customerName?: T;
-  priceCents?: T;
-  status?: T;
-  note?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members_select".
- */
-export interface MembersSelect<T extends boolean = true> {
-  name?: T;
-  email?: T;
-  tier?: T;
-  status?: T;
-  favoriteRecipeCode?: T;
-  notes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pos-devices_select".
- */
-export interface PosDevicesSelect<T extends boolean = true> {
-  name?: T;
-  active?: T;
-  tokenHash?: T;
-  registeredBy?: T;
-  lastSeenAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

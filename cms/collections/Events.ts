@@ -3,6 +3,7 @@ import { editorialAccess } from "../access";
 
 export const Events: CollectionConfig = {
   slug: "events",
+  labels: { singular: "Evento", plural: "Eventos" },
   admin: { useAsTitle: "title", defaultColumns: ["title", "when", "membersOnly"] },
   access: editorialAccess,
   fields: [

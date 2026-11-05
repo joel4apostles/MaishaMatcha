@@ -1,7 +1,9 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
-import { buildConfig } from "payload";
+import { buildConfig, type CollectionConfig } from "payload";
+import { es } from "@payloadcms/translations/languages/es";
+import { en } from "@payloadcms/translations/languages/en";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 
 import { Users } from "./cms/collections/Users";
@@ -50,6 +52,14 @@ const db = postgresAdapter({
 
 const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
 
+/** Groups each collection in the dashboard and hides the developer API tab. */
+function inSalonOrder(list: [CollectionConfig, string][]): CollectionConfig[] {
+  return list.map(([collection, group]) => ({
+    ...collection,
+    admin: { ...collection.admin, group, hideAPIURL: true },
+  }));
+}
+
 export default buildConfig({
   secret: appSecret(),
   // Cookie-authenticated requests are only accepted from our own origin.
@@ -76,23 +86,26 @@ export default buildConfig({
       },
     },
   },
-  collections: [
-    Users,
-    Media,
-    MenuCategories,
-    MenuItems,
-    TaxRates,
-    ModifierGroups,
-    Modifiers,
-    Events,
-    StoryChapters,
-    InventoryItems,
-    StockMovements,
-    Orders,
-    Members,
-    PosDevices,
-    AuditLog,
-  ],
+  // The admin speaks Spanish first, like the salon (English stays available).
+  i18n: { supportedLanguages: { es, en }, fallbackLanguage: "es" },
+  // Dashboard order and groups follow how the salon works, not the schema.
+  collections: inSalonOrder([
+    [Orders, "Barra"],
+    [PosDevices, "Barra"],
+    [MenuItems, "Carta"],
+    [MenuCategories, "Carta"],
+    [ModifierGroups, "Carta"],
+    [Modifiers, "Carta"],
+    [TaxRates, "Carta"],
+    [InventoryItems, "Inventario"],
+    [StockMovements, "Inventario"],
+    [Members, "Personas"],
+    [Users, "Personas"],
+    [Events, "Web"],
+    [StoryChapters, "Web"],
+    [Media, "Web"],
+    [AuditLog, "Control"],
+  ]),
   typescript: {
     outputFile: path.resolve(dirname, "cms/payload-types.ts"),
   },

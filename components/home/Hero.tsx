@@ -32,16 +32,18 @@ export function Hero() {
           className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10"
           style={riseDelay(100)}
         >
-          {/* Real matcha powder under a green veil (15% show-through, AA-safe). */}
+          {/* Real matcha powder under a green veil (15% show-through, AA-safe).
+              Zoomed to the photo's plain top-left corner: the pressed logo
+              in its centre would double the lockup above it. */}
           <Image
             src={matchaPowder}
             alt=""
             aria-hidden="true"
             fill
-            sizes="(min-width: 768px) 672px, calc(100vw - 48px)"
+            sizes="(min-width: 768px) 1600px, 900px"
             quality={50}
             placeholder="blur"
-            className="object-cover"
+            className="origin-top-left scale-[3] object-cover"
           />
           <div aria-hidden="true" className="absolute inset-0 bg-matcha/85" />
           <div className="relative">

@@ -8,6 +8,7 @@ import { owner, ownerOrManager } from "../access";
  */
 export const Members: CollectionConfig = {
   slug: "members",
+  labels: { singular: "Socio", plural: "Socios" },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "email", "tier", "status"],

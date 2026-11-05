@@ -7,6 +7,7 @@ import { anyStaff, nobody, ownerOrManager } from "../access";
  */
 export const Orders: CollectionConfig = {
   slug: "orders",
+  labels: { singular: "Pedido", plural: "Pedidos" },
   admin: {
     useAsTitle: "summary",
     defaultColumns: ["summary", "code", "status", "priceCents", "createdAt"],
