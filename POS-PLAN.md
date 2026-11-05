@@ -264,3 +264,27 @@ import those tickets later.
    then create the owner at /admin with the FIRST_OWNER_EMAIL address.
 4. In Supabase, check the `payload` schema is not under API, Exposed schemas.
 5. Push to main. On the tablet: sign in to /admin as owner, open /pos/registrar.
+
+## 8. Build backlog (founder go-ahead 2026-11-05: "implement every feature")
+
+Mocks approved by the founder's instruction to build everything. Order of
+work, each step committed with tests before the next:
+
+| Step | Feature | Needs from the founder |
+|---|---|---|
+| 2a | Order model: lines, option snapshots, server-priced totals, IVA breakdown, idempotency | none |
+| 2b | Shifts: open with float, close with count, Z report | none |
+| 2c | Counter order screen + options sheet + measured grams (mocks 1 and 2) | none |
+| 2d | Cash payment with change; "card on external terminal" recorded by the barista | none |
+| 2e | Invoice records: series, sequential number, SHA-256 hash chain, QR payload, receipt page (print/QR) | NIF, legal name, address (settings) |
+| 2f | Kitchen display /kds (mock 4), status flow, timers | none |
+| 2g | Refunds and voids with reasons, barista limits, manager approval | none |
+| 2h | Offline queue for cash sales (idempotent sync) | none |
+| 2i | Stripe Terminal card payments | Stripe account + reader |
+| 2j | VERI*FACTU submission to AEAT | company e-certificate, gestor sign-off |
+| 3 | Inventory: recipes (BOM), auto-deduction incl. measured grams, counts, waste, batches, alerts, margin | ingredient costs |
+| 4 | Suppliers + draft purchase orders + approval + email + receiving | supplier list |
+| 5 | Website ordering: pickup slots, pre-order, status page, accounts, CafeRadar stamps | Stripe keys (online pay) |
+| 6 | Drink builder "matcha comes alive": live layered drink, saved/named recipes, share card, recipe becomes an order | none |
+| 7 | Reports, owner dashboard, exports, IVA summary, runbook | none |
+| + | Founding membership (Stripe), events RSVP, email campaigns, CMS-backed pages | Stripe, Resend keys |
