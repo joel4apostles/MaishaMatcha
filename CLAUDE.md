@@ -107,6 +107,8 @@ restart dev. And after ANY `npm install`, repair the lockfile:
 - `messages/{es,en}.json` — UI chrome + prose. Keep keys in sync across locales.
 - `content/*.ts` — structured localized data: `menu.ts`, `story.ts`,
   `events.ts`, `site.ts`. Fields that vary by language use `Record<Locale, …>`.
+- `components/home/` — one file per home section (Hero, Manifesto, StoryTeaser,
+  MenuPreview, TheSpace, Founding) + `motion.ts` delays; the page composes them.
 - `components/` — primitives: `Section`, `Eyebrow`, `Headline`, `Button`
   (+ `buttonClass`/`quietLinkClass`), `Reveal`,
   `WaitlistForm`, `SiteHeader`, `SiteFooter`, `LocaleSwitcher`.
