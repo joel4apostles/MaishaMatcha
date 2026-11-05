@@ -13,6 +13,8 @@ import { stageDelay } from "./motion";
 
 /** The four pivotal chapters told on the front page; the rest live in /historia. */
 const TEASER_CHAPTERS = ["tang", "eisai", "rikyu", "murcia"];
+/** Phones tell only the first and last of them; the full four from sm up. */
+const PHONE_CHAPTERS = new Set(["tang", "murcia"]);
 
 export function StoryTeaser() {
   const t = useTranslations("story");
@@ -34,7 +36,7 @@ export function StoryTeaser() {
             <li
               key={chapter.id}
               data-story-id={chapter.id}
-              className="relative pb-12 last:pb-0"
+              className={`relative pb-12 last:pb-0 ${PHONE_CHAPTERS.has(chapter.id) ? "" : "hidden sm:list-item"}`}
             >
               <span
                 aria-hidden="true"

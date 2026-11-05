@@ -7,7 +7,10 @@ export const routing = defineRouting({
   // Localized pathnames: canonical key -> per-locale segment.
   pathnames: {
     "/": "/",
-    "/menu": "/menu",
+    "/menu": {
+      es: "/carta",
+      en: "/menu",
+    },
     "/crea": {
       es: "/crea",
       en: "/create",

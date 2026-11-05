@@ -164,7 +164,7 @@ export function RecipeBuilder() {
     .join(" · ");
 
   return (
-    <div className="grid grid-cols-1 gap-12 pb-24 md:grid-cols-[1.1fr_0.9fr] md:gap-16 md:pb-0">
+    <div className="recipe-builder grid grid-cols-1 gap-12 pb-24 md:grid-cols-[1.1fr_0.9fr] md:gap-16 md:pb-0">
       <div className="space-y-10">
         <Step title={t("stepTea")}>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">

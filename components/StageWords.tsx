@@ -1,4 +1,5 @@
 import { Fragment, type CSSProperties } from "react";
+import { withMacrons } from "./Macron";
 
 /**
  * Per-word markup for a StageReveal title: words carry staggered delays but
@@ -26,7 +27,7 @@ export function StageWords({
               { "--wr-delay": `${baseDelay + i * step}ms` } as CSSProperties
             }
           >
-            {word}
+            {withMacrons(word)}
           </span>
           {/* Space OUTSIDE the inline-block span — inside it gets trimmed. */}
           {i < words.length - 1 ? " " : null}

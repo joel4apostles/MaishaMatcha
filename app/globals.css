@@ -46,6 +46,31 @@
     scroll-behavior: smooth;
   }
 
+  /* Drawn macron over a plain u (Fraunces' ū glyph is misplaced; see
+     components/Macron.tsx). Positions measured at 24 to 56px. */
+  .macron-u {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+  }
+  .macron-u::after {
+    content: "";
+    position: absolute;
+    left: 0.1em;
+    right: 0.1em;
+    top: 0.235em;
+    height: 0.055em;
+    background: currentColor;
+    border-radius: 0.02em;
+  }
+
+  /* Phones: focused options never hide behind the builder's price bar. */
+  @media (max-width: 767px) {
+    html:has(.recipe-builder) {
+      scroll-padding-bottom: 6rem;
+    }
+  }
+
   /* Fallback for the keyboard: a focused field always keeps room around
      it when the browser scrolls it into view (see KeyboardSafeFields). */
   input,

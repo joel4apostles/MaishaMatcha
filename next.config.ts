@@ -32,6 +32,11 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
   // Next 16 only serves listed qualities: 50 for textures under a veil.
   images: { qualities: [50, 75] },
+  // The Spanish carta moved from /es/menu to /es/carta (2026-11-05):
+  // keep old links and search results working.
+  async redirects() {
+    return [{ source: "/es/menu", destination: "/es/carta", permanent: true }];
+  },
   async headers() {
     return [
       {

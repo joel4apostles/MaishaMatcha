@@ -35,7 +35,7 @@
     },
     "space": {
       "eyebrow": "El espacio",
-      "title": "Una sala de té en Murcia",
+      "title": "Una sala de té en Murcia",
       "body": "Tatami y madera cálida. Cerámica hecha a mano: chawan, chasen, chashaku. En la pared, una obra tejida. En el centro, un árbol. Nada más.",
       "caption1": "la caja de luz",
       "caption2": "la barra",
@@ -44,7 +44,8 @@
       "alt2": "La barra de piedra bajo una obra tejida.",
       "alt3": "El árbol junto a las celosías de madera.",
       "altMain": "El salón: madera cálida, tatami, la barra de piedra y el árbol.",
-      "renderNote": "Imagen del proyecto. No es una imagen final."
+      "renderNote": "Imagen del proyecto. No es una imagen final.",
+      "renderNoteShort": "Imagen del proyecto"
     },
     "founding": {
       "eyebrow": "Socios fundadores",

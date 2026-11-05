@@ -70,8 +70,9 @@ export function Hero() {
       />
 
       {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-4 right-4 rounded-[2px] bg-matcha/90 px-2.5 py-1 text-eyebrow uppercase text-sumi/85">
-        {space("renderNote")}
+      <span className="absolute bottom-4 right-6 rounded-[2px] bg-matcha/90 px-2.5 py-1 text-eyebrow uppercase text-sumi/85 sm:right-8">
+        <span className="sm:hidden">{space("renderNoteShort")}</span>
+        <span className="hidden sm:inline">{space("renderNote")}</span>
       </span>
     </section>
   );

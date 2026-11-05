@@ -66,9 +66,10 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* Monumental closing wordmark, the kit's serif lockup in brand green.
+      {/* Monumental closing wordmark, the kit's serif lockup in brand green at
+          40% (founder decision 2026-11-05: present, never the loudest thing).
           Decorative; held inside the page grid with air below it. */}
-      <div aria-hidden="true" className="mx-auto max-w-[1100px] select-none pb-10 text-matcha sm:pb-16">
+      <div aria-hidden="true" className="mx-auto max-w-[1100px] select-none pb-10 text-matcha/40 sm:pb-16">
         <BrandWordmark className="h-auto w-full" />
       </div>
 
