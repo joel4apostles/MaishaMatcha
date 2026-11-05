@@ -6,6 +6,15 @@ founding-members waitlist. Phase 1 is IN PROGRESS: Payload CMS embedded at
 `/admin` (built + committed, not yet wired to prod Postgres). Later phases add
 payments and more — scaffold cleanly, build only what a phase specifies.
 
+## Session protocol
+
+- **Start**: `HANDOFF.md` is loaded automatically (SessionStart hook in
+  `.claude/settings.json`). It says what is live, what is local, what is next.
+- **End**: run the `handoff` skill (rewrites HANDOFF.md, syncs memory).
+- **Before any push**: run the `security-audit` skill; fix BLOCKERs.
+- **After a feature lands**: run the `code-hygiene` skill (dead code,
+  orphans, bloat), then the auditor bench below.
+
 ## Brand law (read first)
 
 The **`maisha-brand`** skill (`.claude/skills/maisha-brand/SKILL.md`) is the law
