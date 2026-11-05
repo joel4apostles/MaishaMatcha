@@ -441,7 +441,8 @@
       "generic": "Could not send the order. Try again.",
       "missing-required": "A required option is missing.",
       "unavailable-item": "An item has sold out.",
-      "unavailable-option": "An option has sold out."
+      "unavailable-option": "An option has sold out.",
+      "too-many": "You already have several open orders. Collect one first."
     },
     "status": {
       "eyebrow": "Your order",

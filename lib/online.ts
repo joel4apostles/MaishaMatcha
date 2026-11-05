@@ -31,7 +31,13 @@ export async function onlineSettings(payload: Payload) {
   return { enabled: Boolean(b.onlineOrdering), settings };
 }
 
+/** An unpaid card checkout stops holding its slot after this long. */
+export const CHECKOUT_HOLD_MINUTES = 30;
+/** Most open web orders one email may hold at once. */
+export const MAX_OPEN_PER_EMAIL = 3;
+
 export async function takenSlots(payload: Payload, now = new Date()) {
+  const holdCutoff = new Date(now.getTime() - CHECKOUT_HOLD_MINUTES * 60000).toISOString();
   const { docs } = await payload.find({
     collection: "orders",
     overrideAccess: true,
@@ -42,6 +48,14 @@ export async function takenSlots(payload: Payload, now = new Date()) {
         { channel: { equals: "online" } },
         { status: { not_equals: "cancelled" } },
         { pickupAt: { greater_than_equal: now.toISOString() } },
+        // Abandoned card checkouts must not block real customers.
+        {
+          or: [
+            { payOnline: { not_equals: true } },
+            { paymentStatus: { not_equals: "unpaid" } },
+            { createdAt: { greater_than: holdCutoff } },
+          ],
+        },
       ],
     },
   });
@@ -84,11 +98,28 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
   });
   if (existing.docs[0]) {
     const o = existing.docs[0];
+    // A retried key only returns the order to the same customer.
+    if ((o.customerEmail ?? "").toLowerCase() !== input.email.trim().toLowerCase()) return { ok: false, error: "invalid" };
     return { ok: true, orderId: o.id, token: o.publicToken ?? "", label: o.label ?? "", totalCents: o.totalCents };
   }
 
+  const open = await payload.count({
+    collection: "orders",
+    overrideAccess: true,
+    where: {
+      and: [
+        { channel: { equals: "online" } },
+        { customerEmail: { equals: input.email.trim() } },
+        { status: { in: ["received", "preparing", "ready"] } },
+        { pickupAt: { greater_than_equal: now.toISOString() } },
+      ],
+    },
+  });
+  if (open.totalDocs >= MAX_OPEN_PER_EMAIL) return { ok: false, error: "too-many" };
+
   const catalog = new Map((await loadCatalog(payload)).map((i) => [i.id, i]));
-  const priced = priceOrder(catalog, input.lines);
+  // Measured grams are a barista input, never a customer one.
+  const priced = priceOrder(catalog, input.lines.map((l) => ({ ...l, grams: null })));
   if (!priced.ok) return { ok: false, error: priced.error };
 
   const req = await createLocalReq({}, payload);
@@ -133,12 +164,27 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
     return { ok: true, orderId: order.id, token, label, totalCents: priced.totalCents };
   } catch (err) {
     await killTransaction(req);
+    // Two submits with one key at the same instant: the unique index wins,
+    // the loser returns the order the winner created.
+    const again = await payload.find({ collection: "orders", overrideAccess: true, depth: 0, limit: 1, where: { idempotencyKey: { equals: input.idempotencyKey } } });
+    const o = again.docs[0];
+    if (o && (o.customerEmail ?? "").toLowerCase() === input.email.trim().toLowerCase()) {
+      return { ok: true, orderId: o.id, token: o.publicToken ?? "", label: o.label ?? "", totalCents: o.totalCents };
+    }
     throw err;
   }
 }
 
+/** Stripe says the checkout expired unpaid: cancel, freeing the slot. */
+export async function cancelUnpaidOnline(payload: Payload, orderId: number) {
+  const o = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true }).catch(() => null);
+  if (!o || o.channel !== "online" || o.paymentStatus !== "unpaid" || !o.payOnline || o.status !== "received") return false;
+  await payload.update({ collection: "orders", id: orderId, overrideAccess: true, data: { status: "cancelled", statusChangedAt: new Date().toISOString() } });
+  return true;
+}
+
 /** Stripe confirmed payment: record it, invoice, deduct stock. Idempotent. */
-export async function markOnlinePaid(payload: Payload, orderId: number, providerRef: string) {
+export async function markOnlinePaid(payload: Payload, orderId: number, providerRef: string, amountCents?: number) {
   const req = await createLocalReq({}, payload);
   await initTransaction(req);
   let touched: number[] = [];
@@ -146,7 +192,7 @@ export async function markOnlinePaid(payload: Payload, orderId: number, provider
     const orders = table(payload, "orders");
     await query(payload, sql`select id from ${orders} where id = ${orderId} for update`, req);
     const order = await payload.findByID({ collection: "orders", id: orderId, req, depth: 0, overrideAccess: true }).catch(() => null);
-    if (!order || order.paymentStatus !== "unpaid") {
+    if (!order || order.paymentStatus !== "unpaid" || (amountCents !== undefined && amountCents !== order.totalCents)) {
       await commitTransaction(req);
       return false;
     }

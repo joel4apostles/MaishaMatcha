@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { Payload } from "payload";
-import { availableSlots, markOnlinePaid, orderByToken, placeOnlineOrder, type PlaceInput } from "@/lib/online";
+import { availableSlots, markOnlinePaid, orderByToken, placeOnlineOrder, takenSlots, type PlaceInput } from "@/lib/online";
 import { kitchenQueue } from "@/lib/pos/sales";
 import { boot } from "./harness";
 
@@ -20,7 +20,7 @@ const input = (over: Partial<PlaceInput> = {}): PlaceInput => ({
   lines: [{ menuItemId: ujiId, quantity: 1, modifierKeys: ["prep.latte", "leche.avena"] }],
   pickupAt: ELEVEN,
   name: "Ana López",
-  email: "ana@example.com",
+  email: `ana+${randomUUID().slice(0, 8)}@example.com`,
   payOnline: false,
   idempotencyKey: randomUUID(),
   ...over,
@@ -44,9 +44,9 @@ describe("web orders", () => {
       data: { onlineOrdering: true, slotCapacity: 3, openDays: ["tue", "wed", "thu", "fri", "sat", "sun"] },
     });
     const key = randomUUID();
-    const first = await placeOnlineOrder(payload, input({ idempotencyKey: key }), NOW);
+    const first = await placeOnlineOrder(payload, input({ idempotencyKey: key, email: "retry@example.com" }), NOW);
     expect(first).toMatchObject({ ok: true, totalCents: 880 + 140 });
-    const again = await placeOnlineOrder(payload, input({ idempotencyKey: key }), NOW);
+    const again = await placeOnlineOrder(payload, input({ idempotencyKey: key, email: "retry@example.com" }), NOW);
     if (!first.ok || !again.ok) throw new Error("not placed");
     expect(again.orderId).toBe(first.orderId);
     expect(first.label).toMatch(/^W-\d{4}$/);
@@ -88,8 +88,38 @@ describe("web orders", () => {
     if (!placed.ok) throw new Error(placed.error);
     const view = await orderByToken(payload, placed.token);
     expect(view).toMatchObject({ label: placed.label, status: "received", firstName: "Ana", paymentStatus: "unpaid" });
-    expect(JSON.stringify(view)).not.toContain("ana@example.com");
+    expect(JSON.stringify(view)).not.toContain("@");
     expect(await orderByToken(payload, "x".repeat(32))).toBeNull();
     expect(await orderByToken(payload, "bad token")).toBeNull();
+  });
+});
+
+describe("abuse limits (security review)", () => {
+  const AT = "2027-03-02T13:00:00.000Z";
+  it("lets abandoned card checkouts stop holding a slot after the hold window", async () => {
+    await payload.updateGlobal({ slug: "business", data: { slotCapacity: 1 } });
+    const held = await placeOnlineOrder(payload, input({ payOnline: true, pickupAt: AT }), NOW);
+    if (!held.ok) throw new Error(held.error);
+    // Pin its creation to the test clock (orders are created "now" in real time).
+    await payload.update({ collection: "orders", id: held.orderId, overrideAccess: true, data: { createdAt: NOW.toISOString() } as never });
+    expect(await placeOnlineOrder(payload, input({ pickupAt: AT }), NOW)).toMatchObject({ error: "slot-full" });
+    const later = new Date(NOW.getTime() + 31 * 60000);
+    expect((await takenSlots(payload, later)).get(AT) ?? 0).toBe(0);
+    await payload.updateGlobal({ slug: "business", data: { slotCapacity: 3 } });
+  });
+
+  it("caps open orders per email and ignores customer grams", async () => {
+    const email = "cap@example.com";
+    const times = ["2027-03-02T14:00:00.000Z", "2027-03-02T14:15:00.000Z", "2027-03-02T14:30:00.000Z"];
+    for (const t of times) expect((await placeOnlineOrder(payload, input({ email, pickupAt: t, lines: [{ menuItemId: ujiId, quantity: 1, modifierKeys: ["prep.usucha"], grams: 20 }] }), NOW)).ok).toBe(true);
+    expect(await placeOnlineOrder(payload, input({ email, pickupAt: "2027-03-02T14:45:00.000Z" }), NOW)).toMatchObject({ error: "too-many" });
+    const mine = await payload.find({ collection: "orders", where: { customerEmail: { equals: email } }, overrideAccess: true });
+    expect(mine.docs.every((o) => (o.lines ?? []).every((l) => l.grams == null))).toBe(true);
+  });
+
+  it("does not hand an order to someone else replaying its key", async () => {
+    const key = randomUUID();
+    expect((await placeOnlineOrder(payload, input({ idempotencyKey: key, email: "own@example.com", pickupAt: "2027-03-02T15:00:00.000Z" }), NOW)).ok).toBe(true);
+    expect(await placeOnlineOrder(payload, input({ idempotencyKey: key, email: "other@example.com" }), NOW)).toEqual({ ok: false, error: "invalid" });
   });
 });

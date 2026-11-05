@@ -8,7 +8,7 @@ import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
-const KNOWN = ["closed", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option"];
+const KNOWN = ["closed", "too-many", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option"];
 
 const unitOf = (l: Line) =>
   l.item.priceCents +

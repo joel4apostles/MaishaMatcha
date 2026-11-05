@@ -441,7 +441,8 @@
       "generic": "No se ha podido enviar el pedido. Inténtalo otra vez.",
       "missing-required": "Falta elegir una opción obligatoria.",
       "unavailable-item": "Un producto se ha agotado.",
-      "unavailable-option": "Una opción se ha agotado."
+      "unavailable-option": "Una opción se ha agotado.",
+      "too-many": "Ya tienes varios pedidos abiertos. Espera a recoger uno."
     },
     "status": {
       "eyebrow": "Tu pedido",

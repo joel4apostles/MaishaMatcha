@@ -284,7 +284,7 @@ work, each step committed with tests before the next:
 | 2j | VERI*FACTU submission to AEAT | company e-certificate, gestor sign-off |
 | 3 | Inventory: recipes (BOM), auto-deduction incl. measured grams, counts, waste, batches, alerts, margin | ingredient costs |
 | 4 | Suppliers + draft purchase orders + approval + email + receiving | supplier list |
-| 5 | Website ordering: pickup slots, pre-order, status page, accounts, CafeRadar stamps | Stripe keys (online pay) |
-| 6 | Drink builder "matcha comes alive": live layered drink, saved/named recipes, share card, recipe becomes an order | none |
+| 5 | Website ordering: pickup slots, pre-order, status page, accounts, CafeRadar stamps. DONE 2026-11-05: slots with capacity, pay at pickup or Stripe Checkout (webhook), live status page, emails, KDS label. Open: customer accounts, CafeRadar stamps | Stripe keys (online pay), Resend key |
+| 6 | Drink builder: saved/named recipes, share card, recipe becomes an order. DONE 2026-11-05 (the real tinted drink photo stays as the visual; an animated layered drink was not rebuilt) | none |
 | 7 | Reports, owner dashboard, exports, IVA summary, runbook | none |
 | + | Founding membership (Stripe), events RSVP, email campaigns, CMS-backed pages | Stripe, Resend keys |

@@ -5,7 +5,7 @@ import { getPayload } from "payload";
 import { z } from "zod";
 import config from "@payload-config";
 import { placeOnlineOrder, sendConfirmation } from "@/lib/online";
-import { MAX_GRAMS, MAX_NOTE, MAX_QUANTITY } from "@/lib/pos/pricing";
+import { MAX_NOTE, MAX_QUANTITY } from "@/lib/pos/pricing";
 import { rateLimit } from "@/lib/rateLimit";
 import { createCheckoutSession, stripeEnabled } from "@/lib/stripe";
 
@@ -29,7 +29,6 @@ const schema = z.object({
         menuItemId: z.number().int().positive(),
         quantity: z.number().int().min(1).max(MAX_QUANTITY),
         modifierKeys: z.array(z.string().max(80)).max(20),
-        grams: z.number().positive().max(MAX_GRAMS).nullable().optional(),
         note: z.string().max(MAX_NOTE).nullable().optional(),
       }),
     )
@@ -47,14 +46,15 @@ export async function placeOrderAction(input: z.infer<typeof schema>): Promise<{
   const p = schema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
   const payload = await getPayload({ config });
-  const payOnline = p.data.payOnline && stripeEnabled();
+  // Never build payment return URLs from the Host header in production.
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === "production" ? null : `http://${h.get("host")}`);
+  const payOnline = p.data.payOnline && stripeEnabled() && base !== null;
 
   const placed = await placeOnlineOrder(payload, { ...p.data, payOnline });
   if (!placed.ok) return { ok: false, error: placed.error };
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${h.get("host")}`;
   const statusPath = `/${p.data.locale}/${p.data.locale === "es" ? "pedido" : "order-status"}/${placed.token}`;
-  if (!payOnline) {
+  if (!payOnline || !base) {
     await sendConfirmation(payload, placed.orderId).catch(() => undefined);
     return { ok: true, redirect: statusPath };
   }
