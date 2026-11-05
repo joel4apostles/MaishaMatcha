@@ -93,6 +93,34 @@ export const Business: GlobalConfig = {
       ],
     },
     {
+      type: "collapsible",
+      label: "Suscripción premium",
+      fields: [
+        {
+          name: "premiumOpen",
+          type: "checkbox",
+          defaultValue: false,
+          label: "Abrir la suscripción premium en la web",
+          admin: { description: "Mensual, con Stripe. Necesita precio, IVA y Stripe configurado." },
+        },
+        {
+          type: "row",
+          fields: [
+            { name: "premiumMonthlyCents", type: "number", min: 100, label: "Precio al mes (céntimos, IVA incluido)" },
+            {
+              name: "premiumFoundingMonthlyCents",
+              type: "number",
+              min: 100,
+              label: "Precio fundador al mes (céntimos)",
+              admin: { description: "El precio que se prometió a los socios fundadores. Vacío = el mismo." },
+            },
+            { name: "premiumTaxRate", type: "relationship", relationTo: "tax-rates", label: "IVA de la cuota" },
+          ],
+        },
+        { name: "premiumPerks", type: "textarea", localized: true, label: "Qué incluye (una línea por ventaja)" },
+      ],
+    },
+    {
       name: "targetMarginPercent",
       type: "number",
       min: 0,

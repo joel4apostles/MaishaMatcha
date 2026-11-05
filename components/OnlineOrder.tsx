@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { placeOrderAction } from "@/app/[locale]/(site)/pedir/actions";
 import { formatEuro } from "@/lib/money";
@@ -30,12 +31,15 @@ export function OnlineOrder({
   stripe,
   initialLines = [],
   customer = null,
+  variant = "carta",
 }: {
   catalog: CatalogItem[];
   slots: Slot[];
   stripe: boolean;
   initialLines?: LineInput[];
   customer?: { name: string; email: string } | null;
+  /** "shop": products as photo cards (the tienda); "carta": hairline rows. */
+  variant?: "carta" | "shop";
 }) {
   const t = useTranslations("order");
   const locale = useLocale() as "es" | "en";
@@ -73,7 +77,12 @@ export function OnlineOrder({
     if (!item.available) return;
     const keys = item.groups.filter((g) => g.required && g.selection === "single").map((g) => g.options.find((o) => o.available)?.key ?? "").filter(Boolean);
     const draft = { uid: crypto.randomUUID(), item, quantity: 1, modifierKeys: keys };
-    if (item.groups.length === 0) setLines((ls) => [...ls, draft]);
+    if (item.groups.length === 0)
+      setLines((ls) => {
+        // The same plain product twice is one line with quantity 2.
+        const same = ls.find((l) => l.item.id === item.id && l.modifierKeys.length === 0);
+        return same ? ls.map((l) => (l === same ? { ...l, quantity: Math.min(l.quantity + 1, 20) } : l)) : [...ls, draft];
+      });
     else {
       setMissing(null);
       setSheet(draft);
@@ -140,6 +149,40 @@ export function OnlineOrder({
             <h2 id={`oc-${c}`} className="text-eyebrow font-medium uppercase text-sumi/70">
               {c}
             </h2>
+            {variant === "shop" ? (
+              <ul className="mt-5 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
+                {catalog
+                  .filter((i) => i.category === c)
+                  .map((item) => (
+                    <li key={item.id} className="flex flex-col">
+                      <div className="relative aspect-[4/5] overflow-hidden rounded-[2px] bg-sumi/5">
+                        {item.photo ? (
+                          <Image
+                            src={item.photo.url}
+                            alt={item.photo.alt}
+                            fill
+                            sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 100vw"
+                            className="object-cover"
+                          />
+                        ) : null}
+                      </div>
+                      <div className="mt-4 flex items-baseline justify-between gap-4">
+                        <h3 className="font-serif text-xl font-light">{item.name}</h3>
+                        <span className="shrink-0 text-sumi/80 tabular-nums">{formatEuro(item.priceCents, locale)}</span>
+                      </div>
+                      {item.description ? <p className="mt-2 text-sm text-sumi/75">{item.description}</p> : null}
+                      <button
+                        type="button"
+                        disabled={!item.available}
+                        onClick={() => open(item)}
+                        className="mt-4 inline-flex min-h-[44px] w-fit items-center justify-center rounded-[2px] border border-wood/50 px-5 text-sm font-medium text-sumi hover:border-sumi/60 disabled:opacity-50"
+                      >
+                        {item.available ? t("addShort") : t("soldOut")}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            ) : (
             <ul className="mt-4 border-t border-wood/25">
               {catalog
                 .filter((i) => i.category === c)
@@ -162,6 +205,7 @@ export function OnlineOrder({
                   </li>
                 ))}
             </ul>
+            )}
           </section>
         ))}
       </div>

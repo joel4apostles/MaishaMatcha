@@ -68,6 +68,15 @@ export const MenuItems: CollectionConfig = {
       },
     },
     {
+      name: "stock",
+      type: "number",
+      min: 0,
+      label: "Unidades (tienda)",
+      admin: {
+        description: "Solo para productos de la tienda. Vacío = sin límite. Baja sola con cada venta y vuelve si se anula. A 0 sale como agotado.",
+      },
+    },
+    {
       name: "available",
       type: "checkbox",
       defaultValue: true,

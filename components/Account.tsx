@@ -8,6 +8,8 @@ import {
   signOutAction,
   signOutEverywhereAction,
   startFoundingAction,
+  startPremiumAction,
+  premiumPortalAction,
   updatePrefsAction,
 } from "@/app/[locale]/(site)/cuenta/actions";
 import { inkButtonClass } from "@/components/Button";
@@ -77,7 +79,17 @@ export function SignInForm({ next }: { next?: string }) {
   );
 }
 
-type Order = { label: string; status: string; paymentStatus: string; totalCents: number; createdAt: string; token: string | null; membership: boolean };
+type Order = { label: string; status: string; paymentStatus: string; totalCents: number; createdAt: string; token: string | null; membership: boolean; kind: string };
+type Premium = {
+  open: boolean;
+  priceCents: number | null;
+  foundingPrice: boolean;
+  perks: string[];
+  status: string;
+  periodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  justSubscribed: boolean;
+};
 type Founding = { open: boolean; priceCents: number | null; cap: number; remaining: number; perks: string[] };
 
 export function AccountPanel({
@@ -85,11 +97,13 @@ export function AccountPanel({
   orders,
   founding,
   justPaid,
+  premium,
 }: {
   member: { name: string; email: string; tier: string; emailOptIn: boolean; locale: "es" | "en" };
   orders: Order[];
   founding: Founding | null;
   justPaid: boolean;
+  premium: Premium;
 }) {
   const t = useTranslations("account");
   const st = useTranslations("order.status");
@@ -100,10 +114,20 @@ export function AccountPanel({
   const [note, setNote] = useState("");
   const [foundingMsg, setFoundingMsg] = useState("");
   const [deleteMsg, setDeleteMsg] = useState("");
+  const [premiumMsg, setPremiumMsg] = useState("");
+  const go = (fn: () => Promise<{ ok: true; url: string } | { ok: false; error: string }>, onErr: (m: string) => void) =>
+    start(async () => {
+      const r = await fn().catch(() => ({ ok: false as const, error: "generic" }));
+      if (r.ok) window.location.assign(r.url);
+      else onErr(err(r.error));
+    });
+  const until = premium.periodEnd
+    ? new Date(premium.periodEnd).toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", { timeZone: "Europe/Madrid", day: "numeric", month: "long" })
+    : "";
 
   const isFounding = member.tier === "founding";
   const statusText = (o: Order) =>
-    o.membership ? t("membership") : (["received", "preparing", "ready", "collected", "cancelled"].includes(o.status) ? st(o.status as "received") : o.status);
+    o.kind === "subscription" ? t("subscription") : o.membership ? t("membership") : (["received", "preparing", "ready", "collected", "cancelled"].includes(o.status) ? st(o.status as "received") : o.status);
 
   return (
     <div className="grid grid-cols-1 gap-16 md:grid-cols-2">
@@ -151,6 +175,51 @@ export function AccountPanel({
           ) : (
             <p className="mt-4 text-sumi/80">{t("foundingClosed")}</p>
           )}
+        </section>
+
+        <section aria-labelledby="a-premium">
+          <h2 id="a-premium" className="font-serif text-3xl font-light">
+            {t("premiumTitle")}
+          </h2>
+          {premium.status === "active" || premium.status === "past_due" ? (
+            <>
+              <p className="mt-4 text-sumi/80">
+                {premium.status === "past_due"
+                  ? t("premiumPastDue")
+                  : premium.cancelAtPeriodEnd
+                    ? t("premiumEnds", { date: until })
+                    : t("premiumActive", { date: until })}
+              </p>
+              <button type="button" disabled={pending} onClick={() => go(() => premiumPortalAction(locale), setPremiumMsg)} className={`${quietButton} mt-5`}>
+                {t("premiumManage")}
+              </button>
+            </>
+          ) : premium.justSubscribed ? (
+            <p role="status" className="mt-4">
+              {t("premiumThanks")}
+            </p>
+          ) : premium.open && premium.priceCents ? (
+            <>
+              <p className="mt-4 text-sumi/80">{premium.foundingPrice ? t("premiumFoundingPrice") : t("premiumBody")}</p>
+              {premium.perks.length ? (
+                <ul className="mt-4 border-t border-wood/25">
+                  {premium.perks.map((p) => (
+                    <li key={p} className="border-b border-wood/25 py-3">
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <button type="button" disabled={pending} onClick={() => go(() => startPremiumAction(locale), setPremiumMsg)} className={`${inkButtonClass} mt-6 w-full sm:w-auto`}>
+                {t("premiumCta", { price: formatEuro(premium.priceCents, locale) })}
+              </button>
+            </>
+          ) : (
+            <p className="mt-4 text-sumi/80">{t("premiumClosed")}</p>
+          )}
+          <p role="status" className="mt-2 min-h-[1.25rem] text-sm">
+            {premiumMsg}
+          </p>
         </section>
 
         <section aria-labelledby="a-orders">

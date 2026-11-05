@@ -60,6 +60,36 @@ export const Members: CollectionConfig = {
       ],
     },
     {
+      type: "collapsible",
+      label: "Suscripción premium",
+      fields: [
+        {
+          type: "row",
+          fields: [
+            {
+              name: "subscriptionStatus",
+              type: "select",
+              defaultValue: "none",
+              label: "Estado",
+              access: { create: hiddenField, update: hiddenField },
+              admin: { readOnly: true },
+              options: [
+                { label: "Sin suscripción", value: "none" },
+                { label: "Activa", value: "active" },
+                { label: "Pago pendiente", value: "past_due" },
+                { label: "Cancelada", value: "cancelled" },
+              ],
+            },
+            { name: "subscriptionPeriodEnd", type: "date", label: "Pagada hasta", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+            { name: "cancelAtPeriodEnd", type: "checkbox", label: "Termina al final del periodo", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+          ],
+        },
+        // Stripe references: server only, never shown or editable.
+        { name: "stripeCustomerId", type: "text", index: true, access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
+        { name: "stripeSubscriptionId", type: "text", index: true, access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
+      ],
+    },
+    {
       name: "emailOptIn",
       type: "checkbox",
       defaultValue: false,

@@ -30,7 +30,7 @@ async function load(locale: "es" | "en") {
     const payload = await getPayload({ config });
     const { enabled, slots } = await availableSlots(payload);
     if (!enabled) return { state: "closed" as const };
-    return { state: "open" as const, slots, catalog: await loadCatalog(payload, locale) };
+    return { state: "open" as const, slots, catalog: (await loadCatalog(payload, locale, "online")).filter((i) => !i.shop) };
   } catch {
     return { state: "unavailable" as const };
   }

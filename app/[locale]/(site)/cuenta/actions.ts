@@ -6,6 +6,7 @@ import { z } from "zod";
 import config from "@payload-config";
 import { rsvp } from "@/lib/events";
 import { startFounding } from "@/lib/founding";
+import { premiumPortal, startPremium } from "@/lib/premium";
 import { eraseMember, revokeSessions, safeNext, sendSignInLink } from "@/lib/members";
 import { clearMemberSession, currentMember } from "@/lib/members-server";
 import { rateLimit } from "@/lib/rateLimit";
@@ -82,4 +83,25 @@ export async function rsvpAction(eventId: number, seats: number) {
   if (!rateLimit(`rsvp:${m.id}`, 10)) return { ok: false as const, error: "rate-limited" };
   if (!Number.isInteger(eventId) || eventId <= 0) return { ok: false as const, error: "invalid" };
   return rsvp(await getPayload({ config }), m, eventId, seats);
+}
+
+async function siteBase() {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === "production" ? null : `http://${(await headers()).get("host")}`);
+}
+
+export async function startPremiumAction(locale: "es" | "en") {
+  const m = await currentMember();
+  if (!m) return { ok: false as const, error: "signed-out" };
+  if (!rateLimit(`premium:${m.id}`, 5)) return { ok: false as const, error: "rate-limited" };
+  const base = await siteBase();
+  if (!base) return { ok: false as const, error: "closed" };
+  return startPremium(await getPayload({ config }), m, locale === "en" ? "en" : "es", base);
+}
+
+export async function premiumPortalAction(locale: "es" | "en") {
+  const m = await currentMember();
+  if (!m) return { ok: false as const, error: "signed-out" };
+  const base = await siteBase();
+  if (!base) return { ok: false as const, error: "closed" };
+  return premiumPortal(m, `${base}/${locale === "en" ? "en/account" : "es/cuenta"}`);
 }

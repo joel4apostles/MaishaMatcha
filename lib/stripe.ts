@@ -80,3 +80,55 @@ export function verifyStripeSignature(rawBody: string, header: string | null, se
     return given.length === expected.length && timingSafeEqual(given, expected);
   });
 }
+
+async function stripePost(path: string, data: Record<string, string | number>, idempotencyKey?: string) {
+  const res = await fetch(`https://api.stripe.com/v1/${path}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+      ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+    },
+    body: new URLSearchParams(Object.entries(data).map(([k, v]) => [k, String(v)])).toString(),
+  });
+  if (!res.ok) throw new Error(`stripe ${res.status}`);
+  return (await res.json()) as { id: string; url: string };
+}
+
+/** Monthly subscription through hosted Checkout (price built inline, no Stripe dashboard products needed). */
+export async function createSubscriptionCheckout(input: {
+  memberId: number;
+  name: string;
+  monthlyCents: number;
+  taxRateBasisPoints: number;
+  customerId?: string | null;
+  email: string;
+  successUrl: string;
+  cancelUrl: string;
+  locale: "es" | "en";
+}) {
+  const data: Record<string, string | number> = {
+    mode: "subscription",
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    locale: input.locale,
+    "metadata[kind]": "premium",
+    "metadata[memberId]": input.memberId,
+    "subscription_data[metadata][kind]": "premium",
+    "subscription_data[metadata][memberId]": input.memberId,
+    "subscription_data[metadata][taxBp]": input.taxRateBasisPoints,
+    "line_items[0][quantity]": 1,
+    "line_items[0][price_data][currency]": "eur",
+    "line_items[0][price_data][unit_amount]": input.monthlyCents,
+    "line_items[0][price_data][recurring][interval]": "month",
+    "line_items[0][price_data][product_data][name]": input.name,
+  };
+  if (input.customerId) data.customer = input.customerId;
+  else data.customer_email = input.email;
+  return stripePost("checkout/sessions", data);
+}
+
+/** Stripe's hosted page where a subscriber changes card or cancels. */
+export async function createPortalSession(customerId: string, returnUrl: string) {
+  return stripePost("billing_portal/sessions", { customer: customerId, return_url: returnUrl });
+}

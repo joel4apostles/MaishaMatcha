@@ -77,6 +77,9 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-1 border-t border-wood/25 py-4">
         <p className="text-sm text-sumi/70">{t("rights")}</p>
         <nav aria-label={t("legalAria")} className="flex flex-wrap items-center gap-x-6">
+          <Link href="/tienda" className={quietLink}>
+            {nav("shop")}
+          </Link>
           <Link href="/cuenta" className={quietLink}>
             {nav("account")}
           </Link>

@@ -31,6 +31,12 @@ export type CatalogItem = {
   available: boolean;
   defaultGrams: number | null;
   groups: CatalogGroup[];
+  /** Shop products (retail), shown on /tienda instead of the carta. */
+  shop?: boolean;
+  /** Units left; null = not counted. */
+  stock?: number | null;
+  description?: string | null;
+  photo?: { url: string; alt: string; width: number; height: number } | null;
 };
 
 export type LineInput = {

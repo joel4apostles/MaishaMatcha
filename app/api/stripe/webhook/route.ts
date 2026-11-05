@@ -4,6 +4,7 @@ import config from "@payload-config";
 import { cancelUnpaidOnline, markOnlinePaid } from "@/lib/online";
 import { verifyStripeSignature } from "@/lib/stripe";
 import { completeFounding } from "@/lib/founding";
+import { onPremiumCheckout, onPremiumInvoicePaid, onPremiumSubscription } from "@/lib/premium";
 
 /**
  * Stripe webhook: the ONLY place a web order becomes paid. Verifies the
@@ -17,22 +18,49 @@ export async function POST(request: Request) {
   if (!verifyStripeSignature(raw, request.headers.get("stripe-signature"), secret)) {
     return NextResponse.json({ error: "bad signature" }, { status: 400 });
   }
-  const event = JSON.parse(raw) as {
-    type: string;
-    data: { object: { metadata?: { orderId?: string; kind?: string }; payment_status?: string; payment_intent?: string; amount_total?: number; id: string } };
+  // Shapes vary across Stripe API versions: read defensively.
+  const event = JSON.parse(raw) as { type: string; data: { object: Record<string, unknown> & { id: string } } };
+  const obj = event.data.object as never as {
+    id: string;
+    mode?: string;
+    metadata?: { orderId?: string; kind?: string; memberId?: string };
+    payment_status?: string;
+    payment_intent?: string;
+    amount_total?: number;
+    customer?: string | null;
+    subscription?: string | null;
   };
-  if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
-    const session = event.data.object;
-    const orderId = Number(session.metadata?.orderId);
-    if (session.payment_status === "paid" && Number.isInteger(orderId)) {
-      const payload = await getPayload({ config });
-      if (session.metadata?.kind === "founding") await completeFounding(payload, orderId, session.payment_intent ?? session.id, session.amount_total);
-      else await markOnlinePaid(payload, orderId, session.payment_intent ?? session.id, session.amount_total);
+  const payload = await getPayload({ config });
+
+  switch (event.type) {
+    case "checkout.session.completed":
+    case "checkout.session.async_payment_succeeded": {
+      if (obj.metadata?.kind === "premium") {
+        await onPremiumCheckout(payload, obj);
+        break;
+      }
+      const orderId = Number(obj.metadata?.orderId);
+      if (obj.payment_status === "paid" && Number.isInteger(orderId)) {
+        if (obj.metadata?.kind === "founding") await completeFounding(payload, orderId, obj.payment_intent ?? obj.id, obj.amount_total);
+        else await markOnlinePaid(payload, orderId, obj.payment_intent ?? obj.id, obj.amount_total);
+      }
+      break;
     }
-  }
-  if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {
-    const orderId = Number(event.data.object.metadata?.orderId);
-    if (Number.isInteger(orderId)) await cancelUnpaidOnline(await getPayload({ config }), orderId);
+    case "checkout.session.expired":
+    case "checkout.session.async_payment_failed": {
+      const orderId = Number(obj.metadata?.orderId);
+      if (Number.isInteger(orderId)) await cancelUnpaidOnline(payload, orderId);
+      break;
+    }
+    case "invoice.paid":
+      await onPremiumInvoicePaid(payload, event.data.object as never);
+      break;
+    case "customer.subscription.updated":
+      await onPremiumSubscription(payload, event.data.object as never);
+      break;
+    case "customer.subscription.deleted":
+      await onPremiumSubscription(payload, event.data.object as never, true);
+      break;
   }
   return NextResponse.json({ received: true });
 }

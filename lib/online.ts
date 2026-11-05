@@ -13,6 +13,7 @@ import { formatEuro } from "@/lib/money";
 import { priceOrder, type LineInput } from "@/lib/pos/pricing";
 import { issueInvoiceFor, loadCatalog } from "@/lib/pos/sales";
 import { isBookable, pickupSlots, type SlotSettings } from "@/lib/slots";
+import { returnUnits, takeUnits } from "@/lib/units";
 
 /**
  * Web orders: pickup slots, server pricing, pay at pickup or online
@@ -118,7 +119,7 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
   });
   if (open.totalDocs >= MAX_OPEN_PER_EMAIL) return { ok: false, error: "too-many" };
 
-  const catalog = new Map((await loadCatalog(payload)).map((i) => [i.id, i]));
+  const catalog = new Map((await loadCatalog(payload, "es", "online")).map((i) => [i.id, i]));
   // Measured grams are a barista input, never a customer one.
   const priced = priceOrder(catalog, input.lines.map((l) => ({ ...l, grams: null })));
   if (!priced.ok) return { ok: false, error: priced.error };
@@ -134,6 +135,10 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
     if (!isBookable(settings, now, await takenSlots(payload, now), input.pickupAt)) {
       await killTransaction(req);
       return { ok: false, error: "slot-full" };
+    }
+    if (!(await takeUnits(req, catalog, input.lines))) {
+      await killTransaction(req);
+      return { ok: false, error: "unavailable-item" };
     }
     const label = `W-${String(Number(rows[0].value) % 10000).padStart(4, "0")}`;
     const token = randomBytes(24).toString("base64url");
@@ -183,6 +188,7 @@ export async function cancelUnpaidOnline(payload: Payload, orderId: number) {
   if (!o || o.channel !== "online" || o.paymentStatus !== "unpaid" || !o.payOnline) return false;
   if (o.status !== "received" && o.kind !== "membership") return false;
   await payload.update({ collection: "orders", id: orderId, overrideAccess: true, data: { status: "cancelled", statusChangedAt: new Date().toISOString() } });
+  await returnUnits(payload, (o.lines ?? []) as never);
   return true;
 }
 

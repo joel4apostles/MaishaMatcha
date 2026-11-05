@@ -17,5 +17,12 @@ export const MenuCategories: CollectionConfig = {
     },
     { name: "title", type: "text", required: true, localized: true },
     { name: "order", type: "number", required: true, defaultValue: 0 },
+    {
+      name: "shop",
+      type: "checkbox",
+      defaultValue: false,
+      label: "Tienda",
+      admin: { description: "Productos para llevar (latas de matcha, utensilios...). Salen en la tienda de la web, no en la carta." },
+    },
   ],
 };

@@ -7,6 +7,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { AccountPanel, SignInForm } from "@/components/Account";
 import { foundingSettings } from "@/lib/founding";
+import { monthlyPriceFor, premiumSettings } from "@/lib/premium";
 import { memberOrders } from "@/lib/members";
 import { currentMember } from "@/lib/members-server";
 import { pageMetadata } from "@/lib/seo";
@@ -26,7 +27,7 @@ export default async function AccountPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ enlace?: string; fundador?: string; next?: string }>;
+  searchParams: Promise<{ enlace?: string; fundador?: string; premium?: string; next?: string }>;
 }) {
   const { locale } = await params;
   const sp = await searchParams;
@@ -55,9 +56,10 @@ export default async function AccountPage({
   }
 
   const payload = await getPayload({ config });
-  const [orders, founding] = await Promise.all([
+  const [orders, founding, premium] = await Promise.all([
     memberOrders(payload, member).catch(() => []),
     foundingSettings(payload, locale as "es" | "en").catch(() => null),
+    premiumSettings(payload, locale as "es" | "en").catch(() => null),
   ]);
 
   return (
@@ -81,6 +83,16 @@ export default async function AccountPage({
           orders={orders}
           founding={founding ? { open: founding.open, priceCents: founding.priceCents, cap: founding.cap, remaining: founding.remaining, perks: founding.perks } : null}
           justPaid={sp.fundador === "1"}
+          premium={{
+            open: Boolean(premium?.open),
+            priceCents: premium ? monthlyPriceFor(member, premium) : null,
+            foundingPrice: Boolean(member.tier === "founding" && premium?.foundingMonthlyCents),
+            perks: premium?.perks ?? [],
+            status: member.subscriptionStatus ?? "none",
+            periodEnd: member.subscriptionPeriodEnd ?? null,
+            cancelAtPeriodEnd: Boolean(member.cancelAtPeriodEnd),
+            justSubscribed: sp.premium === "1",
+          }}
         />
       </div>
     </Section>

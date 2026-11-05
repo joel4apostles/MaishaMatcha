@@ -19,6 +19,9 @@ import {
   type PriceError,
 } from "./pricing";
 import { fingerprint, fullInvoiceNumber, qrUrl, type InvoiceType } from "./verifactu";
+import { returnUnits, takeUnits } from "@/lib/units";
+
+class SoldOut extends Error {}
 
 /**
  * Counter operations, server only, free of cookies so they are testable.
@@ -60,6 +63,16 @@ async function inTransaction<T>(payload: Payload, staffId: number | null, fn: (r
   }
 }
 
+/** inTransaction, but a sold-out shop item becomes a normal result. */
+async function inTransactionOr<T>(payload: Payload, staffId: number | null, fn: (req: PayloadRequest) => Promise<T>) {
+  try {
+    return await inTransaction(payload, staffId, fn);
+  } catch (err) {
+    if (err instanceof SoldOut) return { ok: false as const, error: "unavailable-item" as const };
+    throw err;
+  }
+}
+
 /** Advance a named counter atomically; the row lock lasts until commit. */
 async function nextInSequence(req: PayloadRequest, key: string) {
   const seq = table(req.payload, "sequences");
@@ -85,9 +98,13 @@ async function setSequenceHash(req: PayloadRequest, key: string, hash: string) {
 
 const id = (v: unknown): number => (typeof v === "object" && v ? (v as { id: number }).id : (v as number));
 
-export async function loadCatalog(payload: Payload, locale: "es" | "en" = "es"): Promise<CatalogItem[]> {
+export async function loadCatalog(
+  payload: Payload,
+  locale: "es" | "en" = "es",
+  channel: "counter" | "online" = "counter",
+): Promise<CatalogItem[]> {
   const [items, groups, options, rates] = await Promise.all([
-    payload.find({ collection: "menu-items", limit: 500, depth: 0, locale, sort: "order", overrideAccess: true }),
+    payload.find({ collection: "menu-items", limit: 500, depth: 1, locale, sort: "order", overrideAccess: true, populate: { media: { url: true, alt: true, width: true, height: true } } }),
     payload.find({ collection: "modifier-groups", limit: 200, depth: 0, locale, sort: "order", overrideAccess: true }),
     payload.find({ collection: "modifiers", limit: 1000, depth: 0, locale, sort: "order", overrideAccess: true }),
     payload.find({ collection: "tax-rates", limit: 50, depth: 0, overrideAccess: true }),
@@ -95,6 +112,7 @@ export async function loadCatalog(payload: Payload, locale: "es" | "en" = "es"):
   const categories = await payload.find({ collection: "menu-categories", limit: 100, depth: 0, locale, sort: "order", overrideAccess: true });
   const catName = new Map(categories.docs.map((c) => [c.id, c.title]));
   const catOrder = new Map(categories.docs.map((c, i) => [c.id, i]));
+  const shopCat = new Set(categories.docs.filter((c) => c.shop).map((c) => c.id));
   const rateOf = new Map(rates.docs.map((r) => [r.id, r.rateBasisPoints]));
   const groupOf = new Map<number, CatalogGroup>(
     groups.docs.map((g) => [
@@ -118,9 +136,17 @@ export async function loadCatalog(payload: Payload, locale: "es" | "en" = "es"):
       name: i.name,
       category: String(catName.get(id(i.category)) ?? ""),
       color: i.color,
-      priceCents: i.priceCents,
+      // Prices per channel: the web may charge its own price (Empresa never invents one).
+      priceCents: channel === "online" && i.onlinePriceCents != null ? i.onlinePriceCents : i.priceCents,
       taxRateBasisPoints: rateOf.get(id(i.taxRate)) ?? 1000,
-      available: i.available !== false,
+      available: i.available !== false && (i.stock == null || i.stock > 0),
+      shop: shopCat.has(id(i.category)),
+      stock: i.stock ?? null,
+      description: i.description ?? null,
+      photo:
+        i.photo && typeof i.photo === "object" && i.photo.url
+          ? { url: i.photo.url, alt: i.photo.alt ?? i.name, width: i.photo.width ?? 800, height: i.photo.height ?? 1000 }
+          : null,
       defaultGrams: i.defaultGrams ?? null,
       groups: (i.modifierGroups ?? []).map((g) => groupOf.get(id(g))).filter((g): g is CatalogGroup => Boolean(g)),
     }));
@@ -185,7 +211,9 @@ export async function createOrder(
   const priced = priceOrder(catalog, input.lines);
   if (!priced.ok) return priced;
 
-  return inTransaction(payload, actor.staffId, async (req) => {
+  return inTransactionOr(payload, actor.staffId, async (req) => {
+    // Shop units: a conditional update, rolled back with the order if short.
+    if (!(await takeUnits(req, catalog, input.lines))) throw new SoldOut();
     const { value } = await nextInSequence(req, "order-label");
     const label = String(value % 10000).padStart(4, "0");
     const order = await payload.create({
@@ -510,6 +538,7 @@ export async function voidOrder(payload: Payload, actor: Actor, orderId: number,
     overrideAccess: true,
     data: { status: "cancelled", statusChangedAt: new Date().toISOString() },
   });
+  await returnUnits(payload, (order.lines ?? []) as never);
   await writeAudit({ payload }, {
     action: "order.void",
     entity: "orders",

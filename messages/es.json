@@ -7,7 +7,8 @@
     "home": "Inicio",
     "skip": "Saltar al contenido",
     "order": "Pedir",
-    "account": "Cuenta"
+    "account": "Cuenta",
+    "shop": "Tienda"
   },
   "cta": {
     "joinWaitlist": "Unirse a la lista",
@@ -205,6 +206,10 @@
     "account": {
       "title": "Tu cuenta · maisha matcha",
       "description": "Tus pedidos, tus reservas y la membresía fundadora de maisha matcha."
+    },
+    "shop": {
+      "title": "Tienda · maisha matcha",
+      "description": "Matcha y utensilios para casa, para recoger en el salón de Plaza Cetina, Murcia."
     }
   },
   "notFound": {
@@ -511,7 +516,8 @@
     },
     "toCarta": "Ver la carta",
     "signedInAs": "Pides como {name}.",
-    "haveAccount": "¿Tienes cuenta? Entra y guardamos tus pedidos."
+    "haveAccount": "¿Tienes cuenta? Entra y guardamos tus pedidos.",
+    "addShort": "Añadir"
   },
   "account": {
     "eyebrow": "Tu cuenta",
@@ -556,7 +562,18 @@
       "already": "Ya eres socio fundador.",
       "signed-out": "Tu sesión ha terminado. Vuelve a entrar.",
       "pending": "Ya tienes un pago empezado. Termínalo en la otra pestaña o espera media hora."
-    }
+    },
+    "premiumTitle": "Suscripción premium",
+    "premiumBody": "Una cuota al mes. La cancelas cuando quieras.",
+    "premiumFoundingPrice": "Como socio fundador, pagas el precio fundador. La cancelas cuando quieras.",
+    "premiumCta": "Suscribirme · {price} al mes",
+    "premiumClosed": "La suscripción aún no está abierta.",
+    "premiumThanks": "Gracias. En cuanto Stripe confirme el pago verás tu suscripción aquí.",
+    "premiumActive": "Activa. Se renueva el {date}.",
+    "premiumEnds": "Activa hasta el {date}. No se renovará.",
+    "premiumPastDue": "Hay un pago pendiente. Revisa tu tarjeta.",
+    "premiumManage": "Gestionar la suscripción",
+    "subscription": "Suscripción"
   },
   "rsvp": {
     "seats": "Plazas",
@@ -575,5 +592,13 @@
       "signed-out": "Tu sesión ha terminado. Vuelve a entrar."
     },
     "update": "Cambiar plazas"
+  },
+  "shop": {
+    "eyebrow": "Tienda",
+    "title": "Para llevar a casa",
+    "intro": "Lo que usamos en la barra, para tu casa. Se recoge en el salón.",
+    "soon": "La tienda abre pronto.",
+    "soonBody": "Mientras tanto, la carta te espera en la barra.",
+    "fromOrder": "También hay tienda: matcha y utensilios para casa."
   }
 }

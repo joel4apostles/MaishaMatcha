@@ -151,6 +151,7 @@ export async function memberOrders(payload: Payload, member: { id: number; email
     totalCents: o.totalCents,
     createdAt: o.createdAt,
     token: o.publicToken ?? null,
-    membership: o.kind === "membership",
+    membership: o.kind === "membership" || o.kind === "subscription",
+    kind: o.kind ?? "sale",
   }));
 }

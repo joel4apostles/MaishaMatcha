@@ -127,6 +127,7 @@ export const Orders: CollectionConfig = {
       options: [
         { label: "Venta", value: "sale" },
         { label: "Cuota de socio fundador", value: "membership" },
+        { label: "Suscripción premium", value: "subscription" },
       ],
     },
     { name: "staff", type: "relationship", relationTo: "users", label: "Atendido por", admin: { readOnly: true } },

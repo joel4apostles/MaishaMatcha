@@ -229,7 +229,7 @@ export interface Order {
   readyNotifiedAt?: string | null;
   publicToken?: string | null;
   member?: (number | null) | Member;
-  kind?: ('sale' | 'membership') | null;
+  kind?: ('sale' | 'membership' | 'subscription') | null;
   staff?: (number | null) | User;
   device?: (number | null) | PosDevice;
   shift?: (number | null) | Shift;
@@ -259,6 +259,10 @@ export interface MenuItem {
    * La barra lo propone y el barista lo ajusta a lo que pesa de verdad. Vacío = no se pesa.
    */
   defaultGrams?: number | null;
+  /**
+   * Solo para productos de la tienda. Vacío = sin límite. Baja sola con cada venta y vuelve si se anula. A 0 sale como agotado.
+   */
+  stock?: number | null;
   /**
    * Desmarca para "agotado" en la web y en la barra.
    */
@@ -312,6 +316,10 @@ export interface MenuCategory {
   slug: string;
   title: string;
   order: number;
+  /**
+   * Productos para llevar (latas de matcha, utensilios...). Salen en la tienda de la web, no en la carta.
+   */
+  shop?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -406,6 +414,11 @@ export interface Member {
   status: 'active' | 'paused' | 'cancelled';
   foundingNumber?: number | null;
   foundingSince?: string | null;
+  subscriptionStatus?: ('none' | 'active' | 'past_due' | 'cancelled') | null;
+  subscriptionPeriodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean | null;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
   /**
    * Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó.
    */
@@ -1230,6 +1243,7 @@ export interface MenuItemsSelect<T extends boolean = true> {
   onlinePriceCents?: T;
   taxRate?: T;
   defaultGrams?: T;
+  stock?: T;
   available?: T;
   allergens?: T;
   modifierGroups?: T;
@@ -1250,6 +1264,7 @@ export interface MenuCategoriesSelect<T extends boolean = true> {
   slug?: T;
   title?: T;
   order?: T;
+  shop?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1433,6 +1448,11 @@ export interface MembersSelect<T extends boolean = true> {
   status?: T;
   foundingNumber?: T;
   foundingSince?: T;
+  subscriptionStatus?: T;
+  subscriptionPeriodEnd?: T;
+  cancelAtPeriodEnd?: T;
+  stripeCustomerId?: T;
+  stripeSubscriptionId?: T;
   emailOptIn?: T;
   locale?: T;
   favoriteRecipeCode?: T;
@@ -1716,6 +1736,17 @@ export interface Business {
   foundingTaxRate?: (number | null) | TaxRate;
   foundingPerks?: string | null;
   /**
+   * Mensual, con Stripe. Necesita precio, IVA y Stripe configurado.
+   */
+  premiumOpen?: boolean | null;
+  premiumMonthlyCents?: number | null;
+  /**
+   * El precio que se prometió a los socios fundadores. Vacío = el mismo.
+   */
+  premiumFoundingMonthlyCents?: number | null;
+  premiumTaxRate?: (number | null) | TaxRate;
+  premiumPerks?: string | null;
+  /**
    * Avisa de las bebidas cuyo margen baje de aquí.
    */
   targetMarginPercent?: number | null;
@@ -1745,6 +1776,11 @@ export interface BusinessSelect<T extends boolean = true> {
   foundingCap?: T;
   foundingTaxRate?: T;
   foundingPerks?: T;
+  premiumOpen?: T;
+  premiumMonthlyCents?: T;
+  premiumFoundingMonthlyCents?: T;
+  premiumTaxRate?: T;
+  premiumPerks?: T;
   targetMarginPercent?: T;
   updatedAt?: T;
   createdAt?: T;

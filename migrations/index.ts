@@ -8,6 +8,7 @@ import * as migration_20261105_224951_online_orders from './20261105_224951_onli
 import * as migration_20261105_231005_members_events_campaigns from './20261105_231005_members_events_campaigns';
 import * as migration_20261105_231006_members_tier_default from './20261105_231006_members_tier_default';
 import * as migration_20261105_231007_lowercase_order_emails from './20261105_231007_lowercase_order_emails';
+import * as migration_20261105_233005_shop_premium from './20261105_233005_shop_premium';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261105_231007_lowercase_order_emails.up,
     down: migration_20261105_231007_lowercase_order_emails.down,
     name: '20261105_231007_lowercase_order_emails',
+  },
+  {
+    up: migration_20261105_233005_shop_premium.up,
+    down: migration_20261105_233005_shop_premium.down,
+    name: '20261105_233005_shop_premium'
   },
 ];

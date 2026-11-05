@@ -7,7 +7,8 @@
     "home": "Home",
     "skip": "Skip to content",
     "order": "Order",
-    "account": "Account"
+    "account": "Account",
+    "shop": "Shop"
   },
   "cta": {
     "joinWaitlist": "Join the list",
@@ -205,6 +206,10 @@
     "account": {
       "title": "Your account · maisha matcha",
       "description": "Your orders, your bookings and the maisha matcha founding membership."
+    },
+    "shop": {
+      "title": "Shop · maisha matcha",
+      "description": "Matcha and tools for home, collected at the salon in Plaza Cetina, Murcia."
     }
   },
   "notFound": {
@@ -511,7 +516,8 @@
     },
     "toCarta": "See the carta",
     "signedInAs": "Ordering as {name}.",
-    "haveAccount": "Have an account? Sign in and we keep your orders."
+    "haveAccount": "Have an account? Sign in and we keep your orders.",
+    "addShort": "Add"
   },
   "account": {
     "eyebrow": "Your account",
@@ -556,7 +562,18 @@
       "already": "You are already a founding member.",
       "signed-out": "Your session has ended. Sign in again.",
       "pending": "You already have a payment in progress. Finish it in the other tab or wait half an hour."
-    }
+    },
+    "premiumTitle": "Premium subscription",
+    "premiumBody": "A monthly fee. Cancel whenever you like.",
+    "premiumFoundingPrice": "As a founding member, you pay the founding price. Cancel whenever you like.",
+    "premiumCta": "Subscribe · {price} a month",
+    "premiumClosed": "The subscription is not open yet.",
+    "premiumThanks": "Thank you. Once Stripe confirms the payment your subscription appears here.",
+    "premiumActive": "Active. Renews on {date}.",
+    "premiumEnds": "Active until {date}. It will not renew.",
+    "premiumPastDue": "A payment is pending. Check your card.",
+    "premiumManage": "Manage the subscription",
+    "subscription": "Subscription"
   },
   "rsvp": {
     "seats": "Seats",
@@ -575,5 +592,13 @@
       "signed-out": "Your session has ended. Sign in again."
     },
     "update": "Change seats"
+  },
+  "shop": {
+    "eyebrow": "Shop",
+    "title": "To take home",
+    "intro": "What we use at the bar, for your home. Collected at the salon.",
+    "soon": "The shop opens soon.",
+    "soonBody": "Meanwhile, the menu is waiting at the bar.",
+    "fromOrder": "There is also a shop: matcha and tools for home."
   }
 }
