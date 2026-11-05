@@ -312,7 +312,11 @@
         "short-cash": "The cash tendered does not cover the total.",
         "already-paid": "This order was already paid.",
         "generic": "Could not take the payment. Check the connection and try again; it will never charge twice."
-      }
+      },
+      "offline": "Offline. Cash sales are kept on this tablet and sent when the network returns. Card is not available.",
+      "syncing": "Back online. Sending the saved sales.",
+      "queued": "{count, plural, one {# sale queued} other {# sales queued}}",
+      "savedOffline": "Saved on the tablet while offline. It will be sent, with its ticket, when the network returns."
     },
     "kds": {
       "title": "Bar",

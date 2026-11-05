@@ -312,7 +312,11 @@
         "short-cash": "El importe entregado no cubre el total.",
         "already-paid": "Este pedido ya estaba cobrado.",
         "generic": "No se ha podido cobrar. Comprueba la conexión e inténtalo otra vez; no se cobrará dos veces."
-      }
+      },
+      "offline": "Sin conexión. Las ventas en efectivo se guardan en esta tablet y se envían al volver la red. La tarjeta no está disponible.",
+      "syncing": "Conexión recuperada. Enviando las ventas guardadas.",
+      "queued": "{count, plural, one {# venta en cola} other {# ventas en cola}}",
+      "savedOffline": "Guardado en la tablet sin conexión. Se enviará y tendrá su ticket al volver la red."
     },
     "kds": {
       "title": "Barra",

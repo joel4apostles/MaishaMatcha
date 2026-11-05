@@ -1,15 +1,17 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { chargeAction } from "@/app/(pos)/pos/sale-actions";
 import { formatEuro, taxBreakdown } from "@/lib/money";
 import { changeBreakdown, quickTenders, type CatalogItem } from "@/lib/pos/pricing";
 import { OptionsSheet, type DraftLine } from "./OptionsSheet";
+import { enqueue, markFailed, readQueue, remove } from "./offlineQueue";
 
 type Mode = "order" | "cash" | "card" | "done";
-type Done = { label: string; invoiceNumber: string | null; changeCents: number; orderId: number };
+type Done = { label: string; invoiceNumber: string | null; changeCents: number; orderId: number | null; queued?: boolean };
+const BUSINESS_ERRORS = ["invalid", "missing-required", "unavailable-item", "unavailable-option", "short-cash", "no-shift"];
 
 const newKey = () => crypto.randomUUID();
 const uid = () => Math.random().toString(36).slice(2);
@@ -47,6 +49,39 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const [key, setKey] = useState(newKey);
+  const [online, setOnline] = useState(true);
+  const [queued, setQueued] = useState(0);
+
+  // Offline queue: cash sales kept on the tablet sync when the network
+  // returns. Idempotency keys make every retry safe.
+  const flush = useCallback(async () => {
+    for (const sale of readQueue()) {
+      try {
+        const r = await chargeAction({ ...sale, method: "cash", note: null });
+        if (r.ok || r.error === "already-paid") remove(sale.idempotencyKey);
+        else if (BUSINESS_ERRORS.includes(r.error)) markFailed(sale.idempotencyKey, r.error);
+      } catch {
+        break; // Still offline: try again later.
+      }
+    }
+    setQueued(readQueue().length);
+  }, []);
+
+  useEffect(() => {
+    const update = () => {
+      setOnline(navigator.onLine);
+      if (navigator.onLine) flush();
+    };
+    update();
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    const timer = setInterval(flush, 20000);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+      clearInterval(timer);
+    };
+  }, [flush]);
 
   const categories = useMemo(() => [...new Set(catalog.map((i) => i.category))], [catalog]);
   const total = lines.reduce((s, l) => s + lineUnit(l) * l.quantity, 0);
@@ -100,34 +135,65 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
       if (r.ok) {
         setDone({ label: r.label, invoiceNumber: r.invoiceNumber, changeCents: r.changeCents, orderId: r.orderId });
         setMode("done");
+        setOnline(true);
       } else {
         const errors = ["no-shift", "no-session", "invalid", "missing-required", "unavailable-item", "unavailable-option", "short-cash", "already-paid"];
         setError(t(`errors.${errors.includes(r.error) ? r.error : "generic"}` as "errors.generic"));
       }
     } catch {
-      setError(t("errors.generic"));
+      // Network failure. Cash can be kept on the tablet; card cannot.
+      if (method === "cash") {
+        enqueue({
+          idempotencyKey: key,
+          service,
+          tenderedCents,
+          totalCents: total,
+          queuedAt: new Date().toISOString(),
+          lines: lines.map((l) => ({ menuItemId: l.item.id, quantity: l.quantity, modifierKeys: l.modifierKeys, grams: l.grams, note: l.note || null })),
+        });
+        setQueued(readQueue().length);
+        setOnline(false);
+        setDone({ label: "", invoiceNumber: null, changeCents: tenderedCents - total, orderId: null, queued: true });
+        setMode("done");
+      } else {
+        setOnline(false);
+        setError(t("errors.generic"));
+      }
     } finally {
       setBusy(false);
     }
   };
 
+  const banner =
+    !online || queued > 0 ? (
+      <div role="status" className="col-span-full mb-2 flex flex-wrap items-center justify-between gap-4 rounded-[2px] bg-sumi px-5 py-3 text-[15px] text-washi">
+        <span>{online ? t("syncing") : t("offline")}</span>
+        {queued > 0 ? <span className="whitespace-nowrap">{t("queued", { count: queued })}</span> : null}
+      </div>
+    ) : null;
+
   // ---------------------------------------------------------------- done
   if (mode === "done" && done) {
     return (
       <div className="mx-auto w-full max-w-xl py-10 text-center">
+        {banner}
         <p className="text-eyebrow uppercase text-sumi/70">{t("paidTitle")}</p>
         <p className="mt-4 font-serif text-[2.5rem] font-light leading-tight">{formatEuro(total)}</p>
-        <p className="mt-3 text-sumi/80">{t("paidLine", { label: done.label, invoice: done.invoiceNumber ?? "" })}</p>
+        <p className="mt-3 text-sumi/80">
+          {done.queued ? t("savedOffline") : t("paidLine", { label: done.label, invoice: done.invoiceNumber ?? "" })}
+        </p>
         {done.changeCents > 0 ? (
           <p className="mt-6 font-serif text-[2rem] font-light">{t("changeLine", { change: formatEuro(done.changeCents) })}</p>
         ) : null}
         <div className="mt-10 flex flex-wrap justify-center gap-3">
+          {done.orderId ? (
           <Link
             href={`/pos/ticket/${done.orderId}`}
             className="inline-flex min-h-[56px] items-center rounded-[2px] border border-sumi/55 px-8 text-sm font-medium"
           >
             {t("printTicket")}
           </Link>
+          ) : null}
           <button type="button" onClick={reset} autoFocus className="min-h-[56px] rounded-[2px] bg-sumi px-10 text-sm font-medium text-washi">
             {t("newOrder")}
           </button>
@@ -143,6 +209,7 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
       setTendered((v) => (k === "del" ? v.slice(0, -1) : k === "," ? (v.includes(",") ? v : `${v || "0"},`) : (v.split(",")[1]?.length ?? 0) >= 2 ? v : v + k));
     return (
       <div className="grid w-full grid-cols-1 gap-10 lg:grid-cols-2">
+        {banner}
         <section className="flex flex-col">
           <button type="button" onClick={() => setMode("order")} className="self-start text-sm underline decoration-wood/60 underline-offset-4 min-h-[44px]">
             {t("backToOrder")}
@@ -236,7 +303,8 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
 
   // --------------------------------------------------------------- order
   return (
-    <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[11rem_minmax(0,1fr)_22rem]">
+    <div className="grid w-full grid-cols-1 content-start gap-8 lg:grid-cols-[11rem_minmax(0,1fr)_22rem]">
+      {banner}
       <nav aria-label={t("categories")} className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
         {categories.map((c) => (
           <a
@@ -349,7 +417,7 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
           </button>
           <button
             type="button"
-            disabled={lines.length === 0}
+            disabled={lines.length === 0 || !online}
             onClick={() => {
               setError(null);
               setMode("card");
