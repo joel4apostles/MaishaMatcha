@@ -195,6 +195,72 @@ list and a device test checklist.
 If the business is an SL, the invoice hash chain and AEAT submission move
 to the front of Phase 2 so the counter is compliant from 1 January 2027.
 
-## 6. Open questions
+## 6. Owner answers (2026-11-05)
 
-Listed in the reply to the owner and answered there; record answers here.
+| # | Question | Answer | Consequence |
+|---|---|---|---|
+| 1 | Legal form | Registered under the parent company | Almost certainly pays Impuesto sobre Sociedades: VERI*FACTU from **1 January 2027**. Confirm with the gestor |
+| 2 | Opening | Saturday 7 November 2026 | Our POS cannot be ready. Use a stopgap till until the new counter goes live (below) |
+| 3 | Payments | Stripe on the website | Counter card terminal still open: Stripe Terminal readers work in Spain |
+| 4 | Hardware | Probably Android tablet | Build is browser-based, tested at tablet and 390px widths |
+| 5 | IVA | "Both" (dine-in and takeaway) | Seeded IVA 10 % (hostelería) as default and 21 % general. Gestor to confirm |
+| 6 | VERI*FACTU software | None | Free tier constraint: submit to AEAT directly with the company's certificate (no paid provider) |
+| 7 | Hours | 8:00 to 18:00 | Pre-order slots in Phase 5 |
+| 8 | Suppliers | Netherlands now, Japan later | Supplier records in Phase 4 |
+| 9 | Menu | Founder's carta PDF | Loaded as `content/carta.ts` (see below) |
+| 10 | Staff | 3 baristas, may grow | Roles and PIN login built |
+| 11 | Loyalty | CafeRadar stamp card | No loyalty built here. Integrate in Phase 5 |
+| 12 | Customers | Founding-member list becomes accounts | Phase 5 |
+| 13 | Languages | Spanish and English | As today |
+| 14 | Design | Current brand, made premium | Brand law kept. No dark mode, no animation library |
+| 15 | Budget | Free services only | Supabase free, no paid APIs. Caveat: Vercel Hobby forbids commercial use |
+
+### Saturday stopgap
+
+From Saturday until the counter goes live, sell with a simple till or the
+card terminal's own app and keep paper tickets. VERI*FACTU is not yet
+mandatory before 2027, and the back-entry scanner planned in Phase 4 can
+import those tickets later.
+
+### Carta notes to confirm
+
+- Zumo de naranja 9,50 € and Yuzu 9,80 € are much higher than the teas.
+  Seeded as printed. Please confirm they are not typos.
+- Milks: the carta says "la leche que prefieras, también vegetal de avena".
+  Seeded Leche and Avena. Add any other milks in the admin.
+- Allergens are filled only where the law makes them certain (milk, oats,
+  pistachio, cheesecake). Mochi fillings and extras need the supplier sheets.
+
+## 7. Phase 1 status (2026-11-05): done locally
+
+- Next 16, Payload 3.93, Node 24, clean strict lockfile.
+- Postgres everywhere (docker locally, throwaway database per test run,
+  Supabase in production) with committed migrations in a `payload` schema.
+- Roles owner, manager and barista enforced on the server. Staff never
+  deleted. Orders, stock movements and audit records never deleted.
+- Audit log for prices, availability, staff changes, PINs, waste,
+  adjustments, device registration and every counter sign-in.
+- IVA rates, EU allergens, channel prices, option groups, the real carta.
+- Stock ledger with one atomic increment per movement inside the transaction.
+- Counter: tablet registration by the owner, name and PIN sign-in on that
+  device only, five attempts then a 15 minute lock (atomic, so parallel
+  guesses cannot bypass it), sessions bound to person, device and PIN.
+- 48 automated tests on Postgres plus a 14-step browser check.
+- Security review and code review run. Both blockers and the other
+  security fixes are resolved. Still open from the code review: removing
+  the remaining type casts in the audit writer, typed adapter access in
+  `cms/db.ts`, audit tests for availability and staff-field changes, an
+  `unknown-staff` vs `wrong-pin` merge (harmless, the device already shows
+  names), and a refund rounding rule for negative amounts (Phase 2).
+- Phase 2 mocks for approval: order screen, options sheet, cash payment
+  offline, kitchen display.
+
+### Go-live checklist for Phase 1
+
+1. Create the Supabase project (EU region) and copy the transaction pooler URI.
+2. In Vercel, Production environment only: `DATABASE_URL`, `PAYLOAD_SECRET`
+   (`openssl rand -base64 48`), `FIRST_OWNER_EMAIL`, `NEXT_PUBLIC_SITE_URL`.
+3. From this Mac: `DATABASE_URL=<uri> npm run migrate && DATABASE_URL=<uri> npm run seed`,
+   then create the owner at /admin with the FIRST_OWNER_EMAIL address.
+4. In Supabase, check the `payload` schema is not under API, Exposed schemas.
+5. Push to main. On the tablet: sign in to /admin as owner, open /pos/registrar.

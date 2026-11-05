@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { ALLERGENS } from "@/lib/allergens";
 import { editorialAccess } from "../access";
+import { integerCents } from "../validators";
 import { changed, writeAudit } from "../audit";
 
 /**
@@ -45,6 +46,7 @@ export const Modifiers: CollectionConfig = {
       name: "priceDeltaCents",
       type: "number",
       defaultValue: 0,
+      validate: integerCents,
       label: "Suplemento (céntimos, IVA incl.)",
     },
     { name: "grams", type: "number", label: "Gramos de matcha" },

@@ -1,19 +1,15 @@
 import type { Payload } from "payload";
-import { menu } from "../content/menu";
-import { intensities, bases, fruits, temps } from "../content/recipe";
+import { carta, cartaGroups } from "../content/carta";
 import { events } from "../content/events";
 import { story } from "../content/story";
 import { ROLES } from "../lib/auth/roles";
 
-const euroToCents = (price: string): number =>
-  Math.round(parseFloat(price.replace(",", ".").replace("€", "").trim()) * 100);
-
 type Log = (msg: string) => void;
 
 /**
- * Imports the typed content files into Payload. Idempotent: each block only
- * runs when its collection is empty, and the migrations at the top only
- * touch rows that need them. Safe to re-run against a live database.
+ * Imports the typed content files into Payload: IVA rates, the real carta
+ * (content/carta.ts) with its option groups, events and story. Idempotent
+ * and resumable; safe to re-run against a live database.
  */
 export async function seedDatabase(payload: Payload, log: Log = console.log) {
   const has = async (collection: Parameters<Payload["count"]>[0]["collection"]) =>
@@ -54,84 +50,28 @@ export async function seedDatabase(payload: Payload, log: Log = console.log) {
       limit: 1,
     })
   ).docs[0];
-
-  // --- menu categories + items
-  if (!(await has("menu-categories"))) {
-    for (const [i, cat] of menu.entries()) {
-      const created = await payload.create({
-        collection: "menu-categories",
-        locale: "es",
-        overrideAccess: true,
-        data: { slug: cat.id, title: cat.title.es, order: i },
-      });
-      await payload.update({
-        collection: "menu-categories",
-        id: created.id,
-        locale: "en",
-        overrideAccess: true,
-        data: { title: cat.title.en },
-      });
-      for (const [j, item] of cat.items.entries()) {
-        const doc = await payload.create({
-          collection: "menu-items",
-          locale: "es",
-          overrideAccess: true,
-          data: {
-            name: item.name,
-            category: created.id,
-            priceCents: euroToCents(item.price),
-            taxRate: defaultRate.id,
-            available: true,
-            color: item.color,
-            description: item.description.es,
-            origin: item.origin?.es,
-            signature: Boolean(item.signature),
-            order: j,
-          },
-        });
-        await payload.update({
-          collection: "menu-items",
-          id: doc.id,
-          locale: "en",
-          overrideAccess: true,
-          data: { description: item.description.en, origin: item.origin?.en },
-        });
-      }
-    }
-    log("seeded menu");
+  if (!defaultRate) {
+    throw new Error("Seed needs an IVA rate of 10 % (1000 basis points). Add it under Tipos de IVA.");
   }
 
-  // Items created before IVA existed get the default rate.
-  const untaxed = await payload.find({
-    collection: "menu-items",
-    overrideAccess: true,
-    limit: 500,
-    where: { taxRate: { exists: false } },
-  });
-  for (const item of untaxed.docs) {
-    await payload.update({
-      collection: "menu-items",
-      id: item.id,
+  // --- the carta: option groups, then categories and items. Upserts by
+  // natural key: a crashed run can be re-run, and existing rows (which the
+  // owner may have edited) are never overwritten.
+  const groupIds = new Map<string, number>();
+  for (const [gi, g] of cartaGroups.entries()) {
+    const found = await payload.find({
+      collection: "modifier-groups",
       overrideAccess: true,
-      data: { taxRate: defaultRate.id },
+      where: { slug: { equals: g.slug } },
+      limit: 1,
     });
-  }
-  if (untaxed.docs.length) log(`set IVA on ${untaxed.docs.length} menu items`);
-
-  // --- modifier groups + options, from the recipe builder's data
-  if (!(await has("modifier-groups"))) {
-    const groups = [
-      { slug: "intensity", label: { es: "Intensidad", en: "Intensity" }, required: true, options: intensities },
-      { slug: "base", label: { es: "Base", en: "Base" }, required: true, options: bases },
-      { slug: "fruit", label: { es: "Fruta", en: "Fruit" }, required: false, options: fruits },
-      { slug: "temp", label: { es: "Temperatura", en: "Temperature" }, required: true, options: temps },
-    ];
-    for (const [gi, g] of groups.entries()) {
-      const group = await payload.create({
+    let group = found.docs[0];
+    if (!group) {
+      group = await payload.create({
         collection: "modifier-groups",
         locale: "es",
         overrideAccess: true,
-        data: { slug: g.slug, label: g.label.es, selection: "single", required: g.required, order: gi },
+        data: { slug: g.slug, label: g.label.es, selection: g.selection, required: g.required, order: gi },
       });
       await payload.update({
         collection: "modifier-groups",
@@ -140,41 +80,104 @@ export async function seedDatabase(payload: Payload, log: Log = console.log) {
         overrideAccess: true,
         data: { label: g.label.en },
       });
-      for (const [i, opt] of g.options.entries()) {
-        const o = opt as Record<string, unknown> & {
-          id: string;
-          code: string;
-          label: { es: string; en: string };
-        };
-        const note = o.note as { es: string; en: string } | undefined;
-        const doc = await payload.create({
-          collection: "modifiers",
-          locale: "es",
-          overrideAccess: true,
-          data: {
-            group: group.id,
-            key: `${g.slug}.${o.id}`,
-            code: o.code,
-            label: o.label.es,
-            note: note?.es,
-            priceDeltaCents: (o.surchargeCents as number | undefined) ?? 0,
-            grams: o.grams as number | undefined,
-            ml: o.ml as number | undefined,
-            hue: o.hue as string | undefined,
-            available: true,
-            order: i,
-          },
-        });
-        await payload.update({
-          collection: "modifiers",
-          id: doc.id,
-          locale: "en",
-          overrideAccess: true,
-          data: { label: o.label.en, note: note?.en },
-        });
-      }
+      log(`seeded option group ${g.slug}`);
     }
-    log("seeded modifier groups");
+    groupIds.set(g.slug, group.id);
+
+    for (const [i, o] of g.options.entries()) {
+      const exists = await payload.count({
+        collection: "modifiers",
+        overrideAccess: true,
+        where: { key: { equals: o.key } },
+      });
+      if (exists.totalDocs > 0) continue;
+      const doc = await payload.create({
+        collection: "modifiers",
+        locale: "es",
+        overrideAccess: true,
+        data: {
+          group: group.id,
+          key: o.key,
+          label: o.label.es,
+          note: o.note?.es,
+          priceDeltaCents: o.priceDeltaCents,
+          allergens: o.allergens ?? [],
+          available: true,
+          order: i,
+        },
+      });
+      await payload.update({
+        collection: "modifiers",
+        id: doc.id,
+        locale: "en",
+        overrideAccess: true,
+        data: { label: o.label.en, note: o.note?.en },
+      });
+    }
+  }
+
+  for (const [ci, cat] of carta.entries()) {
+    const found = await payload.find({
+      collection: "menu-categories",
+      overrideAccess: true,
+      where: { slug: { equals: cat.slug } },
+      limit: 1,
+    });
+    let category = found.docs[0];
+    if (!category) {
+      category = await payload.create({
+        collection: "menu-categories",
+        locale: "es",
+        overrideAccess: true,
+        data: { slug: cat.slug, title: cat.title.es, order: ci },
+      });
+      await payload.update({
+        collection: "menu-categories",
+        id: category.id,
+        locale: "en",
+        overrideAccess: true,
+        data: { title: cat.title.en },
+      });
+      log(`seeded category ${cat.slug}`);
+    }
+
+    for (const [j, item] of cat.items.entries()) {
+      const exists = await payload.count({
+        collection: "menu-items",
+        overrideAccess: true,
+        where: { and: [{ name: { equals: item.name } }, { category: { equals: category.id } }] },
+      });
+      if (exists.totalDocs > 0) continue;
+      const groups = item.groups.map((slug) => {
+        const id = groupIds.get(slug);
+        if (id === undefined) throw new Error(`carta item ${item.name} names unknown group ${slug}`);
+        return id;
+      });
+      const doc = await payload.create({
+        collection: "menu-items",
+        locale: "es",
+        overrideAccess: true,
+        data: {
+          name: item.name,
+          category: category.id,
+          priceCents: item.priceCents,
+          taxRate: defaultRate.id,
+          available: true,
+          modifierGroups: groups,
+          color: item.color,
+          description: item.description.es,
+          signature: Boolean(item.signature),
+          order: j,
+        },
+      });
+      await payload.update({
+        collection: "menu-items",
+        id: doc.id,
+        locale: "en",
+        overrideAccess: true,
+        data: { description: item.description.en },
+      });
+    }
   }
 
   // --- events

@@ -193,22 +193,23 @@
       "needOwner": "Primero inicia sesión como propietario en esta misma tablet.",
       "signIn": "Iniciar sesión",
       "errorName": "Escribe un nombre para la tablet.",
-      "errorOwner": "Solo el propietario puede registrar una tablet."
+      "errorOwner": "Solo el propietario puede registrar una tablet.",
+      "errorFailed": "No se ha podido registrar la tablet. Comprueba la conexión e inténtalo otra vez."
     },
     "login": {
-      "eyebrow": "Barra",
       "title": "¿Quién atiende?",
       "noStaff": "Nadie del equipo tiene PIN todavía. El propietario puede asignarlos en Equipo, dentro de la administración.",
       "pinFor": "PIN de {name}",
       "back": "Cambiar de persona",
       "enter": "Entrar",
       "delete": "Borrar",
-      "digits": "{count} de 6 cifras",
-      "wrongPin": "PIN incorrecto. Te quedan {left} intentos.",
-      "locked": "Demasiados intentos. Prueba de nuevo en {minutes} minutos o pide al propietario un PIN nuevo.",
+      "digits": "{count} de {max} cifras",
+      "wrongPin": "PIN incorrecto. {left, plural, one {Te queda # intento.} other {Te quedan # intentos.}}",
+      "locked": "Demasiados intentos. Prueba de nuevo en {minutes, plural, one {# minuto} other {# minutos}} o pide al propietario un PIN nuevo.",
       "noDevice": "Esta tablet ya no está registrada.",
       "unknown": "No hemos podido encontrar a esa persona. Elige de nuevo.",
-      "failed": "No se ha podido entrar. Comprueba la conexión e inténtalo otra vez."
+      "failed": "No se ha podido entrar. Comprueba la conexión e inténtalo otra vez.",
+      "invalid": "El PIN debe tener de 4 a 6 cifras."
     },
     "home": {
       "greeting": "Hola, {name}",
@@ -222,6 +223,12 @@
       "nextBody": "El acceso, los permisos y el registro de actividad ya funcionan. Cuando apruebes el diseño, esta pantalla se convierte en la caja.",
       "backOffice": "Abrir la administración",
       "logout": "Salir"
+    },
+    "error": {
+      "eyebrow": "Barra",
+      "title": "Algo no ha ido bien",
+      "body": "No se ha perdido nada de lo ya guardado. Vuelve a intentarlo; si sigue igual, comprueba la conexión de la tablet.",
+      "retry": "Intentar de nuevo"
     }
   }
 }

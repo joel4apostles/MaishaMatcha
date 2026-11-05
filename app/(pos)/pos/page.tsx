@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { PinLogin } from "@/components/pos/PinLogin";
 import { PosEyebrow, PosFrame } from "@/components/pos/PosFrame";
-import { canUseBackOffice } from "@/lib/auth/roles";
 import { currentDevice, currentPosSession, pinStaff } from "@/lib/pos/server";
 import { logoutAction } from "./actions";
 
@@ -65,7 +64,7 @@ export default async function PosPage() {
         </h1>
         <p className="mt-8 text-lg">{t("home.next")}</p>
         <p className="mt-3 max-w-[50ch] leading-relaxed text-sumi/85">{t("home.nextBody")}</p>
-        {canUseBackOffice({ role: staff.role, active: true }) && (
+        {staff.role !== "barista" && (
           <Link
             href="/admin"
             className="mt-10 inline-flex min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4 hover:decoration-sumi/70"

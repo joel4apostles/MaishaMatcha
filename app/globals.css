@@ -46,6 +46,14 @@
     scroll-behavior: smooth;
   }
 
+  /* Fallback for the keyboard: a focused field always keeps room around
+     it when the browser scrolls it into view (see KeyboardSafeFields). */
+  input,
+  textarea,
+  select {
+    scroll-margin-block: 6rem;
+  }
+
   body {
     font-size: 1rem;
     line-height: 1.7;

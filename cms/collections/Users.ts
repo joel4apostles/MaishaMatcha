@@ -3,6 +3,7 @@ import { hasRole, canUseBackOffice } from "@/lib/auth/roles";
 import { hashPin, pinProblem } from "@/lib/pos/pin";
 import { hiddenField, nobody, owner, ownerField } from "../access";
 import { changed, writeAudit } from "../audit";
+import { integerCents } from "../validators";
 
 /**
  * Staff accounts (never customers). Owner creates, edits and deactivates
@@ -64,6 +65,7 @@ export const Users: CollectionConfig = {
       type: "number",
       defaultValue: 0,
       min: 0,
+      validate: integerCents,
       label: "Límite de devolución (céntimos)",
       access: { create: ownerField, update: ownerField },
       admin: {
@@ -110,6 +112,17 @@ export const Users: CollectionConfig = {
             req,
           });
           if (totalDocs === 0) {
+            // In production nobody but the named owner can claim the empty
+            // database through /admin/create-first-user.
+            const allowed = process.env.FIRST_OWNER_EMAIL?.trim().toLowerCase();
+            if (process.env.VERCEL && (!allowed || String(data.email ?? "").toLowerCase() !== allowed)) {
+              throw new APIError(
+                "La primera cuenta solo puede crearla el propietario indicado en FIRST_OWNER_EMAIL.",
+                403,
+                null,
+                true,
+              );
+            }
             data.role = "owner";
             data.active = true;
           }
@@ -118,7 +131,10 @@ export const Users: CollectionConfig = {
           data.pinHash = await hashPin(data.pin);
           data.pinFailedCount = 0;
           data.pinLockedUntil = null;
-          req.context.pinChanged = true;
+          // Per document: req.context is shared by every doc in a bulk update.
+          const ids = (req.context.pinChangedIds as Set<unknown> | undefined) ?? new Set();
+          ids.add(originalDoc?.id);
+          req.context.pinChangedIds = ids;
         }
         delete data.pin;
         return data;
@@ -128,6 +144,11 @@ export const Users: CollectionConfig = {
       ({ user }) => {
         if (user.active === false) {
           throw new APIError("Esta cuenta está desactivada.", 403, null, true);
+        }
+        // Password login (admin + REST API) is for owner and manager only.
+        // Baristas sign in with their PIN on a registered counter tablet.
+        if (!canUseBackOffice(user)) {
+          throw new APIError("Los baristas entran con su PIN en la tablet de la barra.", 403, null, true);
         }
         return user;
       },
@@ -145,7 +166,7 @@ export const Users: CollectionConfig = {
         if (diff?.after.refundLimitCents !== undefined) {
           await writeAudit(req, { action: "staff.refund-limit", entity: "users", entityId: doc.id, ...pick(diff, "refundLimitCents") });
         }
-        if (req.context.pinChanged) {
+        if ((req.context.pinChangedIds as Set<unknown> | undefined)?.has(doc.id)) {
           await writeAudit(req, { action: "staff.pin", entity: "users", entityId: doc.id });
         }
         return doc;

@@ -1,58 +1,36 @@
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import path from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import type { Payload } from "payload";
+import { asUser, boot, staff, type Staff } from "./harness";
 
 /**
- * Phase 1 guarantees, proven against a real (temporary) Payload + SQLite:
- * server-side role checks, append-only records, audit trail, atomic stock,
- * and PIN storage. Runs the same seed as production.
+ * Phase 1 guarantees, proven against Payload on a real (throwaway)
+ * Postgres: server-side role checks, append-only records, audit trail,
+ * atomic stock, PIN storage, and the production seed.
  */
-const dir = mkdtempSync(path.join(tmpdir(), "maisha-test-"));
-process.env.PAYLOAD_SQLITE_PATH = path.join(dir, "test.db");
-
 let payload: Payload;
-type Staff = Record<string, unknown> & { id: number; collection: "users" };
 let owner: Staff, manager: Staff, barista: Staff;
 
-const asUser = (u: Staff) => ({ user: u as never, overrideAccess: false });
-
-async function makeUser(email: string, role: string, name: string): Promise<Staff> {
-  const doc = await payload.create({
-    collection: "users",
-    overrideAccess: true,
-    data: { email, password: "test-password-123", name, role: role as never },
-  });
-  return { ...(doc as unknown as Record<string, unknown>), id: doc.id as number, collection: "users" };
-}
-
 beforeAll(async () => {
-  const { getPayload } = await import("payload");
-  const { default: config } = await import("@payload-config");
-  const { seedDatabase } = await import("@/cms/seedData");
-  payload = await getPayload({ config });
-  await seedDatabase(payload, () => {});
+  payload = await boot();
   // The first account always becomes the owner, whatever role was asked.
-  owner = await makeUser("owner@test.local", "barista", "Owner");
-  manager = await makeUser("manager@test.local", "manager", "Manager");
-  barista = await makeUser("barista@test.local", "barista", "Barista");
-});
-
-afterAll(async () => {
-  await payload?.destroy?.();
-  rmSync(dir, { recursive: true, force: true });
+  owner = await staff(payload, "owner@test.local", "barista", "Owner");
+  manager = await staff(payload, "manager@test.local", "manager", "Manager");
+  barista = await staff(payload, "barista@test.local", "barista", "Barista");
 });
 
 describe("seed", () => {
-  it("imports menu, IVA rates and modifier groups from the content files", async () => {
-    const items = await payload.find({ collection: "menu-items", limit: 100 });
-    expect(items.totalDocs).toBeGreaterThan(0);
-    expect(items.docs.every((i) => i.taxRate)).toBe(true);
-    const groups = await payload.find({ collection: "modifier-groups", limit: 10 });
-    expect(groups.docs.map((g) => g.slug).sort()).toEqual(["base", "fruit", "intensity", "temp"]);
-    const tonic = await payload.find({ collection: "modifiers", where: { key: { equals: "base.tonica" } } });
-    expect(tonic.docs[0]?.priceDeltaCents).toBe(100);
+  it("imports the real carta with IVA and its option groups", async () => {
+    const uji = (await payload.find({ collection: "menu-items", where: { name: { equals: "Uji" } }, depth: 1 })).docs[0];
+    expect(uji.priceCents).toBe(880);
+    expect(uji.taxRate).toBeTruthy();
+    const groupSlugs = (uji.modifierGroups ?? []).map((g) => (typeof g === "object" ? g.slug : g));
+    expect(groupSlugs).toEqual(["preparacion-matcha", "leche", "extras"]);
+    const latte = await payload.find({ collection: "modifiers", where: { key: { equals: "prep.latte" } } });
+    expect(latte.docs[0]?.priceDeltaCents).toBe(140);
+    const oat = await payload.find({ collection: "modifiers", where: { key: { equals: "leche.avena" } } });
+    expect(oat.docs[0]?.allergens).toEqual(["gluten"]);
+    const items = await payload.count({ collection: "menu-items" });
+    expect(items.totalDocs).toBe(9);
   });
 
   it("is safe to run twice", async () => {
@@ -113,8 +91,16 @@ describe("staff accounts", () => {
     ).rejects.toThrow();
   });
 
+  it("refuses password login for baristas (PIN on the counter only)", async () => {
+    await expect(
+      payload.login({ collection: "users", data: { email: "barista@test.local", password: "test-password-123" } }),
+    ).rejects.toThrow();
+    const ok = await payload.login({ collection: "users", data: { email: "manager@test.local", password: "test-password-123" } });
+    expect(ok.token).toBeTruthy();
+  });
+
   it("refuses to log in a deactivated account", async () => {
-    const temp = await makeUser("temp@test.local", "barista", "Temp");
+    const temp = await staff(payload, "temp@test.local", "manager", "Temp");
     await payload.update({ collection: "users", id: temp.id, data: { active: false }, ...asUser(owner) });
     await expect(
       payload.login({ collection: "users", data: { email: "temp@test.local", password: "test-password-123" } }),
@@ -225,5 +211,64 @@ describe("stock ledger", () => {
     });
     const audit = await payload.find({ collection: "audit-log", where: { action: { equals: "stock.waste" } } });
     expect(audit.docs[0]?.reason).toBe("Se cayó al suelo");
+  });
+});
+
+describe("configuration access", () => {
+  it("lets only the owner change IVA rates, with whole basis points", async () => {
+    const rate = (await payload.find({ collection: "tax-rates", limit: 1 })).docs[0];
+    await expect(
+      payload.update({ collection: "tax-rates", id: rate.id, data: { rateBasisPoints: 500 }, ...asUser(manager) }),
+    ).rejects.toThrow();
+    await expect(
+      payload.update({ collection: "tax-rates", id: rate.id, data: { rateBasisPoints: 10.5 }, ...asUser(owner) }),
+    ).rejects.toThrow();
+    await expect(
+      payload.update({ collection: "tax-rates", id: rate.id, data: { rateBasisPoints: 50000 }, ...asUser(owner) }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects fractional cents on prices", async () => {
+    const item = (await payload.find({ collection: "menu-items", limit: 1 })).docs[0];
+    await expect(
+      payload.update({ collection: "menu-items", id: item.id, data: { priceCents: 450.5 }, ...asUser(owner) }),
+    ).rejects.toThrow();
+  });
+
+  it("hides counter devices from everyone but the owner, and never returns token hashes", async () => {
+    await payload.create({
+      collection: "pos-devices",
+      overrideAccess: true,
+      data: { name: "Prueba", tokenHash: "x".repeat(64), active: true },
+    });
+    await expect(payload.find({ collection: "pos-devices", ...asUser(manager) })).rejects.toThrow();
+    const asOwner = await payload.find({ collection: "pos-devices", ...asUser(owner) });
+    expect(asOwner.totalDocs).toBeGreaterThan(0);
+    expect(asOwner.docs.every((d) => (d as unknown as Record<string, unknown>).tokenHash === undefined)).toBe(true);
+  });
+});
+
+describe("transactions", () => {
+  it("rolls back the stock change together with a failed movement", async () => {
+    const { createLocalReq, initTransaction, killTransaction } = await import("payload");
+    const item = await payload.create({
+      collection: "inventory-items",
+      data: { name: "Hojicha", unit: "g" },
+      ...asUser(manager),
+    });
+    const req = await createLocalReq({ user: manager as never }, payload);
+    await initTransaction(req);
+    await payload.create({
+      collection: "stock-movements",
+      data: { item: item.id, delta: 250, reason: "purchase" },
+      req,
+      overrideAccess: false,
+      user: manager as never,
+    });
+    await killTransaction(req);
+    const after = await payload.findByID({ collection: "inventory-items", id: item.id });
+    expect(after.stock ?? 0).toBe(0);
+    const moves = await payload.find({ collection: "stock-movements", where: { item: { equals: item.id } } });
+    expect(moves.totalDocs).toBe(0);
   });
 });

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { ALLERGENS } from "@/lib/allergens";
 import { editorialAccess } from "../access";
+import { integerCents } from "../validators";
 import { changed, writeAudit } from "../audit";
 
 /**
@@ -35,6 +36,7 @@ export const MenuItems: CollectionConfig = {
           type: "number",
           required: true,
           min: 0,
+          validate: integerCents,
           label: "Precio en barra (céntimos)",
           admin: { description: "IVA incluido. 450 = 4,50 €." },
         },
@@ -42,6 +44,7 @@ export const MenuItems: CollectionConfig = {
           name: "onlinePriceCents",
           type: "number",
           min: 0,
+          validate: integerCents,
           label: "Precio online (céntimos)",
           admin: { description: "Vacío = mismo precio que en barra." },
         },

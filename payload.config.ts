@@ -3,7 +3,6 @@ import { fileURLToPath } from "url";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { sqliteAdapter } from "@payloadcms/db-sqlite";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 
 import { Users } from "./cms/collections/Users";
@@ -26,36 +25,36 @@ import { appSecret } from "./lib/secret";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Database: Postgres in production (DATABASE_URL, Supabase transaction
- * pooler), SQLite file for local development (PAYLOAD_SQLITE_PATH overrides
- * the file, used by the integration tests). Vercel's serverless
- * filesystem is read-only, so production REQUIRES DATABASE_URL.
+ * Database: Postgres everywhere, so development and tests run on exactly what
+ * production runs. Production: Supabase (DATABASE_URL, transaction pooler).
+ * Local: the docker-compose "db" service (npm run db:up), the default below.
  */
-const db = process.env.DATABASE_URL
-  ? postgresAdapter({
-      pool: { connectionString: process.env.DATABASE_URL },
-      // Own schema: Supabase's public Data API only exposes "public", so the
-      // anon key can never reach staff hashes or orders.
-      schemaName: "payload",
-      // Schema changes reach Postgres ONLY through committed migrations
-      // (run by the vercel-build script), never by a dev server's push.
-      push: false,
-      migrationDir: path.resolve(dirname, "migrations"),
-    })
-  : sqliteAdapter({
-      client: {
-        url: `file:${process.env.PAYLOAD_SQLITE_PATH ?? path.resolve(dirname, "payload.db")}`,
-      },
-    });
+const LOCAL_DATABASE_URL = "postgres://postgres:postgres@127.0.0.1:54322/maisha";
 
 if (process.env.VERCEL && !process.env.DATABASE_URL) {
-  console.warn(
-    "[payload] Running on Vercel without DATABASE_URL — the admin will not persist. Provision Postgres and set DATABASE_URL.",
+  console.error(
+    "[payload] DATABASE_URL is not set on Vercel: the admin and the counter cannot work. " +
+      "Set it in the Vercel project settings (Production only).",
   );
 }
 
+const db = postgresAdapter({
+  pool: { connectionString: process.env.DATABASE_URL ?? LOCAL_DATABASE_URL },
+  // Own schema: Supabase's public Data API only exposes "public", so the
+  // anon key can never reach staff hashes or orders.
+  schemaName: "payload",
+  // Schema changes reach Postgres ONLY through committed migrations
+  // (npm run migrate locally, the vercel-build script in production).
+  push: false,
+  migrationDir: path.resolve(dirname, "migrations"),
+});
+
+const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
+
 export default buildConfig({
   secret: appSecret(),
+  // Cookie-authenticated requests are only accepted from our own origin.
+  ...(siteURL ? { serverURL: siteURL, csrf: [siteURL] } : {}),
   db,
   sharp,
   editor: lexicalEditor(),

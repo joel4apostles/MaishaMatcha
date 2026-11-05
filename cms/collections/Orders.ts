@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { anyStaff, nobody } from "../access";
+import { anyStaff, nobody, ownerOrManager } from "../access";
 
 /**
  * The counter's order board. Custom drinks arrive as recipe codes
@@ -13,7 +13,7 @@ export const Orders: CollectionConfig = {
   },
   // Financial record: never deleted. Phase 2 replaces this board with
   // order lines, payments and invoices; voids become status changes.
-  access: { read: anyStaff, create: anyStaff, update: anyStaff, delete: nobody },
+  access: { read: anyStaff, create: anyStaff, update: ownerOrManager, delete: nobody },
   defaultSort: "-createdAt",
   fields: [
     {

@@ -33,13 +33,26 @@ OG, admin) inherits them.
 
 ## Stack & hard constraints
 
-- **Next.js 15 (App Router) + TypeScript strict + Tailwind CSS 4**, Vercel.
-- **Payload CMS 3** embedded at `/admin` (route group `app/(payload)/`,
-  config `payload.config.ts`, collections in `cms/collections/`): SQLite file
-  in dev, Postgres via `DATABASE_URL` in prod (Supabase Transaction-pooler
-  URI, port 6543; direct 5432 only if migrations complain). Vercel's FS is
-  read-only, so prod REQUIRES `DATABASE_URL`. Public pages still read the
-  typed files under `/content` (CMS-backed rendering is the next migration).
+- **Next.js 16 (App Router) + TypeScript strict + Tailwind CSS 4.3.3 (pinned:
+  4.3.4 breaks Turbopack)**, Node 24 (`.nvmrc`), Vercel.
+- **Payload CMS 3.93** embedded at `/admin` (route group `app/(payload)/`,
+  config `payload.config.ts`, collections in `cms/collections/`).
+- **Postgres everywhere** (no SQLite): local = docker-compose `db`
+  (`npm run db:up`, port 54322), tests = a throwaway database per run, prod =
+  Supabase (`DATABASE_URL`, transaction pooler 6543). Payload lives in its
+  own `payload` schema (Supabase's Data API cannot reach it). `push: false`:
+  schema changes ONLY via committed migrations in `/migrations`
+  (`npm run migrate:create -- <name>`, applied by `npm run migrate` and by
+  the `vercel-build` script).
+- **The counter (POS)** lives at `/pos` (route group `app/(pos)/`, own root
+  layout, Spanish). Auth: owner registers a tablet once (`/pos/registrar`),
+  staff then sign in by name + PIN on that device only. Logic in
+  `lib/pos/core.ts` (testable), cookies in `lib/pos/server.ts`. Baristas
+  cannot password-login at all (`beforeLogin`); owner/manager use `/admin`.
+- **The carta** source of truth is `content/carta.ts` (from the founder's
+  carta PDF): seeded into Payload with option groups (usucha/latte +1,40,
+  milk, extras, mochi flavours). Public pages still read the older draft
+  `content/menu.ts`: switching them to the carta is pending.
 - **No payments yet** (Stripe is Phase 2). Public server code is
   `/api/waitlist`, `/api/og`, and Payload's `/api/[...slug]`.
 - i18n via **next-intl**: routes `/es` (default) and `/en`, localized pathnames
@@ -57,9 +70,15 @@ npm run build          # production build (must stay clean)
 npm run start          # serve the build
 npx tsc --noEmit       # type check (strict)
 npm run lint           # ESLint (must be zero errors)
+npm test               # unit + integration tests (needs npm run db:up)
+
+# Database (Postgres in Docker, same major version as Supabase)
+npm run db:up                   # start local Postgres (docker compose)
+npm run migrate                 # apply committed migrations
+npm run migrate:create -- name  # new migration after a schema change (offline)
 
 # Payload CMS
-npm run seed                    # import content/*.ts into collections (es + en)
+npm run seed                    # carta, IVA, events, story (idempotent upserts)
 npm run generate:types          # regenerate cms/payload-types.ts
 npm run generate:importmap      # regenerate app/(payload)/admin/importMap.js
 ```
@@ -148,18 +167,18 @@ RESEND_API_KEY          # server-only; waitlist audience + confirmation email
 RESEND_AUDIENCE_ID
 RESEND_FROM             # optional, defaults to "maisha matcha <hola@maishamatcha.es>"
 NEXT_PUBLIC_SITE_URL    # canonical origin for metadata/OG/sitemap
-PAYLOAD_SECRET          # signs admin auth cookies — long random string in prod
-DATABASE_URL            # prod Postgres (Supabase pooler :6543); dev falls back to SQLite
+PAYLOAD_SECRET          # 32+ chars; signs admin + POS cookies (random per instance if missing)
+DATABASE_URL            # Supabase pooler :6543 in prod, PRODUCTION env only on Vercel
+FIRST_OWNER_EMAIL       # prod: only this email may create the first (owner) account
 ```
 
 ## Known audit findings (accepted risk, re-check each release)
 
-`npm audit --omit=dev` reports 3 highs, all transitive inside next@15
-(bundled postcss; sharp/libvips). Assessed 2026-08-11: postcss issues are
-build-time on first-party CSS only; sharp is only fed our own static images
-(no `remotePatterns`, no uploads), and Vercel runs optimization on managed
-infra. Real fix requires next@16 (breaking). Re-assess when bumping Next or
-if remote images / user uploads are ever enabled.
+Re-assessed 2026-11-05 after Next 16 + Payload 3.93: the next@15 findings
+are gone. What remains (`npm audit --omit=dev`) sits inside Payload's admin
+editor stack (lexical/happy-dom, dompurify via monaco, drizzle-kit/esbuild
+tooling). Reachable only by signed-in owner/manager in /admin, never by
+public visitors or the counter. Re-check on every Payload upgrade.
 
 ## Content editing
 
@@ -202,11 +221,12 @@ add chief-architect + cto-review before phase transitions.
 
 ## Roadmap (later phases, same repo)
 
-- **Phase 1 — Payload CMS**: IN PROGRESS. Admin scaffolded, themed, and
-  committed with 11 collections + seed script. Remaining: create first admin
-  user, seed, Supabase Postgres + `DATABASE_URL`/`PAYLOAD_SECRET` on Vercel,
-  media storage (Vercel Blob or Supabase Storage — serverless FS is
-  read-only), then migrate public pages to CMS queries with revalidation.
+- **POS build (2026-11-05 prompt, see POS-PLAN.md)**: Phase 1 Foundations
+  DONE LOCALLY (roles owner/manager/barista, audit log, IVA rates, allergens,
+  modifiers, atomic stock ledger, tablet registration + PIN login with
+  lockout, Postgres migrations, 48 tests). Remaining before prod: Supabase
+  project, Vercel env (Production only), media storage, owner approval of
+  the Phase 2 mocks (claude.ai artifact "maisha barra mocks").
 - **Phase 2 — Stripe founding membership**: paid founding tier, member accounts,
   the "founding price" promise honored at checkout.
 - **Phase 3 — Recipe builder**: MVP SHIPPED without a database. `/crea`

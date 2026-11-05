@@ -28,7 +28,13 @@ export function RegisterDeviceForm() {
         className="mt-2 block min-h-[52px] w-full rounded-[2px] border border-wood/50 bg-transparent px-4 text-lg placeholder:text-sumi/40 focus:border-sumi/70"
       />
       <p id="device-error" role="alert" className="mt-3 min-h-[1.5rem] text-sm text-sumi">
-        {state?.error === "name" ? t("errorName") : state?.error === "owner" ? t("errorOwner") : null}
+        {state?.error === "name"
+          ? t("errorName")
+          : state?.error === "owner"
+            ? t("errorOwner")
+            : state?.error === "failed"
+              ? t("errorFailed")
+              : null}
       </p>
       <button
         type="submit"

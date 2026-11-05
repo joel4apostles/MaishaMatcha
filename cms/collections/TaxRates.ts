@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { anyone, nobody, owner } from "../access";
+import { integer } from "../validators";
 
 /**
  * IVA rates as configuration, never hardcoded. Stored in basis points
@@ -25,8 +26,7 @@ export const TaxRates: CollectionConfig = {
       max: 10000,
       label: "Tipo (puntos básicos)",
       admin: { description: "1000 = 10 %, 2100 = 21 %." },
-      validate: (v: number | null | undefined) =>
-        Number.isInteger(v) ? true : "Debe ser un número entero.",
+      validate: integer,
     },
     { name: "active", type: "checkbox", defaultValue: true, label: "Activo" },
   ],

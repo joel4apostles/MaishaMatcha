@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { sans, serif } from "@/lib/fonts";
 import es from "@/messages/es.json";
+import { KeyboardSafeFields } from "@/components/KeyboardSafeFields";
 import "../globals.css";
 
 /**
@@ -11,7 +12,7 @@ import "../globals.css";
  * indexed. No analytics on the counter.
  */
 export const metadata: Metadata = {
-  title: "Barra · maisha matcha",
+  title: `${es.pos.title} · maisha matcha`,
   robots: { index: false, follow: false },
 };
 
@@ -19,6 +20,7 @@ export const viewport: Viewport = {
   themeColor: "#F5F1E8",
   width: "device-width",
   initialScale: 1,
+  interactiveWidget: "resizes-content",
 };
 
 export default function PosLayout({ children }: { children: ReactNode }) {
@@ -28,6 +30,7 @@ export default function PosLayout({ children }: { children: ReactNode }) {
         <NextIntlClientProvider locale="es" messages={{ pos: es.pos }}>
           {children}
         </NextIntlClientProvider>
+        <KeyboardSafeFields />
       </body>
     </html>
   );

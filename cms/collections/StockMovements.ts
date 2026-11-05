@@ -1,7 +1,7 @@
-import { sql } from "@payloadcms/db-postgres";
 import type { CollectionConfig, PayloadRequest } from "payload";
 import { anyStaff, nobody } from "../access";
 import { writeAudit } from "../audit";
+import { query, sql, table } from "../db";
 
 const NEEDS_REASON = new Set(["waste", "adjustment"]);
 
@@ -101,23 +101,10 @@ export const StockMovements: CollectionConfig = {
 
 /** stock = stock + delta, as one statement, on the request's transaction. */
 async function incrementStock(req: PayloadRequest, itemId: number | string, delta: number) {
-  const adapter = req.payload.db as unknown as {
-    drizzle: DrizzleLike;
-    sessions?: Record<string, { db: DrizzleLike }>;
-    tables: Record<string, unknown>;
-  };
-  const txId = req.transactionID ? await req.transactionID : undefined;
-  const db = (txId && adapter.sessions?.[String(txId)]?.db) || adapter.drizzle;
-  // Interpolating Payload's table object renders the right schema
-  // ("payload"."inventory_items" on Postgres, plain on SQLite).
-  const table = adapter.tables.inventory_items;
-  if (!table) throw new Error("inventory_items table not found");
-  const query = sql`update ${table} set stock = coalesce(stock, 0) + ${delta} where id = ${itemId}`;
-  if (typeof db.execute === "function") await db.execute(query);
-  else await db.run!(query);
+  const items = table(req.payload, "inventory_items");
+  await query(
+    req.payload,
+    sql`update ${items} set stock = coalesce(stock, 0) + ${delta} where id = ${itemId}`,
+    req,
+  );
 }
-
-type DrizzleLike = {
-  execute?: (q: unknown) => Promise<unknown>;
-  run?: (q: unknown) => Promise<unknown>;
-};

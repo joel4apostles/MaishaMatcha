@@ -16,11 +16,12 @@
     "test": "vitest run",
     "vercel-build": "node scripts/migrate.mjs && next build",
     "migrate": "payload migrate",
-    "migrate:create": "node scripts/migrate-create.mjs"
+    "migrate:create": "node scripts/migrate-create.mjs",
+    "db:up": "docker compose up -d --wait db",
+    "db:down": "docker compose stop db"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.93.0",
-    "@payloadcms/db-sqlite": "3.93.0",
     "@payloadcms/next": "3.93.0",
     "@payloadcms/richtext-lexical": "3.93.0",
     "@react-email/components": "^1.0.0",
@@ -38,10 +39,12 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "^20.0.0",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "16.4.5",
+    "pg": "^8.20.0",
     "tailwindcss": "4.3.3",
     "tsx": "^4.22.4",
     "typescript": "^5.6.0",

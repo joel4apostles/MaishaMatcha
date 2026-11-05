@@ -193,22 +193,23 @@
       "needOwner": "First sign in as the owner on this same tablet.",
       "signIn": "Sign in",
       "errorName": "Write a name for the tablet.",
-      "errorOwner": "Only the owner can register a tablet."
+      "errorOwner": "Only the owner can register a tablet.",
+      "errorFailed": "Could not register the tablet. Check the connection and try again."
     },
     "login": {
-      "eyebrow": "Counter",
       "title": "Who is serving?",
       "noStaff": "Nobody on the team has a PIN yet. The owner can set them under Team, in the back office.",
       "pinFor": "PIN for {name}",
       "back": "Change person",
       "enter": "Enter",
       "delete": "Delete",
-      "digits": "{count} of 6 digits",
-      "wrongPin": "Wrong PIN. {left} attempts left.",
-      "locked": "Too many attempts. Try again in {minutes} minutes or ask the owner for a new PIN.",
+      "digits": "{count} of {max} digits",
+      "wrongPin": "Wrong PIN. {left, plural, one {# attempt left.} other {# attempts left.}}",
+      "locked": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}} or ask the owner for a new PIN.",
       "noDevice": "This tablet is no longer registered.",
       "unknown": "We could not find that person. Choose again.",
-      "failed": "Could not sign in. Check the connection and try again."
+      "failed": "Could not sign in. Check the connection and try again.",
+      "invalid": "The PIN must have 4 to 6 digits."
     },
     "home": {
       "greeting": "Hello, {name}",
@@ -222,6 +223,12 @@
       "nextBody": "Sign-in, permissions and the activity log already work. Once you approve the design, this screen becomes the till.",
       "backOffice": "Open the back office",
       "logout": "Sign out"
+    },
+    "error": {
+      "eyebrow": "Counter",
+      "title": "Something went wrong",
+      "body": "Nothing already saved has been lost. Try again; if it persists, check the tablet's connection.",
+      "retry": "Try again"
     }
   }
 }
