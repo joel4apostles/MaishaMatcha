@@ -156,10 +156,14 @@ export function changeBreakdown(changeCents: number): { cents: number; count: nu
   return out;
 }
 
-/** Quick cash buttons: exact, then the next round amounts above the total. */
+/**
+ * Quick cash buttons as customers actually pay: exact, the next 5 €, the
+ * next 10 €, then the next banknote. 20,60 € gives 20,60 · 25 · 30 · 50.
+ */
 export function quickTenders(totalCents: number): number[] {
-  const candidates = [500, 1000, 2000, 5000, 10000].flatMap((step) => [
-    Math.ceil(totalCents / step) * step,
-  ]);
-  return [...new Set([totalCents, ...candidates])].filter((v) => v >= totalCents).sort((a, b) => a - b).slice(0, 4);
+  const notes = [500, 1000, 2000, 5000, 10000, 20000].filter((n) => n > totalCents);
+  const next = (step: number) => (Math.floor(totalCents / step) + 1) * step;
+  const candidates = [next(500), next(1000), ...notes];
+  const above = [...new Set(candidates.filter((v) => v > totalCents))].sort((a, b) => a - b);
+  return [totalCents, ...above].slice(0, 4);
 }

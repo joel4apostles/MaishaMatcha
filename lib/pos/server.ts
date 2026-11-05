@@ -38,7 +38,7 @@ const sessionKey = () => deriveKey(appSecret(), "pos-session");
 const cookieBase = () =>
   ({ httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/" }) as const;
 
-const payloadClient = (): Promise<Payload> => getPayload({ config });
+export const payloadClient = (): Promise<Payload> => getPayload({ config });
 
 /** The owner signed in to /admin in this browser, or null. */
 export async function backOfficeOwner() {

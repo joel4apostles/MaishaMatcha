@@ -100,5 +100,7 @@ describe("server pricing", () => {
       { cents: 10, count: 1 },
     ]);
     expect(quickTenders(3290)).toEqual([3290, 3500, 4000, 5000]);
+    expect(quickTenders(2060)).toEqual([2060, 2500, 3000, 5000]);
+    expect(quickTenders(2000)).toEqual([2000, 2500, 3000, 5000]);
   });
 });
