@@ -19,6 +19,10 @@ export const routing = defineRouting({
       es: "/pedido/[token]",
       en: "/order-status/[token]",
     },
+    "/cuenta": {
+      es: "/cuenta",
+      en: "/account",
+    },
     "/crea": {
       es: "/crea",
       en: "/create",

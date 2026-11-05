@@ -79,6 +79,7 @@ export type PlaceInput = {
   note?: string | null;
   payOnline: boolean;
   idempotencyKey: string;
+  memberId?: number | null;
 };
 
 export type PlaceResult =
@@ -158,6 +159,7 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
         statusChangedAt: now.toISOString(),
         publicToken: token,
         idempotencyKey: input.idempotencyKey,
+        member: input.memberId ?? undefined,
       } as never,
     });
     await commitTransaction(req);
@@ -178,13 +180,20 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
 /** Stripe says the checkout expired unpaid: cancel, freeing the slot. */
 export async function cancelUnpaidOnline(payload: Payload, orderId: number) {
   const o = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true }).catch(() => null);
-  if (!o || o.channel !== "online" || o.paymentStatus !== "unpaid" || !o.payOnline || o.status !== "received") return false;
+  if (!o || o.channel !== "online" || o.paymentStatus !== "unpaid" || !o.payOnline) return false;
+  if (o.status !== "received" && o.kind !== "membership") return false;
   await payload.update({ collection: "orders", id: orderId, overrideAccess: true, data: { status: "cancelled", statusChangedAt: new Date().toISOString() } });
   return true;
 }
 
 /** Stripe confirmed payment: record it, invoice, deduct stock. Idempotent. */
-export async function markOnlinePaid(payload: Payload, orderId: number, providerRef: string, amountCents?: number) {
+export async function markOnlinePaid(
+  payload: Payload,
+  orderId: number,
+  providerRef: string,
+  amountCents?: number,
+  opts: { notify?: boolean } = {},
+) {
   const req = await createLocalReq({}, payload);
   await initTransaction(req);
   let touched: number[] = [];
@@ -211,7 +220,7 @@ export async function markOnlinePaid(payload: Payload, orderId: number, provider
     throw err;
   }
   if (touched.length) await draftReorders(payload, touched).catch(() => undefined);
-  await sendConfirmation(payload, orderId).catch(() => undefined);
+  if (opts.notify !== false) await sendConfirmation(payload, orderId).catch(() => undefined);
   return true;
 }
 

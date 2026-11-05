@@ -50,14 +50,15 @@ describe("reports", () => {
   it("summarises IVA and exports invoices that add up", async () => {
     const { from, to } = madridDay();
     const iva = await ivaSummary(payload, from, to);
-    const r10 = iva.find((r) => r.rateBasisPoints === 1000)!;
+    // Other test files share this database and may add other IVA rates.
+    const gross = iva.reduce((sum, r) => sum + r.baseCents + r.taxCents, 0);
     const { docs } = await payload.find({
       collection: "invoices",
       limit: 10000,
       depth: 0,
       where: { and: [{ issuedAt: { greater_than_equal: from } }, { issuedAt: { less_than: to } }] },
     });
-    expect(r10.baseCents + r10.taxCents).toBe(docs.reduce((s, d) => s + d.totalCents, 0));
+    expect(gross).toBe(docs.reduce((s, d) => s + d.totalCents, 0));
     const csv = await invoicesCsv(payload, from, to);
     const lines = csv.split("\r\n");
     expect(lines[0]).toContain('"Número"');

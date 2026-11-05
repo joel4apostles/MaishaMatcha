@@ -1,0 +1,285 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import {
+  deleteAccountAction,
+  requestSignInAction,
+  signOutAction,
+  signOutEverywhereAction,
+  startFoundingAction,
+  updatePrefsAction,
+} from "@/app/[locale]/(site)/cuenta/actions";
+import { inkButtonClass } from "@/components/Button";
+import { Link, useRouter } from "@/i18n/navigation";
+import { formatEuro } from "@/lib/money";
+
+const field =
+  "mt-2 block min-h-[48px] w-full border-b border-wood/40 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
+const label = "text-eyebrow uppercase text-sumi/70";
+const quietButton =
+  "inline-flex min-h-[44px] items-center justify-center rounded-[2px] border border-wood/50 px-5 text-sm font-medium text-sumi hover:border-sumi/60 disabled:opacity-40";
+const KNOWN = ["invalid", "rate-limited", "generic", "confirm", "closed", "already", "signed-out"];
+
+function useError() {
+  const t = useTranslations("account");
+  return (code?: string) => t(`errors.${code && KNOWN.includes(code) ? code : "generic"}` as "errors.generic");
+}
+
+export function SignInForm({ next }: { next?: string }) {
+  const t = useTranslations("account");
+  const err = useError();
+  const locale = useLocale() as "es" | "en";
+  const [state, setState] = useState<"idle" | "sent">("idle");
+  const [message, setMessage] = useState("");
+  const [pending, start] = useTransition();
+
+  return state === "sent" ? (
+    <p role="status" className="text-lg">
+      {t("sent")}
+    </p>
+  ) : (
+    <form
+      action={(form) =>
+        start(async () => {
+          const r = await requestSignInAction({
+            email: String(form.get("email") ?? ""),
+            name: String(form.get("name") ?? "") || undefined,
+            locale,
+            next,
+          }).catch(() => ({ ok: false, error: "generic" }));
+          if (r.ok) setState("sent");
+          else setMessage(err(r.error));
+        })
+      }
+      className="space-y-6"
+    >
+      <div>
+        <label htmlFor="a-email" className={label}>
+          {t("email")}
+        </label>
+        <input id="a-email" name="email" type="email" inputMode="email" required autoComplete="email" enterKeyHint="next" className={field} />
+      </div>
+      <div>
+        <label htmlFor="a-name" className={label}>
+          {t("name")}
+        </label>
+        <input id="a-name" name="name" autoComplete="name" autoCapitalize="words" enterKeyHint="send" maxLength={80} className={field} />
+      </div>
+      <p role="status" className="min-h-[1.25rem] text-sm text-sumi">
+        {message}
+      </p>
+      <button type="submit" disabled={pending} className={`${inkButtonClass} w-full sm:w-auto`}>
+        {pending ? t("sending") : t("send")}
+      </button>
+      <p className="text-sm text-sumi/70">{t("noPassword")}</p>
+    </form>
+  );
+}
+
+type Order = { label: string; status: string; paymentStatus: string; totalCents: number; createdAt: string; token: string | null; membership: boolean };
+type Founding = { open: boolean; priceCents: number | null; cap: number; remaining: number; perks: string[] };
+
+export function AccountPanel({
+  member,
+  orders,
+  founding,
+  justPaid,
+}: {
+  member: { name: string; email: string; tier: string; emailOptIn: boolean; locale: "es" | "en" };
+  orders: Order[];
+  founding: Founding | null;
+  justPaid: boolean;
+}) {
+  const t = useTranslations("account");
+  const st = useTranslations("order.status");
+  const err = useError();
+  const locale = useLocale() as "es" | "en";
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [note, setNote] = useState("");
+  const [foundingMsg, setFoundingMsg] = useState("");
+  const [deleteMsg, setDeleteMsg] = useState("");
+
+  const isFounding = member.tier === "founding";
+  const statusText = (o: Order) =>
+    o.membership ? t("membership") : (["received", "preparing", "ready", "collected", "cancelled"].includes(o.status) ? st(o.status as "received") : o.status);
+
+  return (
+    <div className="grid grid-cols-1 gap-16 md:grid-cols-2">
+      <div className="space-y-16">
+        <section aria-labelledby="a-founding">
+          <h2 id="a-founding" className="font-serif text-3xl font-light">
+            {t("foundingTitle")}
+          </h2>
+          {isFounding ? (
+            <p className="mt-4 text-sumi/80">{t("foundingYours")}</p>
+          ) : justPaid ? (
+            <p role="status" className="mt-4">
+              {t("foundingThanks")}
+            </p>
+          ) : founding?.open && founding.priceCents ? (
+            <>
+              <p className="mt-4 text-sumi/80">{t("foundingBody", { cap: founding.cap, remaining: founding.remaining })}</p>
+              {founding.perks.length ? (
+                <ul className="mt-4 border-t border-wood/25">
+                  {founding.perks.map((p) => (
+                    <li key={p} className="border-b border-wood/25 py-3">
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() =>
+                  start(async () => {
+                    const r = await startFoundingAction(locale).catch(() => ({ ok: false as const, error: "generic" }));
+                    if (r.ok) window.location.assign(r.url);
+                    else setFoundingMsg(err(r.error));
+                  })
+                }
+                className={`${inkButtonClass} mt-6 w-full sm:w-auto`}
+              >
+                {t("foundingCta", { price: formatEuro(founding.priceCents, locale) })}
+              </button>
+              <p role="status" className="mt-2 min-h-[1.25rem] text-sm">
+                {foundingMsg}
+              </p>
+            </>
+          ) : (
+            <p className="mt-4 text-sumi/80">{t("foundingClosed")}</p>
+          )}
+        </section>
+
+        <section aria-labelledby="a-orders">
+          <h2 id="a-orders" className="font-serif text-3xl font-light">
+            {t("ordersTitle")}
+          </h2>
+          {orders.length === 0 ? <p className="mt-4 text-sumi/80">{t("noOrders")}</p> : null}
+          <ul className="mt-4 border-t border-wood/25">
+            {orders.map((o) => (
+              <li key={o.label + o.createdAt} className="border-b border-wood/25">
+                {o.token && !o.membership ? (
+                  <Link
+                    href={{ pathname: "/pedido/[token]", params: { token: o.token } }}
+                    className="flex min-h-[56px] items-center justify-between gap-4 py-3"
+                  >
+                    <OrderRow o={o} text={statusText(o)} locale={locale} />
+                  </Link>
+                ) : (
+                  <div className="flex min-h-[56px] items-center justify-between gap-4 py-3">
+                    <OrderRow o={o} text={statusText(o)} locale={locale} />
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <div className="space-y-16">
+        <section aria-labelledby="a-prefs">
+          <h2 id="a-prefs" className="font-serif text-3xl font-light">
+            {t("prefsTitle")}
+          </h2>
+          <form
+            action={(form) =>
+              start(async () => {
+                const r = await updatePrefsAction({
+                  name: String(form.get("name") ?? ""),
+                  emailOptIn: form.get("letters") === "on",
+                  locale: form.get("lang") === "en" ? "en" : "es",
+                }).catch(() => ({ ok: false, error: "generic" }));
+                setNote(r.ok ? t("saved") : err(r.error));
+                if (r.ok) router.refresh();
+              })
+            }
+            className="mt-6 space-y-6"
+          >
+            <div>
+              <label htmlFor="p-name" className={label}>
+                {t("name").replace(/ \(.*\)$/, "")}
+              </label>
+              <input id="p-name" name="name" required defaultValue={member.name} maxLength={80} autoComplete="name" className={field} />
+            </div>
+            <p className="text-sm text-sumi/70">{member.email}</p>
+            <label className="flex min-h-[44px] cursor-pointer items-start gap-3">
+              <input type="checkbox" name="letters" defaultChecked={member.emailOptIn} className="mt-1 size-5 shrink-0 accent-sumi" />
+              <span>{t("letters")}</span>
+            </label>
+            <div>
+              <label htmlFor="p-lang" className={label}>
+                {t("language")}
+              </label>
+              <select id="p-lang" name="lang" defaultValue={member.locale} className={`${field} cursor-pointer`}>
+                <option value="es">Español</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-4">
+              <button type="submit" disabled={pending} className={quietButton}>
+                {t("save")}
+              </button>
+              <span role="status" className="text-sm text-sumi/70">
+                {note}
+              </span>
+            </div>
+          </form>
+        </section>
+
+        <section className="flex flex-wrap gap-3">
+          <button type="button" className={quietButton} onClick={() => start(async () => { await signOutAction(); router.refresh(); })}>
+            {t("signOut")}
+          </button>
+          <button type="button" className={quietButton} onClick={() => start(async () => { await signOutEverywhereAction(); router.refresh(); })}>
+            {t("signOutAll")}
+          </button>
+        </section>
+
+        <details className="border-t border-wood/25 pt-6">
+          <summary className="flex min-h-[44px] cursor-pointer items-center text-sm text-sumi/80">{t("deleteTitle")}</summary>
+          <form
+            action={(form) =>
+              start(async () => {
+                const r = await deleteAccountAction(String(form.get("confirm") ?? "")).catch(() => ({ ok: false, error: "generic" }));
+                if (r.ok) {
+                  setDeleteMsg(t("deleted"));
+                  router.refresh();
+                } else setDeleteMsg(err(r.error));
+              })
+            }
+            className="mt-4 space-y-4"
+          >
+            <p className="text-sm text-sumi/80">{t("deleteBody")}</p>
+            <label htmlFor="d-confirm" className="sr-only">
+              {t("email")}
+            </label>
+            <input id="d-confirm" name="confirm" type="email" inputMode="email" autoComplete="off" placeholder={member.email} className={field} />
+            <button type="submit" disabled={pending} className={quietButton}>
+              {t("deleteCta")}
+            </button>
+            <p role="status" className="min-h-[1.25rem] text-sm">
+              {deleteMsg}
+            </p>
+          </form>
+        </details>
+      </div>
+    </div>
+  );
+}
+
+function OrderRow({ o, text, locale }: { o: Order; text: string; locale: "es" | "en" }) {
+  return (
+    <>
+      <span className="min-w-0">
+        <span className="block">
+          {o.label} · {new Date(o.createdAt).toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", { timeZone: "Europe/Madrid", day: "numeric", month: "short" })}
+        </span>
+        <span className="block text-sm text-sumi/70">{text}</span>
+      </span>
+      <span className="shrink-0 tabular-nums">{formatEuro(o.totalCents, locale)}</span>
+    </>
+  );
+}

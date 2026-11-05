@@ -29,6 +29,8 @@ import { InventoryItems } from "./cms/collections/InventoryItems";
 import { StockMovements } from "./cms/collections/StockMovements";
 import { Orders } from "./cms/collections/Orders";
 import { Members } from "./cms/collections/Members";
+import { Rsvps } from "./cms/collections/Rsvps";
+import { Campaigns } from "./cms/collections/Campaigns";
 import { appSecret } from "./lib/secret";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -118,8 +120,10 @@ export default buildConfig({
     [Suppliers, "Proveedores"],
     [SupplierProducts, "Proveedores"],
     [Members, "Personas"],
+    [Rsvps, "Personas"],
     [Users, "Personas"],
     [Events, "Web"],
+    [Campaigns, "Web"],
     [StoryChapters, "Web"],
     [Media, "Web"],
     [Invoices, "Control"],

@@ -109,6 +109,17 @@ export const Orders: CollectionConfig = {
       access: { read: () => false },
     },
     { name: "member", type: "relationship", relationTo: "members", label: "Socio" },
+    {
+      name: "kind",
+      type: "select",
+      defaultValue: "sale",
+      label: "Tipo",
+      admin: { readOnly: true },
+      options: [
+        { label: "Venta", value: "sale" },
+        { label: "Cuota de socio fundador", value: "membership" },
+      ],
+    },
     { name: "staff", type: "relationship", relationTo: "users", label: "Atendido por", admin: { readOnly: true } },
     { name: "device", type: "relationship", relationTo: "pos-devices", label: "Tablet", admin: { readOnly: true } },
     { name: "shift", type: "relationship", relationTo: "shifts", label: "Turno", admin: { readOnly: true } },

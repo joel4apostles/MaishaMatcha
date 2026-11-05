@@ -71,6 +71,28 @@ export const Business: GlobalConfig = {
       ],
     },
     {
+      type: "collapsible",
+      label: "Socios fundadores",
+      fields: [
+        {
+          name: "foundingOpen",
+          type: "checkbox",
+          defaultValue: false,
+          label: "Abrir la membresía fundadora en la web",
+          admin: { description: "Necesita precio, IVA y Stripe configurado. Se cierra sola al llegar al límite." },
+        },
+        {
+          type: "row",
+          fields: [
+            { name: "foundingPriceCents", type: "number", min: 100, label: "Precio (céntimos, IVA incluido)" },
+            { name: "foundingCap", type: "number", min: 1, defaultValue: 50, label: "Plazas" },
+            { name: "foundingTaxRate", type: "relationship", relationTo: "tax-rates", label: "IVA de la cuota" },
+          ],
+        },
+        { name: "foundingPerks", type: "textarea", localized: true, label: "Qué incluye (una línea por ventaja)" },
+      ],
+    },
+    {
       name: "targetMarginPercent",
       type: "number",
       min: 0,

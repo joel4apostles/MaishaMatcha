@@ -12,6 +12,7 @@ import { loadCatalog } from "@/lib/pos/sales";
 import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import { fromParam, recipeModifierKeys, resolveRecipe } from "@/lib/recipe";
 import { stripeEnabled } from "@/lib/stripe";
+import { currentMember } from "@/lib/members-server";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
 
@@ -56,7 +57,7 @@ export default async function OrderPage({
   const { r } = await searchParams;
   setRequestLocale(locale as Locale);
   const t = await getTranslations({ locale: locale as Locale, namespace: "order" });
-  const data = await load(locale as "es" | "en");
+  const [data, member] = await Promise.all([load(locale as "es" | "en"), currentMember()]);
 
   return (
     <Section>
@@ -67,11 +68,19 @@ export default async function OrderPage({
       {data.state === "open" ? (
         <>
           <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
+          {member ? (
+            <p className="mt-4 text-sumi/75">{t("signedInAs", { name: member.name.split(" ")[0] })}</p>
+          ) : (
+            <div className="mt-3">
+              <QuietLink href="/cuenta">{t("haveAccount")}</QuietLink>
+            </div>
+          )}
           <div className="mt-14">
             <OnlineOrder
               catalog={data.catalog}
               slots={data.slots}
               stripe={stripeEnabled()}
+              customer={member ? { name: member.name, email: member.email } : null}
               initialLines={recipeLine(data.catalog, typeof r === "string" ? r : undefined)}
             />
           </div>

@@ -21,6 +21,8 @@ export async function createCheckoutSession(input: {
   successUrl: string;
   cancelUrl: string;
   locale: "es" | "en";
+  /** What the webhook should do on payment: a web order or a founding membership. */
+  kind?: "order" | "founding";
 }): Promise<{ id: string; url: string }> {
   const data: Record<string, string | number> = {
     mode: "payment",
@@ -30,6 +32,7 @@ export async function createCheckoutSession(input: {
     "metadata[orderId]": input.orderId,
     "payment_intent_data[metadata][orderId]": input.orderId,
     client_reference_id: String(input.orderId),
+    "metadata[kind]": input.kind ?? "order",
   };
   if (input.email) data.customer_email = input.email;
   input.lines.forEach((l, i) => {

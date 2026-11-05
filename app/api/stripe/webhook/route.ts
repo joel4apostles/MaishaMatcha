@@ -3,6 +3,7 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { cancelUnpaidOnline, markOnlinePaid } from "@/lib/online";
 import { verifyStripeSignature } from "@/lib/stripe";
+import { completeFounding } from "@/lib/founding";
 
 /**
  * Stripe webhook: the ONLY place a web order becomes paid. Verifies the
@@ -18,14 +19,15 @@ export async function POST(request: Request) {
   }
   const event = JSON.parse(raw) as {
     type: string;
-    data: { object: { metadata?: { orderId?: string }; payment_status?: string; payment_intent?: string; amount_total?: number; id: string } };
+    data: { object: { metadata?: { orderId?: string; kind?: string }; payment_status?: string; payment_intent?: string; amount_total?: number; id: string } };
   };
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
     const session = event.data.object;
     const orderId = Number(session.metadata?.orderId);
     if (session.payment_status === "paid" && Number.isInteger(orderId)) {
       const payload = await getPayload({ config });
-      await markOnlinePaid(payload, orderId, session.payment_intent ?? session.id, session.amount_total);
+      if (session.metadata?.kind === "founding") await completeFounding(payload, orderId, session.payment_intent ?? session.id, session.amount_total);
+      else await markOnlinePaid(payload, orderId, session.payment_intent ?? session.id, session.amount_total);
     }
   }
   if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {

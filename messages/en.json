@@ -6,7 +6,8 @@
     "events": "Events",
     "home": "Home",
     "skip": "Skip to content",
-    "order": "Order"
+    "order": "Order",
+    "account": "Account"
   },
   "cta": {
     "joinWaitlist": "Join the list",
@@ -155,6 +156,10 @@
     "order": {
       "title": "Order · maisha matcha",
       "description": "Order your matcha and collect it at the counter, Plaza Cetina 3, Murcia."
+    },
+    "account": {
+      "title": "Your account · maisha matcha",
+      "description": "Your orders, your bookings and the maisha matcha founding membership."
     }
   },
   "notFound": {
@@ -459,6 +464,70 @@
       "notFound": "We could not find this order.",
       "live": "This page updates by itself."
     },
-    "toCarta": "See the carta"
+    "toCarta": "See the carta",
+    "signedInAs": "Ordering as {name}.",
+    "haveAccount": "Have an account? Sign in and we keep your orders."
+  },
+  "account": {
+    "eyebrow": "Your account",
+    "title": "Sign in",
+    "signInIntro": "You do not need an account to order. With one you keep your orders, book events and, if you wish, become a founding member.",
+    "email": "Email",
+    "name": "Name (optional)",
+    "send": "Send me the link",
+    "sending": "Sending...",
+    "sent": "If the address is right, a sign-in link is on its way. It expires in 20 minutes.",
+    "noPassword": "No passwords: you sign in with a link we email you.",
+    "expired": "That link has expired or is not valid. Ask for another.",
+    "hello": "Hello, {name}",
+    "tierCustomer": "Customer",
+    "tierFounding": "Founding member no. {number}",
+    "foundingTitle": "Founding member",
+    "foundingBody": "The first {cap}. {remaining} places left.",
+    "foundingCta": "Become a founding member · {price}",
+    "foundingClosed": "The founding membership is not open yet.",
+    "foundingThanks": "Thank you. Once the payment is confirmed your number appears here.",
+    "foundingYours": "Your place is kept.",
+    "ordersTitle": "Your orders",
+    "noOrders": "No web orders yet.",
+    "membership": "Membership fee",
+    "prefsTitle": "Your details",
+    "letters": "Send me letters by email (events and news, rarely)",
+    "language": "Email language",
+    "save": "Save",
+    "saved": "Saved.",
+    "signOut": "Sign out",
+    "signOutAll": "Sign out on every device",
+    "deleteTitle": "Delete the account",
+    "deleteBody": "We delete your account and bookings. Receipts are kept by law, without your contact details. Type your email to confirm.",
+    "deleteCta": "Delete my account",
+    "deleted": "Your account has been deleted.",
+    "errors": {
+      "invalid": "Check the email address.",
+      "rate-limited": "Too many attempts. Wait a minute.",
+      "generic": "That did not work. Try again.",
+      "confirm": "The email does not match.",
+      "closed": "The founding membership is not open now.",
+      "already": "You are already a founding member.",
+      "signed-out": "Your session has ended. Sign in again."
+    }
+  },
+  "rsvp": {
+    "seats": "Seats",
+    "reserve": "Book",
+    "reserved": "You have {count, plural, one {# seat} other {# seats}}",
+    "cancel": "Cancel booking",
+    "remaining": "{count, plural, =0 {Full} one {# seat left} other {# seats left}}",
+    "signIn": "Sign in to book",
+    "foundingOnly": "For founding members",
+    "errors": {
+      "full": "No seats left.",
+      "members-only": "This event is for founding members.",
+      "not-bookable": "This event no longer takes bookings.",
+      "invalid": "The booking did not go through.",
+      "rate-limited": "Too many attempts. Wait a minute.",
+      "signed-out": "Your session has ended. Sign in again."
+    },
+    "update": "Change seats"
   }
 }

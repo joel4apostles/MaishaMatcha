@@ -8,6 +8,7 @@ import { placeOnlineOrder, sendConfirmation } from "@/lib/online";
 import { MAX_NOTE, MAX_QUANTITY } from "@/lib/pos/pricing";
 import { rateLimit } from "@/lib/rateLimit";
 import { createCheckoutSession, stripeEnabled } from "@/lib/stripe";
+import { currentMember } from "@/lib/members-server";
 
 /**
  * The public "place order" action. Rate-limited per IP, validated with zod,
@@ -50,7 +51,9 @@ export async function placeOrderAction(input: z.infer<typeof schema>): Promise<{
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === "production" ? null : `http://${h.get("host")}`);
   const payOnline = p.data.payOnline && stripeEnabled() && base !== null;
 
-  const placed = await placeOnlineOrder(payload, { ...p.data, payOnline });
+  // Signed-in members get the order on their account (the session decides, not the client).
+  const member = await currentMember();
+  const placed = await placeOnlineOrder(payload, { ...p.data, payOnline, memberId: member?.id ?? null });
   if (!placed.ok) return { ok: false, error: placed.error };
 
   const statusPath = `/${p.data.locale}/${p.data.locale === "es" ? "pedido" : "order-status"}/${placed.token}`;

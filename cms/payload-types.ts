@@ -86,8 +86,10 @@ export interface Config {
     suppliers: Supplier;
     'supplier-products': SupplierProduct;
     members: Member;
+    rsvps: Rsvp;
     users: User;
     events: Event;
+    campaigns: Campaign;
     'story-chapters': StoryChapter;
     media: Media;
     invoices: Invoice;
@@ -119,8 +121,10 @@ export interface Config {
     suppliers: SuppliersSelect<false> | SuppliersSelect<true>;
     'supplier-products': SupplierProductsSelect<false> | SupplierProductsSelect<true>;
     members: MembersSelect<false> | MembersSelect<true>;
+    rsvps: RsvpsSelect<false> | RsvpsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    campaigns: CampaignsSelect<false> | CampaignsSelect<true>;
     'story-chapters': StoryChaptersSelect<false> | StoryChaptersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     invoices: InvoicesSelect<false> | InvoicesSelect<true>;
@@ -225,6 +229,7 @@ export interface Order {
   readyNotifiedAt?: string | null;
   publicToken?: string | null;
   member?: (number | null) | Member;
+  kind?: ('sale' | 'membership') | null;
   staff?: (number | null) | User;
   device?: (number | null) | PosDevice;
   shift?: (number | null) | Shift;
@@ -397,13 +402,19 @@ export interface Member {
   id: number;
   name: string;
   email: string;
-  tier: 'founding' | 'premium' | 'waitlist';
+  tier: 'customer' | 'founding' | 'premium' | 'waitlist';
   status: 'active' | 'paused' | 'cancelled';
+  foundingNumber?: number | null;
+  foundingSince?: string | null;
   /**
-   * Their saved drink code (CLA·TON·YUZ·F)
+   * Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó.
    */
+  emailOptIn?: boolean | null;
+  locale?: ('es' | 'en') | null;
   favoriteRecipeCode?: string | null;
   notes?: string | null;
+  sessionVersion?: number | null;
+  lastSignInAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -794,16 +805,62 @@ export interface SupplierProduct {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rsvps".
+ */
+export interface Rsvp {
+  id: number;
+  event: number | Event;
+  member: number | Member;
+  seats: number;
+  status: 'going' | 'cancelled';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
   id: number;
   title: string;
+  /**
+   * Lo que se lee en la web, p. ej. "Sábado 14, 19:00" o "Fecha por anunciar".
+   */
   when: string;
   description: string;
+  startsAt?: string | null;
+  capacity?: number | null;
   membersOnly?: boolean | null;
   photo?: (number | null) | Media;
   order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "campaigns".
+ */
+export interface Campaign {
+  id: number;
+  subject: string;
+  title: string;
+  /**
+   * Párrafos separados por una línea en blanco. Sin exclamaciones ni rayas, como el resto de la marca.
+   */
+  body: string;
+  audience: 'all' | 'founding';
+  /**
+   * Se envía a quienes tienen ese idioma en su cuenta.
+   */
+  locale: 'es' | 'en';
+  /**
+   * Escribe tu email y guarda: llega una prueba. No cuenta como envío.
+   */
+  sendTestTo?: string | null;
+  status: 'draft' | 'approved' | 'sent';
+  sentCount?: number | null;
+  sentAt?: string | null;
+  approvedBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -977,12 +1034,20 @@ export interface PayloadLockedDocument {
         value: number | Member;
       } | null)
     | ({
+        relationTo: 'rsvps';
+        value: number | Rsvp;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'campaigns';
+        value: number | Campaign;
       } | null)
     | ({
         relationTo: 'story-chapters';
@@ -1080,6 +1145,7 @@ export interface OrdersSelect<T extends boolean = true> {
   readyNotifiedAt?: T;
   publicToken?: T;
   member?: T;
+  kind?: T;
   staff?: T;
   device?: T;
   shift?: T;
@@ -1365,8 +1431,26 @@ export interface MembersSelect<T extends boolean = true> {
   email?: T;
   tier?: T;
   status?: T;
+  foundingNumber?: T;
+  foundingSince?: T;
+  emailOptIn?: T;
+  locale?: T;
   favoriteRecipeCode?: T;
   notes?: T;
+  sessionVersion?: T;
+  lastSignInAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rsvps_select".
+ */
+export interface RsvpsSelect<T extends boolean = true> {
+  event?: T;
+  member?: T;
+  seats?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1409,9 +1493,29 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   when?: T;
   description?: T;
+  startsAt?: T;
+  capacity?: T;
   membersOnly?: T;
   photo?: T;
   order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "campaigns_select".
+ */
+export interface CampaignsSelect<T extends boolean = true> {
+  subject?: T;
+  title?: T;
+  body?: T;
+  audience?: T;
+  locale?: T;
+  sendTestTo?: T;
+  status?: T;
+  sentCount?: T;
+  sentAt?: T;
+  approvedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1604,6 +1708,14 @@ export interface Business {
   slotCapacity?: number | null;
   leadMinutes?: number | null;
   /**
+   * Necesita precio, IVA y Stripe configurado. Se cierra sola al llegar al límite.
+   */
+  foundingOpen?: boolean | null;
+  foundingPriceCents?: number | null;
+  foundingCap?: number | null;
+  foundingTaxRate?: (number | null) | TaxRate;
+  foundingPerks?: string | null;
+  /**
    * Avisa de las bebidas cuyo margen baje de aquí.
    */
   targetMarginPercent?: number | null;
@@ -1628,6 +1740,11 @@ export interface BusinessSelect<T extends boolean = true> {
   slotMinutes?: T;
   slotCapacity?: T;
   leadMinutes?: T;
+  foundingOpen?: T;
+  foundingPriceCents?: T;
+  foundingCap?: T;
+  foundingTaxRate?: T;
+  foundingPerks?: T;
   targetMarginPercent?: T;
   updatedAt?: T;
   createdAt?: T;

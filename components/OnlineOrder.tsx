@@ -29,11 +29,13 @@ export function OnlineOrder({
   slots,
   stripe,
   initialLines = [],
+  customer = null,
 }: {
   catalog: CatalogItem[];
   slots: Slot[];
   stripe: boolean;
   initialLines?: LineInput[];
+  customer?: { name: string; email: string } | null;
 }) {
   const t = useTranslations("order");
   const locale = useLocale() as "es" | "en";
@@ -232,13 +234,13 @@ export function OnlineOrder({
                 <label htmlFor="o-name" className="text-eyebrow uppercase text-sumi/70">
                   {t("name")}
                 </label>
-                <input id="o-name" name="name" required autoComplete="name" autoCapitalize="words" enterKeyHint="next" className={field} />
+                <input id="o-name" name="name" defaultValue={customer?.name} required autoComplete="name" autoCapitalize="words" enterKeyHint="next" className={field} />
               </div>
               <div>
                 <label htmlFor="o-email" className="text-eyebrow uppercase text-sumi/70">
                   {t("email")}
                 </label>
-                <input id="o-email" name="email" type="email" inputMode="email" required autoComplete="email" enterKeyHint="next" aria-describedby="o-email-hint" className={field} />
+                <input id="o-email" name="email" defaultValue={customer?.email} type="email" inputMode="email" required autoComplete="email" enterKeyHint="next" aria-describedby="o-email-hint" className={field} />
                 <p id="o-email-hint" className="mt-1.5 text-sm text-sumi/70">
                   {t("emailHint")}
                 </p>

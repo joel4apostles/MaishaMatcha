@@ -5,6 +5,8 @@ import * as migration_20261105_221955_pos_sales_b from './20261105_221955_pos_sa
 import * as migration_20261105_223038_refunds from './20261105_223038_refunds';
 import * as migration_20261105_223929_inventory_suppliers from './20261105_223929_inventory_suppliers';
 import * as migration_20261105_224951_online_orders from './20261105_224951_online_orders';
+import * as migration_20261105_231005_members_events_campaigns from './20261105_231005_members_events_campaigns';
+import * as migration_20261105_231006_members_tier_default from './20261105_231006_members_tier_default';
 
 export const migrations = [
   {
@@ -40,6 +42,16 @@ export const migrations = [
   {
     up: migration_20261105_224951_online_orders.up,
     down: migration_20261105_224951_online_orders.down,
-    name: '20261105_224951_online_orders'
+    name: '20261105_224951_online_orders',
+  },
+  {
+    up: migration_20261105_231005_members_events_campaigns.up,
+    down: migration_20261105_231005_members_events_campaigns.down,
+    name: '20261105_231005_members_events_campaigns',
+  },
+  {
+    up: migration_20261105_231006_members_tier_default.up,
+    down: migration_20261105_231006_members_tier_default.down,
+    name: '20261105_231006_members_tier_default',
   },
 ];
