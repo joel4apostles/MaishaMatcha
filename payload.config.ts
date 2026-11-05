@@ -88,6 +88,7 @@ export default buildConfig({
       titleSuffix: " · maisha matcha",
     },
     components: {
+      beforeDashboard: ["/cms/components/OwnerDashboard#OwnerDashboard"],
       graphics: {
         Icon: "/cms/components/AdminIcon#AdminIcon",
         Logo: "/cms/components/AdminLogo#AdminLogo",
