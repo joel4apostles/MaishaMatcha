@@ -71,13 +71,17 @@ export interface Config {
     media: Media;
     'menu-categories': MenuCategory;
     'menu-items': MenuItem;
-    'recipe-options': RecipeOption;
+    'tax-rates': TaxRate;
+    'modifier-groups': ModifierGroup;
+    modifiers: Modifier;
     events: Event;
     'story-chapters': StoryChapter;
     'inventory-items': InventoryItem;
     'stock-movements': StockMovement;
     orders: Order;
     members: Member;
+    'pos-devices': PosDevice;
+    'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -89,13 +93,17 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
     'menu-items': MenuItemsSelect<false> | MenuItemsSelect<true>;
-    'recipe-options': RecipeOptionsSelect<false> | RecipeOptionsSelect<true>;
+    'tax-rates': TaxRatesSelect<false> | TaxRatesSelect<true>;
+    'modifier-groups': ModifierGroupsSelect<false> | ModifierGroupsSelect<true>;
+    modifiers: ModifiersSelect<false> | ModifiersSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     'story-chapters': StoryChaptersSelect<false> | StoryChaptersSelect<true>;
     'inventory-items': InventoryItemsSelect<false> | InventoryItemsSelect<true>;
     'stock-movements': StockMovementsSelect<false> | StockMovementsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     members: MembersSelect<false> | MembersSelect<true>;
+    'pos-devices': PosDevicesSelect<false> | PosDevicesSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -142,7 +150,22 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
-  role: 'admin' | 'staff';
+  role: 'owner' | 'manager' | 'barista';
+  /**
+   * Desactiva en lugar de borrar: el historial conserva su nombre.
+   */
+  active?: boolean | null;
+  /**
+   * Devoluciones por encima de esta cantidad necesitan a un encargado. 500 = 5,00 €.
+   */
+  refundLimitCents?: number | null;
+  /**
+   * De 4 a 6 cifras. Se guarda cifrado; nadie puede leerlo después.
+   */
+  pin?: string | null;
+  pinHash?: string | null;
+  pinFailedCount?: number | null;
+  pinLockedUntil?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -150,6 +173,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -231,17 +255,48 @@ export interface MenuItem {
   name: string;
   category: number | MenuCategory;
   /**
-   * Cents: 450 = 4,50 €
+   * IVA incluido. 450 = 4,50 €.
    */
   priceCents: number;
   /**
-   * The drink's hue, hex (#6B7F5E) — swatch + hover
+   * Vacío = mismo precio que en barra.
+   */
+  onlinePriceCents?: number | null;
+  taxRate: number | TaxRate;
+  /**
+   * Desmarca para "agotado" en la web y en la barra.
+   */
+  available?: boolean | null;
+  /**
+   * Los alérgenos de las opciones elegidas se suman en el ticket y en la web.
+   */
+  allergens?:
+    | (
+        | 'gluten'
+        | 'crustaceans'
+        | 'eggs'
+        | 'fish'
+        | 'peanuts'
+        | 'soy'
+        | 'milk'
+        | 'nuts'
+        | 'celery'
+        | 'mustard'
+        | 'sesame'
+        | 'sulphites'
+        | 'lupin'
+        | 'molluscs'
+      )[]
+    | null;
+  modifierGroups?: (number | ModifierGroup)[] | null;
+  /**
+   * El tono de la bebida, hex (#6B7F5E).
    */
   color: string;
   description: string;
   origin?: string | null;
   /**
-   * Appears on the home preview (max 4)
+   * Aparece en la portada (máximo 4).
    */
   signature?: boolean | null;
   photo?: (number | null) | Media;
@@ -250,35 +305,79 @@ export interface MenuItem {
   createdAt: string;
 }
 /**
+ * Confirma los tipos con tu gestor antes de vender.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "recipe-options".
+ * via the `definition` "tax-rates".
  */
-export interface RecipeOption {
+export interface TaxRate {
   id: number;
-  group: 'intensity' | 'base' | 'fruit' | 'temp';
-  optionId: string;
+  name: string;
+  /**
+   * 1000 = 10 %, 2100 = 21 %.
+   */
+  rateBasisPoints: number;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modifier-groups".
+ */
+export interface ModifierGroup {
+  id: number;
+  slug: string;
+  label: string;
+  selection: 'single' | 'multiple';
+  /**
+   * El barista debe elegir antes de cobrar.
+   */
+  required?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modifiers".
+ */
+export interface Modifier {
+  id: number;
+  group: number | ModifierGroup;
+  /**
+   * Estable y única, p. ej. base.tonica. La usan las recetas compartidas.
+   */
+  key: string;
+  /**
+   * Tres letras para el código de receta (TON).
+   */
+  code?: string | null;
   label: string;
   note?: string | null;
-  /**
-   * 2-3 letters for the counter code (TON, YUZ…)
-   */
-  code: string;
-  /**
-   * Added to the base price, in cents
-   */
-  surchargeCents?: number | null;
-  /**
-   * Intensity only: matcha grams (drives the ratio)
-   */
+  priceDeltaCents?: number | null;
   grams?: number | null;
-  /**
-   * Base only: liquid volume (drives ratio + glass)
-   */
   ml?: number | null;
-  /**
-   * Base/fruit: hex tint for the blended drink color
-   */
   hue?: string | null;
+  allergens?:
+    | (
+        | 'gluten'
+        | 'crustaceans'
+        | 'eggs'
+        | 'fish'
+        | 'peanuts'
+        | 'soy'
+        | 'milk'
+        | 'nuts'
+        | 'celery'
+        | 'mustard'
+        | 'sesame'
+        | 'sulphites'
+        | 'lupin'
+        | 'molluscs'
+      )[]
+    | null;
+  available?: boolean | null;
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -321,7 +420,7 @@ export interface StoryChapter {
   createdAt: string;
 }
 /**
- * Stock changes ONLY via Stock Movements — the ledger is the truth.
+ * El stock solo cambia con movimientos: el registro es la verdad.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "inventory-items".
@@ -331,18 +430,18 @@ export interface InventoryItem {
   name: string;
   unit: 'g' | 'kg' | 'ml' | 'l' | 'uds';
   /**
-   * Maintained by movements, never edited directly.
+   * Lo mantienen los movimientos; no se edita a mano.
    */
   stock?: number | null;
   /**
-   * Warn when stock falls below this
+   * Avisar cuando el stock baje de esta cantidad.
    */
   lowStockAt?: number | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Append-only: corrections are new movements, not edits.
+ * Solo se añaden: una corrección es un movimiento nuevo.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stock-movements".
@@ -351,11 +450,12 @@ export interface StockMovement {
   id: number;
   item: number | InventoryItem;
   /**
-   * + receives stock, − consumes it
+   * + entra stock, − sale stock (en la unidad del ingrediente).
    */
   delta: number;
-  reason: 'purchase' | 'usage' | 'waste' | 'adjustment';
+  reason: 'purchase' | 'sale' | 'usage' | 'waste' | 'count' | 'adjustment';
   note?: string | null;
+  createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -403,6 +503,57 @@ export interface Member {
   createdAt: string;
 }
 /**
+ * Desactiva un dispositivo perdido para revocarlo al instante.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pos-devices".
+ */
+export interface PosDevice {
+  id: number;
+  name: string;
+  active?: boolean | null;
+  tokenHash: string;
+  registeredBy?: (number | null) | User;
+  lastSeenAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Solo lectura. Cada acción sensible deja aquí su rastro.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  action: string;
+  actor?: (number | null) | User;
+  device?: (number | null) | PosDevice;
+  entity: string;
+  entityId?: string | null;
+  reason?: string | null;
+  before?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  after?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -443,8 +594,16 @@ export interface PayloadLockedDocument {
         value: number | MenuItem;
       } | null)
     | ({
-        relationTo: 'recipe-options';
-        value: number | RecipeOption;
+        relationTo: 'tax-rates';
+        value: number | TaxRate;
+      } | null)
+    | ({
+        relationTo: 'modifier-groups';
+        value: number | ModifierGroup;
+      } | null)
+    | ({
+        relationTo: 'modifiers';
+        value: number | Modifier;
       } | null)
     | ({
         relationTo: 'events';
@@ -469,6 +628,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'members';
         value: number | Member;
+      } | null)
+    | ({
+        relationTo: 'pos-devices';
+        value: number | PosDevice;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -519,6 +686,12 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
+  active?: T;
+  refundLimitCents?: T;
+  pin?: T;
+  pinHash?: T;
+  pinFailedCount?: T;
+  pinLockedUntil?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -526,6 +699,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -607,6 +781,11 @@ export interface MenuItemsSelect<T extends boolean = true> {
   name?: T;
   category?: T;
   priceCents?: T;
+  onlinePriceCents?: T;
+  taxRate?: T;
+  available?: T;
+  allergens?: T;
+  modifierGroups?: T;
   color?: T;
   description?: T;
   origin?: T;
@@ -618,18 +797,44 @@ export interface MenuItemsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "recipe-options_select".
+ * via the `definition` "tax-rates_select".
  */
-export interface RecipeOptionsSelect<T extends boolean = true> {
+export interface TaxRatesSelect<T extends boolean = true> {
+  name?: T;
+  rateBasisPoints?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modifier-groups_select".
+ */
+export interface ModifierGroupsSelect<T extends boolean = true> {
+  slug?: T;
+  label?: T;
+  selection?: T;
+  required?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modifiers_select".
+ */
+export interface ModifiersSelect<T extends boolean = true> {
   group?: T;
-  optionId?: T;
+  key?: T;
+  code?: T;
   label?: T;
   note?: T;
-  code?: T;
-  surchargeCents?: T;
+  priceDeltaCents?: T;
   grams?: T;
   ml?: T;
   hue?: T;
+  allergens?: T;
+  available?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -684,6 +889,7 @@ export interface StockMovementsSelect<T extends boolean = true> {
   delta?: T;
   reason?: T;
   note?: T;
+  createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -713,6 +919,35 @@ export interface MembersSelect<T extends boolean = true> {
   status?: T;
   favoriteRecipeCode?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pos-devices_select".
+ */
+export interface PosDevicesSelect<T extends boolean = true> {
+  name?: T;
+  active?: T;
+  tokenHash?: T;
+  registeredBy?: T;
+  lastSeenAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  action?: T;
+  actor?: T;
+  device?: T;
+  entity?: T;
+  entityId?: T;
+  reason?: T;
+  before?: T;
+  after?: T;
   updatedAt?: T;
   createdAt?: T;
 }

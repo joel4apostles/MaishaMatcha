@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { owner, ownerOrManager } from "../access";
 
 /**
  * The salon's members — founding fifty first, premium subscribers later.
@@ -11,9 +12,9 @@ export const Members: CollectionConfig = {
     useAsTitle: "name",
     defaultColumns: ["name", "email", "tier", "status"],
   },
-  access: {
-    read: ({ req }) => Boolean(req.user),
-  },
+  // Customer personal data: owner and manager only. Owner may delete on a
+  // GDPR erasure request.
+  access: { read: ownerOrManager, create: ownerOrManager, update: ownerOrManager, delete: owner },
   fields: [
     { name: "name", type: "text", required: true },
     { name: "email", type: "email", required: true, unique: true },

@@ -1,61 +1,118 @@
-import type { CollectionConfig } from "payload";
+import { sql } from "@payloadcms/db-postgres";
+import type { CollectionConfig, PayloadRequest } from "payload";
+import { anyStaff, nobody } from "../access";
+import { writeAudit } from "../audit";
+
+const NEEDS_REASON = new Set(["waste", "adjustment"]);
 
 /**
- * Append-only stock ledger (PRD phase 6 pattern). Each movement adjusts its
- * item's cached stock via hook; movements are never edited or deleted.
+ * Append-only stock ledger. Each movement adds its delta to the item's cached
+ * stock with ONE atomic SQL increment inside the request's transaction, so
+ * concurrent sales cannot overwrite each other and a failed request leaves
+ * neither the movement nor the stock change behind. Corrections are new
+ * movements; nothing is edited or deleted.
  */
 export const StockMovements: CollectionConfig = {
   slug: "stock-movements",
+  labels: { singular: "Movimiento", plural: "Movimientos de stock" },
   admin: {
-    defaultColumns: ["item", "delta", "reason", "createdAt"],
-    description: "Append-only: corrections are new movements, not edits.",
+    defaultColumns: ["item", "delta", "reason", "createdBy", "createdAt"],
+    description: "Solo se añaden: una corrección es un movimiento nuevo.",
   },
-  access: {
-    read: ({ req }) => Boolean(req.user),
-    update: () => false,
-    delete: () => false,
-  },
+  defaultSort: "-createdAt",
+  access: { read: anyStaff, create: anyStaff, update: nobody, delete: nobody },
   fields: [
     {
       name: "item",
       type: "relationship",
       relationTo: "inventory-items",
       required: true,
+      label: "Ingrediente",
     },
     {
       name: "delta",
       type: "number",
       required: true,
-      admin: { description: "+ receives stock, − consumes it" },
+      label: "Cantidad",
+      admin: { description: "+ entra stock, − sale stock (en la unidad del ingrediente)." },
+      validate: (v: number | null | undefined) =>
+        typeof v === "number" && Number.isFinite(v) && v !== 0 ? true : "Indica una cantidad distinta de cero.",
     },
     {
       name: "reason",
       type: "select",
       required: true,
+      label: "Motivo",
       options: [
         { label: "Compra", value: "purchase" },
+        { label: "Venta", value: "sale" },
         { label: "Consumo", value: "usage" },
         { label: "Merma", value: "waste" },
+        { label: "Recuento", value: "count" },
         { label: "Ajuste", value: "adjustment" },
       ],
     },
-    { name: "note", type: "text" },
+    {
+      name: "note",
+      type: "text",
+      label: "Nota",
+      validate: (v: string | null | undefined, { siblingData }: { siblingData: { reason?: string } }) =>
+        NEEDS_REASON.has(siblingData?.reason ?? "") && !v?.trim()
+          ? "Explica el motivo de la merma o del ajuste."
+          : true,
+    },
+    {
+      name: "createdBy",
+      type: "relationship",
+      relationTo: "users",
+      label: "Registrado por",
+      access: { create: () => false, update: () => false },
+      admin: { readOnly: true },
+    },
   ],
   hooks: {
+    beforeChange: [
+      ({ data, operation, req }) => {
+        if (operation === "create" && req.user?.collection === "users") {
+          data.createdBy = req.user.id;
+        }
+        return data;
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }) => {
-        if (operation !== "create") return;
+        if (operation !== "create") return doc;
         const itemId = typeof doc.item === "object" ? doc.item.id : doc.item;
-        const item = await req.payload.findByID({
-          collection: "inventory-items",
-          id: itemId,
-        });
-        await req.payload.update({
-          collection: "inventory-items",
-          id: itemId,
-          data: { stock: (item.stock ?? 0) + doc.delta },
-        });
+        await incrementStock(req, itemId, doc.delta);
+        if (doc.reason === "waste" || doc.reason === "adjustment") {
+          await writeAudit(req, {
+            action: doc.reason === "waste" ? "stock.waste" : "stock.adjustment",
+            entity: "stock-movements",
+            entityId: doc.id,
+            reason: doc.note,
+            after: { item: itemId, delta: doc.delta },
+          });
+        }
+        return doc;
       },
     ],
   },
+};
+
+/** stock = stock + delta, as one statement, on the request's transaction. */
+async function incrementStock(req: PayloadRequest, itemId: number | string, delta: number) {
+  const adapter = req.payload.db as unknown as {
+    drizzle: DrizzleLike;
+    sessions?: Record<string, { db: DrizzleLike }>;
+  };
+  const txId = req.transactionID ? await req.transactionID : undefined;
+  const db = (txId && adapter.sessions?.[String(txId)]?.db) || adapter.drizzle;
+  const query = sql`update inventory_items set stock = coalesce(stock, 0) + ${delta} where id = ${itemId}`;
+  if (typeof db.execute === "function") await db.execute(query);
+  else await db.run!(query);
+}
+
+type DrizzleLike = {
+  execute?: (q: unknown) => Promise<unknown>;
+  run?: (q: unknown) => Promise<unknown>;
 };

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { editorialAccess } from "../access";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -11,9 +12,7 @@ export const Media: CollectionConfig = {
     ],
     mimeTypes: ["image/*"],
   },
-  access: {
-    read: () => true,
-  },
+  access: editorialAccess,
   fields: [
     {
       name: "alt",

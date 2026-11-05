@@ -1,9 +1,10 @@
 import type { CollectionConfig } from "payload";
+import { editorialAccess } from "../access";
 
 export const MenuCategories: CollectionConfig = {
   slug: "menu-categories",
   admin: { useAsTitle: "title", defaultColumns: ["title", "order"] },
-  access: { read: () => true },
+  access: editorialAccess,
   defaultSort: "order",
   fields: [
     {

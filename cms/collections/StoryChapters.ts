@@ -1,9 +1,10 @@
 import type { CollectionConfig } from "payload";
+import { editorialAccess } from "../access";
 
 export const StoryChapters: CollectionConfig = {
   slug: "story-chapters",
   admin: { useAsTitle: "title", defaultColumns: ["title", "era", "order"] },
-  access: { read: () => true },
+  access: editorialAccess,
   defaultSort: "order",
   fields: [
     { name: "chapterId", type: "text", required: true, unique: true },

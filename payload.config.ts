@@ -10,19 +10,25 @@ import { Users } from "./cms/collections/Users";
 import { Media } from "./cms/collections/Media";
 import { MenuCategories } from "./cms/collections/MenuCategories";
 import { MenuItems } from "./cms/collections/MenuItems";
-import { RecipeOptions } from "./cms/collections/RecipeOptions";
+import { ModifierGroups } from "./cms/collections/ModifierGroups";
+import { Modifiers } from "./cms/collections/Modifiers";
+import { TaxRates } from "./cms/collections/TaxRates";
+import { PosDevices } from "./cms/collections/PosDevices";
+import { AuditLog } from "./cms/collections/AuditLog";
 import { Events } from "./cms/collections/Events";
 import { StoryChapters } from "./cms/collections/StoryChapters";
 import { InventoryItems } from "./cms/collections/InventoryItems";
 import { StockMovements } from "./cms/collections/StockMovements";
 import { Orders } from "./cms/collections/Orders";
 import { Members } from "./cms/collections/Members";
+import { appSecret } from "./lib/secret";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Database: Postgres in production (DATABASE_URL from Neon / Vercel
- * Postgres), SQLite file for local development. Vercel's serverless
+ * Database: Postgres in production (DATABASE_URL, Supabase transaction
+ * pooler), SQLite file for local development (PAYLOAD_SQLITE_PATH overrides
+ * the file, used by the integration tests). Vercel's serverless
  * filesystem is read-only, so production REQUIRES DATABASE_URL.
  */
 const db = process.env.DATABASE_URL
@@ -30,7 +36,9 @@ const db = process.env.DATABASE_URL
       pool: { connectionString: process.env.DATABASE_URL },
     })
   : sqliteAdapter({
-      client: { url: `file:${path.resolve(dirname, "payload.db")}` },
+      client: {
+        url: `file:${process.env.PAYLOAD_SQLITE_PATH ?? path.resolve(dirname, "payload.db")}`,
+      },
     });
 
 if (process.env.VERCEL && !process.env.DATABASE_URL) {
@@ -40,7 +48,7 @@ if (process.env.VERCEL && !process.env.DATABASE_URL) {
 }
 
 export default buildConfig({
-  secret: process.env.PAYLOAD_SECRET ?? "maisha-dev-secret-change-in-prod",
+  secret: appSecret(),
   db,
   sharp,
   editor: lexicalEditor(),
@@ -69,13 +77,17 @@ export default buildConfig({
     Media,
     MenuCategories,
     MenuItems,
-    RecipeOptions,
+    TaxRates,
+    ModifierGroups,
+    Modifiers,
     Events,
     StoryChapters,
     InventoryItems,
     StockMovements,
     Orders,
     Members,
+    PosDevices,
+    AuditLog,
   ],
   typescript: {
     outputFile: path.resolve(dirname, "cms/payload-types.ts"),

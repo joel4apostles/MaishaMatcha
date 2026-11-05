@@ -1,9 +1,10 @@
 import type { CollectionConfig } from "payload";
+import { editorialAccess } from "../access";
 
 export const Events: CollectionConfig = {
   slug: "events",
   admin: { useAsTitle: "title", defaultColumns: ["title", "when", "membersOnly"] },
-  access: { read: () => true },
+  access: editorialAccess,
   fields: [
     { name: "title", type: "text", required: true, localized: true },
     { name: "when", type: "text", required: true, localized: true },
