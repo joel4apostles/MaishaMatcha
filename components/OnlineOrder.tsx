@@ -227,7 +227,7 @@ export function OnlineOrder({
                 {summaryOf(l) ? <p className="text-sm text-sumi/70">{summaryOf(l)}</p> : null}
               </div>
               <div className="flex shrink-0 flex-col items-end">
-                <span className="tabular-nums">{formatEuro(unitOf(l) * l.quantity, locale)}</span>
+                <span className="tabular-nums text-sumi/70">{formatEuro(unitOf(l) * l.quantity, locale)}</span>
                 <div className="-mr-3 flex items-center">
                   <button
                     type="button"
@@ -237,9 +237,9 @@ export function OnlineOrder({
                         l.quantity > 1 ? ls.map((x) => (x.uid === l.uid ? { ...x, quantity: x.quantity - 1 } : x)) : ls.filter((x) => x.uid !== l.uid),
                       )
                     }
-                    className="flex h-11 w-11 items-center justify-center text-sumi/70"
+                    className="flex h-11 w-11 items-center justify-center text-sumi/80"
                   >
-                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
                       <path d="M4 10h12" />
                     </svg>
                   </button>
@@ -249,9 +249,9 @@ export function OnlineOrder({
                     aria-label={t("more", { name: l.item.name })}
                     disabled={l.quantity >= 20}
                     onClick={() => setLines((ls) => ls.map((x) => (x.uid === l.uid ? { ...x, quantity: x.quantity + 1 } : x)))}
-                    className="flex h-11 w-11 items-center justify-center text-sumi/70 disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center text-sumi/80 disabled:opacity-40"
                   >
-                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
                       <path d="M4 10h12M10 4v12" />
                     </svg>
                   </button>
