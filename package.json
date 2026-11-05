@@ -13,7 +13,10 @@
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
     "seed": "tsx cms/seed.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "vercel-build": "node scripts/migrate.mjs && next build",
+    "migrate": "payload migrate",
+    "migrate:create": "node scripts/migrate-create.mjs"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.93.0",

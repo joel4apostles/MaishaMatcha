@@ -104,10 +104,15 @@ async function incrementStock(req: PayloadRequest, itemId: number | string, delt
   const adapter = req.payload.db as unknown as {
     drizzle: DrizzleLike;
     sessions?: Record<string, { db: DrizzleLike }>;
+    tables: Record<string, unknown>;
   };
   const txId = req.transactionID ? await req.transactionID : undefined;
   const db = (txId && adapter.sessions?.[String(txId)]?.db) || adapter.drizzle;
-  const query = sql`update inventory_items set stock = coalesce(stock, 0) + ${delta} where id = ${itemId}`;
+  // Interpolating Payload's table object renders the right schema
+  // ("payload"."inventory_items" on Postgres, plain on SQLite).
+  const table = adapter.tables.inventory_items;
+  if (!table) throw new Error("inventory_items table not found");
+  const query = sql`update ${table} set stock = coalesce(stock, 0) + ${delta} where id = ${itemId}`;
   if (typeof db.execute === "function") await db.execute(query);
   else await db.run!(query);
 }

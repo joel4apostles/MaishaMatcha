@@ -98,10 +98,10 @@ describe("staff accounts", () => {
 
   it("stores the PIN only as a hash nobody can read back", async () => {
     await payload.update({ collection: "users", id: barista.id, data: { pin: "4819" } as never, ...asUser(owner) });
-    const viaApi = (await payload.findByID({ collection: "users", id: barista.id, ...asUser(owner) })) as Record<string, unknown>;
+    const viaApi = (await payload.findByID({ collection: "users", id: barista.id, ...asUser(owner) })) as unknown as Record<string, unknown>;
     expect(viaApi.pin).toBeUndefined();
     expect(viaApi.pinHash).toBeUndefined();
-    const raw = (await payload.findByID({ collection: "users", id: barista.id, overrideAccess: true, showHiddenFields: true })) as Record<string, unknown>;
+    const raw = (await payload.findByID({ collection: "users", id: barista.id, overrideAccess: true, showHiddenFields: true })) as unknown as Record<string, unknown>;
     expect(String(raw.pinHash)).toMatch(/^scrypt\$/);
     const audit = await payload.find({ collection: "audit-log", where: { action: { equals: "staff.pin" } } });
     expect(audit.totalDocs).toBe(1);

@@ -174,5 +174,54 @@
     "copyLink": "Copy link",
     "copied": "Link copied.",
     "priceNote": "Opening prices, to be confirmed."
+  },
+  "pos": {
+    "title": "Counter",
+    "unregistered": {
+      "eyebrow": "Counter",
+      "title": "This tablet is not part of the counter yet",
+      "body": "So the team can sign in with their PIN, the owner registers this tablet once.",
+      "action": "Register this tablet"
+    },
+    "register": {
+      "eyebrow": "Register tablet",
+      "title": "A name for this tablet",
+      "body": "So you know where each sale was made.",
+      "label": "Tablet name",
+      "placeholder": "Main counter",
+      "submit": "Register",
+      "needOwner": "First sign in as the owner on this same tablet.",
+      "signIn": "Sign in",
+      "errorName": "Write a name for the tablet.",
+      "errorOwner": "Only the owner can register a tablet."
+    },
+    "login": {
+      "eyebrow": "Counter",
+      "title": "Who is serving?",
+      "noStaff": "Nobody on the team has a PIN yet. The owner can set them under Team, in the back office.",
+      "pinFor": "PIN for {name}",
+      "back": "Change person",
+      "enter": "Enter",
+      "delete": "Delete",
+      "digits": "{count} of 6 digits",
+      "wrongPin": "Wrong PIN. {left} attempts left.",
+      "locked": "Too many attempts. Try again in {minutes} minutes or ask the owner for a new PIN.",
+      "noDevice": "This tablet is no longer registered.",
+      "unknown": "We could not find that person. Choose again.",
+      "failed": "Could not sign in. Check the connection and try again."
+    },
+    "home": {
+      "greeting": "Hello, {name}",
+      "device": "Tablet: {device}",
+      "role": {
+        "owner": "Owner",
+        "manager": "Manager",
+        "barista": "Barista"
+      },
+      "next": "The order screen arrives in phase 2.",
+      "nextBody": "Sign-in, permissions and the activity log already work. Once you approve the design, this screen becomes the till.",
+      "backOffice": "Open the back office",
+      "logout": "Sign out"
+    }
   }
 }

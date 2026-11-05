@@ -34,6 +34,13 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const db = process.env.DATABASE_URL
   ? postgresAdapter({
       pool: { connectionString: process.env.DATABASE_URL },
+      // Own schema: Supabase's public Data API only exposes "public", so the
+      // anon key can never reach staff hashes or orders.
+      schemaName: "payload",
+      // Schema changes reach Postgres ONLY through committed migrations
+      // (run by the vercel-build script), never by a dev server's push.
+      push: false,
+      migrationDir: path.resolve(dirname, "migrations"),
     })
   : sqliteAdapter({
       client: {

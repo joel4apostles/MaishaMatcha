@@ -33,6 +33,10 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: Tests
+        # Unit tests plus Payload integration tests on a temporary SQLite file.
+        run: npm test
+
       - name: Build
         run: npm run build
         env:

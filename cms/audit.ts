@@ -1,4 +1,4 @@
-import type { PayloadRequest } from "payload";
+import type { Payload, PayloadRequest } from "payload";
 
 export type AuditAction =
   | "price.change"
@@ -27,16 +27,21 @@ type Entry = {
 };
 
 /**
- * Append one audit record. Uses the request's transaction when given, so
+ * Append one audit record. Pass the hook's req to share its transaction, so
  * the audit entry commits or rolls back with the change it describes.
  * The collection itself refuses every write through the API.
  */
-export async function writeAudit(req: PayloadRequest, entry: Entry): Promise<void> {
-  const actor = entry.actorId ?? (req.user?.collection === "users" ? req.user.id : null);
-  await req.payload.create({
+export async function writeAudit(
+  ctx: PayloadRequest | { payload: Payload },
+  entry: Entry,
+): Promise<void> {
+  // A hook's req carries headers; a bare { payload } from a server action does not.
+  const req = "headers" in ctx ? (ctx as PayloadRequest) : undefined;
+  const actor = entry.actorId ?? (req?.user?.collection === "users" ? req.user.id : null);
+  await ctx.payload.create({
     collection: "audit-log",
     overrideAccess: true,
-    req,
+    ...(req ? { req } : {}),
     data: {
       action: entry.action,
       entity: entry.entity,

@@ -174,5 +174,54 @@
     "copyLink": "Copiar enlace",
     "copied": "Enlace copiado.",
     "priceNote": "Precios de apertura, por confirmar."
+  },
+  "pos": {
+    "title": "Barra",
+    "unregistered": {
+      "eyebrow": "Barra",
+      "title": "Esta tablet aún no es de la barra",
+      "body": "Para que el equipo pueda entrar con su PIN, el propietario debe registrar esta tablet una sola vez.",
+      "action": "Registrar esta tablet"
+    },
+    "register": {
+      "eyebrow": "Registrar tablet",
+      "title": "Un nombre para esta tablet",
+      "body": "Así sabrás desde dónde se hizo cada venta.",
+      "label": "Nombre de la tablet",
+      "placeholder": "Barra principal",
+      "submit": "Registrar",
+      "needOwner": "Primero inicia sesión como propietario en esta misma tablet.",
+      "signIn": "Iniciar sesión",
+      "errorName": "Escribe un nombre para la tablet.",
+      "errorOwner": "Solo el propietario puede registrar una tablet."
+    },
+    "login": {
+      "eyebrow": "Barra",
+      "title": "¿Quién atiende?",
+      "noStaff": "Nadie del equipo tiene PIN todavía. El propietario puede asignarlos en Equipo, dentro de la administración.",
+      "pinFor": "PIN de {name}",
+      "back": "Cambiar de persona",
+      "enter": "Entrar",
+      "delete": "Borrar",
+      "digits": "{count} de 6 cifras",
+      "wrongPin": "PIN incorrecto. Te quedan {left} intentos.",
+      "locked": "Demasiados intentos. Prueba de nuevo en {minutes} minutos o pide al propietario un PIN nuevo.",
+      "noDevice": "Esta tablet ya no está registrada.",
+      "unknown": "No hemos podido encontrar a esa persona. Elige de nuevo.",
+      "failed": "No se ha podido entrar. Comprueba la conexión e inténtalo otra vez."
+    },
+    "home": {
+      "greeting": "Hola, {name}",
+      "device": "Tablet: {device}",
+      "role": {
+        "owner": "Propietario",
+        "manager": "Encargado",
+        "barista": "Barista"
+      },
+      "next": "La pantalla de pedidos llega en la fase 2.",
+      "nextBody": "El acceso, los permisos y el registro de actividad ya funcionan. Cuando apruebes el diseño, esta pantalla se convierte en la caja.",
+      "backOffice": "Abrir la administración",
+      "logout": "Salir"
+    }
   }
 }
