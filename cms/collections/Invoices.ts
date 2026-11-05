@@ -38,6 +38,7 @@ export const Invoices: CollectionConfig = {
       ],
     },
     { name: "order", type: "relationship", relationTo: "orders", required: true, label: "Pedido" },
+    { name: "rectifies", type: "relationship", relationTo: "invoices", label: "Rectifica a" },
     { name: "issuedAt", type: "date", required: true, label: "Fecha de expedición" },
     { name: "issuerNif", type: "text", label: "NIF del emisor" },
     { name: "totalCents", type: "number", required: true, label: "Importe total (céntimos)" },

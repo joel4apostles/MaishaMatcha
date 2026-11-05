@@ -16,7 +16,9 @@ export type AuditAction =
   | "pos.logout"
   | "shift.cash-difference"
   | "order.void"
-  | "order.refund";
+  | "order.refund"
+  | "pos.approval"
+  | "pos.approval.failed";
 
 type Entry = {
   action: AuditAction;

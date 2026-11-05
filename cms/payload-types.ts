@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     orders: Order;
     payments: Payment;
+    refunds: Refund;
     shifts: Shift;
     'pos-devices': PosDevice;
     'menu-items': MenuItem;
@@ -95,6 +96,7 @@ export interface Config {
   collectionsSelect: {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
+    refunds: RefundsSelect<false> | RefundsSelect<true>;
     shifts: ShiftsSelect<false> | ShiftsSelect<true>;
     'pos-devices': PosDevicesSelect<false> | PosDevicesSelect<true>;
     'menu-items': MenuItemsSelect<false> | MenuItemsSelect<true>;
@@ -496,6 +498,57 @@ export interface Payment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "refunds".
+ */
+export interface Refund {
+  id: number;
+  order: number | Order;
+  shift?: (number | null) | Shift;
+  method: 'cash' | 'card_terminal' | 'card_stripe' | 'online';
+  amountCents: number;
+  reason: string;
+  staff?: (number | null) | User;
+  approvedBy?: (number | null) | User;
+  invoice?: (number | null) | Invoice;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Registro inalterable. Las correcciones son facturas rectificativas.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: number;
+  fullNumber: string;
+  series: string;
+  number: number;
+  type: 'F2' | 'F1' | 'R5';
+  order: number | Order;
+  rectifies?: (number | null) | Invoice;
+  issuedAt: string;
+  issuerNif?: string | null;
+  totalCents: number;
+  taxCents: number;
+  taxBreakdown?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  hash: string;
+  previousHash?: string | null;
+  qrUrl?: string | null;
+  aeatStatus: 'pending' | 'accepted' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "modifiers".
  */
 export interface Modifier {
@@ -616,39 +669,6 @@ export interface StoryChapter {
   createdAt: string;
 }
 /**
- * Registro inalterable. Las correcciones son facturas rectificativas.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "invoices".
- */
-export interface Invoice {
-  id: number;
-  fullNumber: string;
-  series: string;
-  number: number;
-  type: 'F2' | 'F1' | 'R5';
-  order: number | Order;
-  issuedAt: string;
-  issuerNif?: string | null;
-  totalCents: number;
-  taxCents: number;
-  taxBreakdown?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  hash: string;
-  previousHash?: string | null;
-  qrUrl?: string | null;
-  aeatStatus: 'pending' | 'accepted' | 'rejected';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Solo lectura. Cada acción sensible deja aquí su rastro.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -726,6 +746,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'payments';
         value: number | Payment;
+      } | null)
+    | ({
+        relationTo: 'refunds';
+        value: number | Refund;
       } | null)
     | ({
         relationTo: 'shifts';
@@ -886,6 +910,22 @@ export interface PaymentsSelect<T extends boolean = true> {
   changeCents?: T;
   providerRef?: T;
   staff?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "refunds_select".
+ */
+export interface RefundsSelect<T extends boolean = true> {
+  order?: T;
+  shift?: T;
+  method?: T;
+  amountCents?: T;
+  reason?: T;
+  staff?: T;
+  approvedBy?: T;
+  invoice?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1161,6 +1201,7 @@ export interface InvoicesSelect<T extends boolean = true> {
   number?: T;
   type?: T;
   order?: T;
+  rectifies?: T;
   issuedAt?: T;
   issuerNif?: T;
   totalCents?: T;

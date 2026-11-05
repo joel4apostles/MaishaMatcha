@@ -346,6 +346,39 @@
       "tendered": "Tendered",
       "change": "Change",
       "card": "Card"
+    },
+    "orders": {
+      "link": "Orders",
+      "title": "Shift orders",
+      "empty": "No orders in this shift yet.",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "refunded": "Refunded",
+      "partially_refunded": "Partly refunded",
+      "cancelled": "Voided",
+      "void": "Void",
+      "refund": "Refund",
+      "reason": "Reason",
+      "reasonPlaceholder": "What happened",
+      "amount": "Amount to refund",
+      "remaining": "Still refundable: {amount}",
+      "confirmVoid": "Void order",
+      "confirmRefund": "Refund {amount}",
+      "approval": "Above your limit: a manager approves.",
+      "approver": "Manager",
+      "approverPin": "Manager PIN",
+      "doneVoid": "Order voided.",
+      "doneRefund": "Refunded {amount}. Corrective invoice {invoice}.",
+      "cancel": "Cancel",
+      "errors": {
+        "reason-required": "Write the reason.",
+        "over-limit": "Above your refund limit. A manager must approve.",
+        "approval-failed": "The manager PIN is wrong.",
+        "bad-amount": "The amount is invalid or above what was paid.",
+        "not-paid": "The order is not paid.",
+        "paid": "A paid order is refunded, not voided.",
+        "generic": "Could not complete it. Try again."
+      }
     }
   }
 }

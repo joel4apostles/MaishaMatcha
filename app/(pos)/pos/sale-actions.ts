@@ -100,3 +100,33 @@ export async function advanceOrderAction(orderId: number, to: string) {
   if (!s.success || !Number.isInteger(orderId)) return invalid;
   return advanceOrder(await payloadClient(), a, orderId, s.data);
 }
+
+export async function voidOrderAction(orderId: number, reason: string) {
+  const a = await actor();
+  if (!a) return noSession;
+  if (!Number.isInteger(orderId) || typeof reason !== "string" || reason.length > 300) return invalid;
+  const { voidOrder } = await import("@/lib/pos/sales");
+  return voidOrder(await payloadClient(), a, orderId, reason);
+}
+
+const refundSchema = z.object({
+  orderId: z.number().int().positive(),
+  amountCents: z.number().int().positive().max(1_000_000),
+  reason: z.string().min(1).max(300),
+  approverId: z.number().int().positive().optional(),
+  approverPin: z.string().regex(/^\d{4,6}$/).optional(),
+});
+
+export async function refundOrderAction(input: z.infer<typeof refundSchema>) {
+  const a = await actor();
+  if (!a) return noSession;
+  const p = refundSchema.safeParse(input);
+  if (!p.success) return invalid;
+  const { refundOrder } = await import("@/lib/pos/sales");
+  return refundOrder(await payloadClient(), a, {
+    orderId: p.data.orderId,
+    amountCents: p.data.amountCents,
+    reason: p.data.reason,
+    approver: p.data.approverId && p.data.approverPin ? { staffId: p.data.approverId, pin: p.data.approverPin } : undefined,
+  });
+}

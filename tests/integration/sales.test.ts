@@ -146,3 +146,68 @@ describe("closing", () => {
     expect(audit.totalDocs).toBe(1);
   });
 });
+
+describe("refunds and voids", () => {
+  let manager: { id: number };
+  beforeAll(async () => {
+    manager = await staff(payload, "sales-manager@test.local", "manager", "Marta", "6048");
+    await payload.update({ collection: "users", id: actor.staffId, overrideAccess: true, data: { refundLimitCents: 300 } });
+    await openShift(payload, actor, 5000);
+  });
+
+  async function paidOrder() {
+    const o = await createOrder(payload, actor, { lines: [usucha()], service: "here", idempotencyKey: randomUUID() });
+    if (!o.ok) throw new Error(o.error);
+    const p = await payOrder(payload, actor, { orderId: o.orderId, method: "cash", tenderedCents: 1000 });
+    if (!p.ok) throw new Error(p.error);
+    return o.orderId;
+  }
+
+  it("voids only unpaid orders, with a reason", async () => {
+    const o = await createOrder(payload, actor, { lines: [usucha()], service: "here", idempotencyKey: randomUUID() });
+    if (!o.ok) throw new Error(o.error);
+    const { voidOrder } = await import("@/lib/pos/sales");
+    expect(await voidOrder(payload, actor, o.orderId, "  ")).toMatchObject({ ok: false, error: "reason-required" });
+    expect(await voidOrder(payload, actor, o.orderId, "Cliente se fue")).toMatchObject({ ok: true });
+    const paid = await paidOrder();
+    expect(await voidOrder(payload, actor, paid, "x")).toMatchObject({ ok: false, error: "paid" });
+  });
+
+  it("lets a barista refund up to the limit, and needs a manager PIN above it", async () => {
+    const { refundOrder } = await import("@/lib/pos/sales");
+    const orderId = await paidOrder();
+    const small = await refundOrder(payload, actor, { orderId, amountCents: 250, reason: "Bebida fría" });
+    expect(small).toMatchObject({ ok: true, refundedCents: 250 });
+    expect(await refundOrder(payload, actor, { orderId, amountCents: 630, reason: "Resto" })).toMatchObject({
+      ok: false,
+      error: "over-limit",
+    });
+    expect(
+      await refundOrder(payload, actor, { orderId, amountCents: 630, reason: "Resto", approver: { staffId: manager.id, pin: "1111" } }),
+    ).toMatchObject({ ok: false, error: "approval-failed" });
+    const big = await refundOrder(payload, actor, {
+      orderId,
+      amountCents: 630,
+      reason: "Resto",
+      approver: { staffId: manager.id, pin: "6048" },
+    });
+    expect(big).toMatchObject({ ok: true });
+    expect(await refundOrder(payload, actor, { orderId, amountCents: 1, reason: "más" })).toMatchObject({ ok: false, error: "bad-amount" });
+    const order = await payload.findByID({ collection: "orders", id: orderId });
+    expect(order.paymentStatus).toBe("refunded");
+    const refunds = await payload.find({ collection: "refunds", where: { order: { equals: orderId } }, depth: 0 });
+    expect(refunds.docs.find((r) => r.amountCents === 630)?.approvedBy).toBe(manager.id);
+  });
+
+  it("chains corrective invoices and subtracts cash refunds from the Z report", async () => {
+    const { docs } = await payload.find({ collection: "invoices", sort: "number", limit: 200, depth: 0 });
+    const r5 = docs.filter((d) => d.type === "R5");
+    expect(r5.length).toBe(2);
+    expect(r5.every((d) => d.totalCents < 0 && d.rectifies)).toBe(true);
+    for (let i = 1; i < docs.length; i++) expect(docs[i].previousHash).toBe(docs[i - 1].hash);
+    const closed = await closeShift(payload, actor, 0);
+    if (!closed.ok) throw new Error(closed.error);
+    expect(closed.report.refundsByMethod.cash).toBe(880);
+    expect(closed.report.expectedCashCents).toBe(5000 + 2 * 880 - 880);
+  });
+});

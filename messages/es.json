@@ -346,6 +346,39 @@
       "tendered": "Entregado",
       "change": "Cambio",
       "card": "Tarjeta"
+    },
+    "orders": {
+      "link": "Pedidos",
+      "title": "Pedidos del turno",
+      "empty": "Todavía no hay pedidos en este turno.",
+      "paid": "Pagado",
+      "unpaid": "Sin cobrar",
+      "refunded": "Devuelto",
+      "partially_refunded": "Devuelto en parte",
+      "cancelled": "Anulado",
+      "void": "Anular",
+      "refund": "Devolver",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Qué ha pasado",
+      "amount": "Importe a devolver",
+      "remaining": "Pendiente de devolver: {amount}",
+      "confirmVoid": "Anular pedido",
+      "confirmRefund": "Devolver {amount}",
+      "approval": "Por encima de tu límite: aprueba un encargado.",
+      "approver": "Encargado",
+      "approverPin": "PIN del encargado",
+      "doneVoid": "Pedido anulado.",
+      "doneRefund": "Devuelto {amount}. Factura rectificativa {invoice}.",
+      "cancel": "Cancelar",
+      "errors": {
+        "reason-required": "Escribe el motivo.",
+        "over-limit": "Supera tu límite de devolución. Necesita la aprobación de un encargado.",
+        "approval-failed": "El PIN del encargado no es correcto.",
+        "bad-amount": "El importe no es válido o supera lo cobrado.",
+        "not-paid": "El pedido no está cobrado.",
+        "paid": "Un pedido cobrado se devuelve, no se anula.",
+        "generic": "No se ha podido completar. Inténtalo otra vez."
+      }
     }
   }
 }

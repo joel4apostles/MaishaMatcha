@@ -55,6 +55,11 @@ export default async function PosPage() {
         {t("till.kds")}
       </Link>
       {shift ? (
+        <Link href="/pos/pedidos" className="inline-flex min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4">
+          {t("orders.link")}
+        </Link>
+      ) : null}
+      {shift ? (
         <Link href="/pos/cierre" className="inline-flex min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4">
           {t("shift.closeLink")}
         </Link>

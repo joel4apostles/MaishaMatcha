@@ -17,6 +17,7 @@ import { PosDevices } from "./cms/collections/PosDevices";
 import { AuditLog } from "./cms/collections/AuditLog";
 import { Shifts } from "./cms/collections/Shifts";
 import { Payments } from "./cms/collections/Payments";
+import { Refunds } from "./cms/collections/Refunds";
 import { Invoices } from "./cms/collections/Invoices";
 import { Sequences } from "./cms/collections/Sequences";
 import { Business } from "./cms/globals/Business";
@@ -97,6 +98,7 @@ export default buildConfig({
   collections: inSalonOrder([
     [Orders, "Barra"],
     [Payments, "Barra"],
+    [Refunds, "Barra"],
     [Shifts, "Barra"],
     [PosDevices, "Barra"],
     [MenuItems, "Carta"],

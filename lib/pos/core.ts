@@ -61,9 +61,10 @@ export async function listPinStaff(payload: Payload): Promise<PosStaff[]> {
  */
 export async function attemptPin(
   payload: Payload,
-  input: { deviceId: number; userId: number; pin: string; now?: Date },
+  input: { deviceId: number; userId: number; pin: string; now?: Date; purpose?: "login" | "approval" },
 ): Promise<PinResult> {
   const now = input.now ?? new Date();
+  const approval = input.purpose === "approval";
   const user = await payload
     .findByID({ collection: "users", id: input.userId, overrideAccess: true, showHiddenFields: true, depth: 0 })
     .catch(() => null);
@@ -104,7 +105,7 @@ export async function attemptPin(
       );
     }
     await writeAudit({ payload }, {
-      action: lock ? "pos.login.locked" : "pos.login.failed",
+      action: lock ? "pos.login.locked" : approval ? "pos.approval.failed" : "pos.login.failed",
       entity: "users",
       entityId: user.id,
       actorId: user.id,
@@ -119,14 +120,16 @@ export async function attemptPin(
     payload,
     sql`update ${users} set pin_failed_count = 0, pin_locked_until = null where id = ${input.userId}`,
   );
-  await payload.update({
-    collection: "pos-devices",
-    id: input.deviceId,
-    overrideAccess: true,
-    data: { lastSeenAt: now.toISOString() },
-  });
+  if (!approval) {
+    await payload.update({
+      collection: "pos-devices",
+      id: input.deviceId,
+      overrideAccess: true,
+      data: { lastSeenAt: now.toISOString() },
+    });
+  }
   await writeAudit({ payload }, {
-    action: "pos.login",
+    action: approval ? "pos.approval" : "pos.login",
     entity: "users",
     entityId: user.id,
     actorId: user.id,

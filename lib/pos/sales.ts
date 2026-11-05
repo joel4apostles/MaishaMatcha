@@ -7,6 +7,7 @@ import {
   type PayloadRequest,
 } from "payload";
 import { writeAudit } from "@/cms/audit";
+import { attemptPin } from "./core";
 import { query, sql, table } from "@/cms/db";
 import {
   cashChange,
@@ -25,7 +26,20 @@ import { fingerprint, fullInvoiceNumber, qrUrl, type InvoiceType } from "./verif
  * client. Every money operation runs in ONE database transaction.
  */
 export type Actor = { staffId: number; deviceId: number };
-export type SaleError = PriceError | "no-shift" | "shift-open" | "not-found" | "already-paid" | "cancelled" | "short-cash" | "bad-amount";
+export type SaleError =
+  | PriceError
+  | "no-shift"
+  | "shift-open"
+  | "not-found"
+  | "already-paid"
+  | "cancelled"
+  | "short-cash"
+  | "bad-amount"
+  | "not-paid"
+  | "reason-required"
+  | "over-limit"
+  | "approval-failed"
+  | "paid";
 
 type Result<T> = { ok: true } & T | { ok: false; error: SaleError; detail?: string };
 
@@ -200,7 +214,12 @@ export async function createOrder(
 
 // --------------------------------------------------------------- payments
 
-async function issueInvoice(req: PayloadRequest, order: { id: number; totalCents: number; taxBreakdown?: unknown }, type: InvoiceType = "F2") {
+async function issueInvoice(
+  req: PayloadRequest,
+  order: { id: number; totalCents: number; taxBreakdown?: unknown },
+  type: InvoiceType = "F2",
+  rectifies?: number,
+) {
   const business = await req.payload.findGlobal({ slug: "business", req, overrideAccess: true });
   const series = business.invoiceSeries || "T";
   const now = new Date();
@@ -242,6 +261,7 @@ async function issueInvoice(req: PayloadRequest, order: { id: number; totalCents
       previousHash: lastHash ?? undefined,
       qrUrl: qrUrl({ issuerNif, fullNumber, issuedAt: now, totalCents: order.totalCents }),
       aeatStatus: "pending",
+      rectifies,
     },
   });
 }
@@ -338,6 +358,7 @@ export type ZReport = {
   floatCents: number;
   orders: number;
   byMethod: Record<string, number>;
+  refundsByMethod: Record<string, number>;
   totalCents: number;
   tax: { rateBasisPoints: number; baseCents: number; taxCents: number; grossCents: number }[];
   expectedCashCents: number;
@@ -369,14 +390,25 @@ export async function zReport(payload: Payload, shiftId: number, floatCents: num
       tax.set(r.rateBasisPoints, t);
     }
   }
-  const totalCents = Object.values(byMethod).reduce((s, v) => s + v, 0);
+  const refunds = await payload.find({
+    collection: "refunds",
+    overrideAccess: true,
+    depth: 0,
+    limit: 5000,
+    where: { shift: { equals: shiftId } },
+  });
+  const refundsByMethod: Record<string, number> = {};
+  for (const r of refunds.docs) refundsByMethod[r.method] = (refundsByMethod[r.method] ?? 0) + r.amountCents;
+  const refundTotal = Object.values(refundsByMethod).reduce((s, v) => s + v, 0);
+  const totalCents = Object.values(byMethod).reduce((s, v) => s + v, 0) - refundTotal;
   return {
     floatCents,
     orders: orderIds.length,
     byMethod,
+    refundsByMethod,
     totalCents,
     tax: [...tax.values()].sort((a, b) => a.rateBasisPoints - b.rateBasisPoints),
-    expectedCashCents: floatCents + (byMethod.cash ?? 0),
+    expectedCashCents: floatCents + (byMethod.cash ?? 0) - (refundsByMethod.cash ?? 0),
   };
 }
 
@@ -435,4 +467,174 @@ export async function advanceOrder(payload: Payload, actor: Actor, orderId: numb
     await writeAudit({ payload }, { action: "order.void", entity: "orders", entityId: orderId, actorId: actor.staffId, deviceId: actor.deviceId });
   }
   return { ok: true };
+}
+
+// ---------------------------------------------------- refunds and voids
+
+/** Cancel an order that has not been paid (a void), with a reason. */
+export async function voidOrder(payload: Payload, actor: Actor, orderId: number, reason: string): Promise<Result<object>> {
+  const why = reason.trim();
+  if (!why) return { ok: false, error: "reason-required" };
+  const order = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true }).catch(() => null);
+  if (!order) return { ok: false, error: "not-found" };
+  if (order.paymentStatus !== "unpaid") return { ok: false, error: "paid" };
+  if (order.status === "cancelled") return { ok: false, error: "cancelled" };
+  await payload.update({
+    collection: "orders",
+    id: orderId,
+    overrideAccess: true,
+    data: { status: "cancelled", statusChangedAt: new Date().toISOString() },
+  });
+  await writeAudit({ payload }, {
+    action: "order.void",
+    entity: "orders",
+    entityId: orderId,
+    reason: why,
+    actorId: actor.staffId,
+    deviceId: actor.deviceId,
+  });
+  return { ok: true };
+}
+
+/**
+ * Refund all or part of a paid order. Above the person's refund limit a
+ * manager or owner must approve with their PIN on the same device. Issues a
+ * corrective invoice (R5) for the negative amount in the same hash chain.
+ */
+export async function refundOrder(
+  payload: Payload,
+  actor: Actor,
+  input: { orderId: number; amountCents: number; reason: string; approver?: { staffId: number; pin: string } },
+): Promise<Result<{ invoiceNumber: string; refundedCents: number }>> {
+  const why = input.reason.trim();
+  if (!why) return { ok: false, error: "reason-required" };
+  if (!Number.isInteger(input.amountCents) || input.amountCents <= 0) return { ok: false, error: "bad-amount" };
+  const shift = await currentShift(payload, actor.deviceId);
+  if (!shift) return { ok: false, error: "no-shift" };
+
+  const staffDoc = await payload.findByID({ collection: "users", id: actor.staffId, depth: 0, overrideAccess: true });
+  const limit = staffDoc.role === "barista" ? (staffDoc.refundLimitCents ?? 0) : Number.POSITIVE_INFINITY;
+  let approvedBy: number | undefined;
+  if (input.amountCents > limit) {
+    if (!input.approver) return { ok: false, error: "over-limit" };
+    const approver = await payload.findByID({ collection: "users", id: input.approver.staffId, depth: 0, overrideAccess: true }).catch(() => null);
+    if (!approver || (approver.role !== "owner" && approver.role !== "manager")) return { ok: false, error: "approval-failed" };
+    const check = await attemptPin(payload, {
+      deviceId: actor.deviceId,
+      userId: input.approver.staffId,
+      pin: input.approver.pin,
+      purpose: "approval",
+    });
+    if (!check.ok) return { ok: false, error: "approval-failed" };
+    approvedBy = approver.id;
+  }
+
+  return inTransaction(payload, actor.staffId, async (req) => {
+    const orders = table(payload, "orders");
+    await query(payload, sql`select id from ${orders} where id = ${input.orderId} for update`, req);
+    const order = await payload.findByID({ collection: "orders", id: input.orderId, req, depth: 0, overrideAccess: true }).catch(() => null);
+    if (!order) return { ok: false as const, error: "not-found" as const };
+    if (order.paymentStatus === "unpaid") return { ok: false as const, error: "not-paid" as const };
+    const { docs: prior } = await payload.find({
+      collection: "refunds",
+      req,
+      depth: 0,
+      overrideAccess: true,
+      limit: 100,
+      where: { order: { equals: order.id } },
+    });
+    const already = prior.reduce((s, r) => s + r.amountCents, 0);
+    if (already + input.amountCents > order.totalCents) return { ok: false as const, error: "bad-amount" as const };
+    const { docs: pays } = await payload.find({
+      collection: "payments",
+      req,
+      depth: 0,
+      overrideAccess: true,
+      limit: 1,
+      where: { order: { equals: order.id } },
+    });
+    const { docs: invoices } = await payload.find({
+      collection: "invoices",
+      req,
+      depth: 0,
+      overrideAccess: true,
+      limit: 1,
+      where: { and: [{ order: { equals: order.id } }, { type: { equals: "F2" } }] },
+    });
+
+    // Corrective invoice: negative amounts, IVA split in proportion.
+    const share = input.amountCents / order.totalCents;
+    const rates = ((order.taxBreakdown as { rateBasisPoints: number; grossCents: number; baseCents: number; taxCents: number }[]) ?? []).map((r) => {
+      const gross = -Math.round(r.grossCents * share);
+      const tax = -Math.round(r.taxCents * share);
+      return { rateBasisPoints: r.rateBasisPoints, grossCents: gross, taxCents: tax, baseCents: gross - tax };
+    });
+    const invoice = await issueInvoice(req, { id: order.id, totalCents: -input.amountCents, taxBreakdown: rates }, "R5", invoices[0]?.id);
+    await payload.create({
+      collection: "refunds",
+      req,
+      overrideAccess: true,
+      data: {
+        order: order.id,
+        shift: shift.id,
+        method: pays[0]?.method ?? "cash",
+        amountCents: input.amountCents,
+        reason: why,
+        staff: actor.staffId,
+        approvedBy,
+        invoice: invoice.id,
+      },
+    });
+    const full = already + input.amountCents === order.totalCents;
+    await payload.update({
+      collection: "orders",
+      id: order.id,
+      req,
+      overrideAccess: true,
+      data: { paymentStatus: full ? "refunded" : "partially_refunded" },
+    });
+    await writeAudit(req, {
+      action: "order.refund",
+      entity: "orders",
+      entityId: order.id,
+      reason: why,
+      actorId: actor.staffId,
+      deviceId: actor.deviceId,
+      after: { amountCents: input.amountCents, approvedBy: approvedBy ?? null },
+    });
+    return { ok: true as const, invoiceNumber: invoice.fullNumber, refundedCents: input.amountCents };
+  });
+}
+
+/** This tablet's orders in the open shift, newest first, for the orders list. */
+export async function shiftOrders(payload: Payload, deviceId: number) {
+  const shift = await currentShift(payload, deviceId);
+  if (!shift) return [];
+  const { docs } = await payload.find({
+    collection: "orders",
+    overrideAccess: true,
+    depth: 0,
+    limit: 200,
+    sort: "-createdAt",
+    where: { shift: { equals: shift.id } },
+  });
+  const refunds = await payload.find({
+    collection: "refunds",
+    overrideAccess: true,
+    depth: 0,
+    limit: 1000,
+    where: { shift: { equals: shift.id } },
+  });
+  const refunded = new Map<number, number>();
+  for (const r of refunds.docs) refunded.set(id(r.order), (refunded.get(id(r.order)) ?? 0) + r.amountCents);
+  return docs.map((o) => ({
+    id: o.id,
+    label: o.label ?? String(o.id),
+    createdAt: o.createdAt,
+    status: o.status,
+    paymentStatus: o.paymentStatus,
+    totalCents: o.totalCents,
+    refundedCents: refunded.get(o.id) ?? 0,
+    summary: (o.lines ?? []).map((l) => `${l.quantity} × ${l.name}`).join(", "),
+  }));
 }
