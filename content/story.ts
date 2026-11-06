@@ -76,8 +76,8 @@ export const story: StoryChapter[] = [
     era: { es: "Uji, Kioto", en: "Uji, Kyoto" },
     title: { es: "El origen", en: "The origin" },
     body: {
-      es: "En las colinas de Uji, junto a Kioto, el matcha encuentra su casa desde hace siglos. Agua, niebla y paciencia. De ahí viene la hoja que servimos.",
-      en: "In the hills of Uji, near Kyoto, matcha has found its home for centuries. Water, mist and patience. From there comes the leaf we serve.",
+      es: "En las colinas de Uji, junto a Kioto, el matcha encuentra su casa desde hace siglos. Agua, niebla y paciencia. De ahí viene el primero de nuestros tres matchas.",
+      en: "In the hills of Uji, near Kyoto, matcha has found its home for centuries. Water, mist and patience. From there comes the first of our three matchas.",
     },
   },
   {

@@ -4,10 +4,10 @@ import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import salonArbol from "@/public/images/salon-arbol.jpg";
-import { inkButtonClass } from "@/components/Button";
+import { inkButtonClass, quietLinkClass } from "@/components/Button";
+import { Link } from "@/i18n/navigation";
 import { StageReveal } from "@/components/StageReveal";
 import { StageWords } from "@/components/StageWords";
-import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
@@ -42,109 +42,133 @@ export default async function StoryPage({
   return <StoryContent />;
 }
 
+/** Chapter markers on the rail: kanji numerals, as on the home path and the carta. */
+const NUMERALS = ["一", "二", "三", "四", "五", "六", "七", "八"];
+
 function StoryContent() {
   const t = useTranslations("story");
   const space = useTranslations("home.space");
   const cta = useTranslations("cta");
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
   return (
-    <Section>
-      <Reveal>
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <Headline as="h1" className="mt-5 text-display">
-          {t("title")}
-        </Headline>
-        <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
-      </Reveal>
-
-      <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,40rem)_1fr] lg:gap-16">
-      <div className="relative">
-        <TimelineRail />
-        <ol className="pl-6 sm:pl-10">
-        {story.map((chapter) => (
-          <li
-            key={chapter.id}
-            data-story-id={chapter.id}
-            className="relative pb-12 last:pb-0 sm:pb-16"
-          >
+    <div className="px-6 sm:px-8">
+      <div className="mx-auto max-w-[1100px] pb-24 sm:pb-32">
+        {/* Opening: the title, and one brushed phrase standing beside it. */}
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] gap-6 pt-16 pb-14 sm:gap-12 sm:pt-28 sm:pb-24">
+          <Reveal>
+            <Eyebrow>{t("eyebrow")}</Eyebrow>
+            <h1 className="mt-6 max-w-[12ch] text-balance font-serif text-hero font-light text-sumi">{t("title")}</h1>
+            <p className="measure mt-7 text-lg text-sumi/80">{t("intro")}</p>
+          </Reveal>
+          <div>
             <span
+              lang="ja"
               aria-hidden="true"
-              className="absolute -left-[calc(1.5rem+3px)] top-2.5 h-1.5 w-1.5 rounded-full bg-wood sm:-left-[calc(2.5rem+3px)]"
-            />
-            {/* Dramatic staged entrance: era, then title word by word, then body. */}
-            <StageReveal>
-              {/* Phones and tablets: the era's character sits with its chapter
-                  (desktop shows it large in the sticky panel instead). */}
-              {chapter.glyph ? (
-                <div data-s aria-hidden="true" style={{ "--sd": "0ms" } as CSSProperties} className="mb-4 lg:hidden">
-                  <span className="select-none font-brush text-[5.5rem] leading-none text-matcha/40">{chapter.glyph}</span>
-                </div>
-              ) : null}
-              <div data-s style={{ "--sd": "0ms" } as CSSProperties}>
-                <Eyebrow>{chapter.era[locale]}</Eyebrow>
-              </div>
-              <Headline as="h2" className="mt-3 text-4xl sm:text-5xl">
-                <StageWords
-                  text={chapter.title[locale]}
-                  baseDelay={200}
-                  step={80}
-                />
-              </Headline>
-              <div data-s style={{ "--sd": "550ms" } as CSSProperties}>
-                <p className="measure mt-5 text-lg text-sumi/80">
-                  {chapter.body[locale]}
-                </p>
-              </div>
-            </StageReveal>
-            {/* One breath of imagery, at the wabi-sabi chapter: the tree. */}
-            {chapter.id === "wabisabi" ? (
-              <Reveal className="mt-10 max-w-sm">
-                <figure>
-                  <div className="overflow-hidden rounded-[2px]">
-                    <Image
-                      src={salonArbol}
-                      alt={space("alt3")}
-                      sizes="(min-width: 640px) 384px, 100vw"
-                      placeholder="blur"
-                      className="h-auto w-full"
-                    />
-                  </div>
-                  <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">
-                    {space("caption3")}
-                  </figcaption>
-                </figure>
-              </Reveal>
-            ) : null}
-          </li>
-        ))}
-        </ol>
-      </div>
+              className="ink-write block select-none font-brush text-[clamp(1.9rem,2vw+1.2rem,3.25rem)] leading-[1.12] text-sumi [writing-mode:vertical-rl]"
+              style={{ animationDelay: "300ms" }}
+            >
+              温故知新
+            </span>
+            <span className="sr-only">{t("phrase")}</span>
+          </div>
+        </header>
 
-      {/* The visual matches the history: era emblems crossfade per chapter. */}
-      <div className="hidden lg:block">
-        <div className="sticky top-24">
-          <StoryVisual
-            items={story.map((c) => ({
-              id: c.id,
-              glyph: c.glyph,
-              era: c.era[locale],
-            }))}
-          />
-        </div>
-      </div>
-      </div>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,40rem)_1fr] lg:gap-16">
+          <div className="relative">
+            <TimelineRail />
+            <ol className="pl-9 sm:pl-12">
+              {story.map((chapter, i) => (
+                <li
+                  key={chapter.id}
+                  data-story-id={chapter.id}
+                  className="relative pb-14 last:pb-0 sm:pb-20"
+                >
+                  {/* The path's marker: the numeral sits on the rail, cutting it. */}
+                  <span
+                    lang="ja"
+                    aria-hidden="true"
+                    className="absolute -left-9 top-0 -translate-x-1/2 select-none bg-washi py-1.5 font-brush text-[1.4rem] leading-none text-sumi sm:-left-12"
+                  >
+                    {NUMERALS[i]}
+                  </span>
+                  {/* Dramatic staged entrance: era, then title word by word, then body. */}
+                  <StageReveal>
+                    {/* Phones and tablets: the era's character sits with its chapter
+                        (desktop shows it large in the sticky panel instead). */}
+                    {chapter.glyph ? (
+                      <div data-s aria-hidden="true" style={{ "--sd": "0ms" } as CSSProperties} className="mb-3 lg:hidden">
+                        <span className="select-none font-brush text-[4.25rem] leading-none text-matcha/45">{chapter.glyph}</span>
+                      </div>
+                    ) : null}
+                    <div data-s style={{ "--sd": "0ms" } as CSSProperties}>
+                      <Eyebrow>{chapter.era[locale]}</Eyebrow>
+                    </div>
+                    <Headline as="h2" className="mt-3 text-4xl sm:text-5xl">
+                      <StageWords text={chapter.title[locale]} baseDelay={200} step={80} />
+                    </Headline>
+                    <div data-s style={{ "--sd": "550ms" } as CSSProperties}>
+                      <p className="measure mt-5 text-lg text-sumi/80">{chapter.body[locale]}</p>
+                    </div>
+                  </StageReveal>
+                  {/* The origin chapter hands over to the three matchas on the carta. */}
+                  {chapter.id === "uji" ? (
+                    <Reveal className="mt-6">
+                      <Link href={{ pathname: "/menu", hash: "matcha" }} className={quietLinkClass}>
+                        {t("toCarta")}
+                      </Link>
+                    </Reveal>
+                  ) : null}
+                  {/* One breath of imagery, at the wabi-sabi chapter: the tree. */}
+                  {chapter.id === "wabisabi" ? (
+                    <Reveal className="mt-10 max-w-sm">
+                      <figure>
+                        <div className="overflow-hidden rounded-[2px]">
+                          <Image
+                            src={salonArbol}
+                            alt={space("alt3")}
+                            sizes="(min-width: 640px) 384px, 100vw"
+                            placeholder="blur"
+                            className="h-auto w-full"
+                          />
+                        </div>
+                        <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">{space("caption3")}</figcaption>
+                      </figure>
+                    </Reveal>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </div>
 
-      {/* Closing: history hands over to the founding list. */}
-      <Reveal className="mt-20 max-w-3xl border-t border-wood/25 pt-10">
-        <p className="font-serif text-2xl font-light text-sumi">
-          {t("closing")}
-        </p>
-        <div className="mt-7">
-          <a href={`/${locale}#socios`} className={inkButtonClass}>
-            {cta("joinWaitlist")}
-          </a>
+          {/* The visual matches the history: era emblems crossfade per chapter. */}
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <StoryVisual items={story.map((c) => ({ id: c.id, glyph: c.glyph, era: c.era[locale] }))} />
+            </div>
+          </div>
         </div>
-      </Reveal>
-    </Section>
+
+        {/* Closing: history hands over to the founding list, under the seal. */}
+        <Reveal className="mt-24 border-t border-wood/35 pt-10 sm:mt-28">
+          <div className="flex items-start justify-between gap-8">
+            <div className="max-w-3xl">
+              <p className="font-serif text-2xl font-light text-sumi">{t("closing")}</p>
+              <div className="mt-7">
+                <a href={`/${locale}#socios`} className={inkButtonClass}>
+                  {cta("joinWaitlist")}
+                </a>
+              </div>
+            </div>
+            <span
+              lang="ja"
+              aria-hidden="true"
+              className="grid size-9 shrink-0 select-none place-items-center rounded-[2px] border border-sumi/70 font-brush text-[0.85rem] leading-[1.05] text-sumi [writing-mode:vertical-rl]"
+            >
+              抹茶
+            </span>
+          </div>
+        </Reveal>
+      </div>
+    </div>
   );
 }

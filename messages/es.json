@@ -94,9 +94,11 @@
   },
   "story": {
     "eyebrow": "Historia",
-    "title": "Del monte Tang a Murcia",
+    "title": "De China a Murcia",
     "intro": "Ocho momentos en el camino del matcha.",
-    "closing": "La historia continúa en Murcia, con cincuenta socios fundadores."
+    "closing": "La historia continúa en Murcia, con cincuenta socios fundadores.",
+    "phrase": "On ko chi shin: mirar lo antiguo para entender lo nuevo.",
+    "toCarta": "Los tres matchas, en la carta"
   },
   "events": {
     "eyebrow": "Eventos",
@@ -189,7 +191,7 @@
     },
     "story": {
       "title": "Historia · maisha matcha",
-      "description": "Del monte Tang a Murcia: ocho momentos en el camino del matcha."
+      "description": "De China a Murcia: ocho momentos en el camino del matcha."
     },
     "events": {
       "title": "Eventos · maisha matcha",

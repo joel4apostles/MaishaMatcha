@@ -94,9 +94,11 @@
   },
   "story": {
     "eyebrow": "Story",
-    "title": "From the Tang hills to Murcia",
+    "title": "From China to Murcia",
     "intro": "Eight moments on the path of matcha.",
-    "closing": "The story continues in Murcia, with fifty founding members."
+    "closing": "The story continues in Murcia, with fifty founding members.",
+    "phrase": "On ko chi shin: look at the old to understand the new.",
+    "toCarta": "The three matchas, on the menu"
   },
   "events": {
     "eyebrow": "Events",
@@ -189,7 +191,7 @@
     },
     "story": {
       "title": "Story · maisha matcha",
-      "description": "From the Tang hills to Murcia: eight moments on the path of matcha."
+      "description": "From China to Murcia: eight moments on the path of matcha."
     },
     "events": {
       "title": "Events · maisha matcha",
