@@ -37,6 +37,9 @@ export type CatalogItem = {
   stock?: number | null;
   description?: string | null;
   photo?: { url: string; alt: string; width: number; height: number } | null;
+  /** Shop product page: how to use it, and up to three products it pairs with. */
+  ritual?: string | null;
+  pairsWith?: number[];
 };
 
 export type LineInput = {

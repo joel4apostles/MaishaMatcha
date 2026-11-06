@@ -8,6 +8,8 @@ import { BrandMark } from "@/components/BrandMark";
 import { formatEuro } from "@/lib/money";
 import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
+import { Link } from "@/i18n/navigation";
+import { productSlug, restoreLines } from "@/lib/shop";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
 /** Section markers, as on the carta: kanji numerals in the brush face. */
@@ -63,6 +65,45 @@ export function OnlineOrder({
       return item ? [{ uid: `recipe-${i}`, item, quantity: l.quantity, modifierKeys: l.modifierKeys }] : [];
     }),
   );
+  // The shop basket follows the visitor between the shop and product pages
+  // (this tab only), always re-checked against today's stock and prices.
+  const persistKey = variant === "shop" ? "maisha.shop.basket" : null;
+  const [restored, setRestored] = useState(persistKey == null);
+  const restoreOnce = useRef(false);
+  useEffect(() => {
+    // Once per mount, even when effects run twice (React strict mode).
+    if (!persistKey || restoreOnce.current) return;
+    restoreOnce.current = true;
+    try {
+      const saved = restoreLines(JSON.parse(sessionStorage.getItem(persistKey) ?? "[]"), catalog);
+      if (saved.length)
+        // Restoring from storage can only happen after mount (no storage on the server).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLines((ls) => {
+          const next = [...ls];
+          for (const s2 of saved) {
+            const item = catalog.find((c) => c.id === s2.menuItemId)!;
+            const same = next.findIndex((l) => l.item.id === item.id);
+            if (same >= 0) next[same] = { ...next[same], quantity: Math.min(5, next[same].quantity + s2.quantity) };
+            else next.push({ uid: crypto.randomUUID(), item, quantity: s2.quantity, modifierKeys: [] });
+          }
+          return next;
+        });
+      // A product page sent "?add=": drop it so a reload does not add again.
+      if (new URLSearchParams(window.location.search).has("add")) window.history.replaceState(null, "", window.location.pathname + "#tu-pedido");
+    } catch {
+      // Storage blocked (private mode): the basket simply lives on this page.
+    }
+    setRestored(true);
+  }, [persistKey, catalog]);
+  useEffect(() => {
+    if (!persistKey || !restored) return;
+    try {
+      sessionStorage.setItem(persistKey, JSON.stringify(lines.map((l) => ({ id: l.item.id, q: l.quantity }))));
+    } catch {
+      // ignore
+    }
+  }, [lines, restored, persistKey]);
   const [sheet, setSheet] = useState<Line | null>(null);
   const usualLines = useMemo(
     () =>
@@ -217,7 +258,16 @@ export function OnlineOrder({
           payOnline: payOnline || hasShopItem,
           lines: lines.map((l) => ({ menuItemId: l.item.id, quantity: l.quantity, modifierKeys: l.modifierKeys })),
         });
-        if (r.ok) window.location.assign(r.redirect);
+        if (r.ok) {
+          if (persistKey) {
+            try {
+              sessionStorage.removeItem(persistKey);
+            } catch {
+              // ignore
+            }
+          }
+          window.location.assign(r.redirect);
+        }
         else setError(t(`errors.${KNOWN.includes(r.error) ? r.error : "generic"}` as "errors.generic"));
       } catch {
         setError(t("errors.generic"));
@@ -274,8 +324,12 @@ export function OnlineOrder({
                 {catalog
                   .filter((i) => i.category === c)
                   .map((item) => (
-                    <li key={item.id} className="flex flex-col">
-                      <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[2px] border border-wood/30">
+                    <li key={item.id} className="group flex flex-col">
+                      <Link
+                        href={{ pathname: "/tienda/[slug]", params: { slug: productSlug(item.name) } }}
+                        aria-label={item.name}
+                        className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[2px] bg-sumi/[0.03]"
+                      >
                         {item.photo ? (
                           <Image
                             src={item.photo.url}
@@ -283,14 +337,18 @@ export function OnlineOrder({
                             fill
                             unoptimized={/^https?:/.test(item.photo.url)}
                             sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 100vw"
-                            className="object-cover"
+                            className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                           />
                         ) : (
                           <BrandMark className="w-10 text-wood/30" />
                         )}
-                      </div>
+                      </Link>
                       <div className="mt-4 flex items-baseline justify-between gap-4">
-                        <h3 className="font-serif text-xl font-light">{item.name}</h3>
+                        <h3 className="font-serif text-[1.4rem] font-light leading-tight">
+                          <Link href={{ pathname: "/tienda/[slug]", params: { slug: productSlug(item.name) } }} className="hover:underline hover:decoration-wood/60 hover:underline-offset-4">
+                            {item.name}
+                          </Link>
+                        </h3>
                         <span className="shrink-0 text-sumi/80 tabular-nums">{formatEuro(item.priceCents, locale)}</span>
                       </div>
                       {item.description ? <p className="mt-2 text-sm text-sumi/75">{item.description}</p> : null}

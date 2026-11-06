@@ -27,12 +27,14 @@ export function LocaleSwitcher({
 }) {
   const active = useLocale() as Locale;
   const pathname = usePathname();
-  const params = useParams<{ token?: string }>();
-  // The private order page is the one dynamic route: carry its token.
+  const params = useParams<{ token?: string; slug?: string }>();
+  // Dynamic routes carry their params (order token, product slug).
   const href =
     pathname === "/pedido/[token]" && params.token
       ? ({ pathname, params: { token: params.token } } as const)
-      : (pathname as Exclude<typeof pathname, "/pedido/[token]">);
+      : pathname === "/tienda/[slug]" && params.slug
+        ? ({ pathname, params: { slug: params.slug } } as const)
+        : (pathname as Exclude<typeof pathname, "/pedido/[token]" | "/tienda/[slug]">);
   const t = useTranslations("footer");
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);

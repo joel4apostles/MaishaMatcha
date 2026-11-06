@@ -722,6 +722,15 @@
     "soon": "La tienda abre pronto.",
     "soonBody": "Mientras tanto, la carta te espera en la barra.",
     "fromOrder": "También hay tienda: matcha y utensilios para casa.",
-    "photoAlt": "Latas de matcha maisha, chasen y chawan sobre los azulejos verdes de la barra."
+    "photoAlt": "Latas de matcha maisha, chasen y chawan sobre los azulejos verdes de la barra.",
+    "phrase": "Chadogu: los utensilios del té.",
+    "addToBasket": "Añadir a la cesta",
+    "backToShop": "Tienda",
+    "ritualTitle": "Cómo se usa",
+    "pairsTitle": "Combina con",
+    "left": "Quedan {count}",
+    "soldOut": "Agotado",
+    "pickupCard": "Se paga con tarjeta al pedir y se recoge en el salón.",
+    "pickupCounter": "Se paga y se recoge en el salón."
   }
 }

@@ -118,6 +118,22 @@ export const MenuItems: CollectionConfig = {
       admin: { description: "Aparece en la portada (máximo 4)." },
     },
     { name: "photo", type: "upload", relationTo: "media", label: "Foto" },
+    {
+      name: "ritual",
+      type: "textarea",
+      localized: true,
+      label: "Cómo se usa (tienda)",
+      admin: { description: "Solo productos de la tienda. Opcional: si está vacío, la página del producto no muestra esta parte." },
+    },
+    {
+      name: "pairsWith",
+      type: "relationship",
+      relationTo: "menu-items",
+      hasMany: true,
+      maxRows: 3,
+      label: "Combina con (tienda)",
+      admin: { description: "Hasta tres productos de la tienda que se sugieren en la página de este." },
+    },
     { name: "order", type: "number", defaultValue: 0, label: "Orden" },
   ],
   hooks: {

@@ -722,6 +722,15 @@
     "soon": "The shop opens soon.",
     "soonBody": "Meanwhile, the menu is waiting at the bar.",
     "fromOrder": "There is also a shop: matcha and tools for home.",
-    "photoAlt": "maisha matcha tins, chasen and chawan on the green tiles of the bar."
+    "photoAlt": "maisha matcha tins, chasen and chawan on the green tiles of the bar.",
+    "phrase": "Chadogu: the tools of tea.",
+    "addToBasket": "Add to basket",
+    "backToShop": "Shop",
+    "ritualTitle": "How to use it",
+    "pairsTitle": "Goes well with",
+    "left": "{count} left",
+    "soldOut": "Sold out",
+    "pickupCard": "Paid by card when you order, collected at the salon.",
+    "pickupCounter": "Paid and collected at the salon."
   }
 }

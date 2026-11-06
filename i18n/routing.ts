@@ -23,6 +23,10 @@ export const routing = defineRouting({
       es: "/tienda",
       en: "/shop",
     },
+    "/tienda/[slug]": {
+      es: "/tienda/[slug]",
+      en: "/shop/[slug]",
+    },
     "/cuenta/entrar": {
       es: "/cuenta/entrar",
       en: "/account/sign-in",

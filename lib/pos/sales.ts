@@ -152,6 +152,8 @@ export async function loadCatalog(
         i.photo && typeof i.photo === "object" && i.photo.url
           ? { url: localPath(i.photo.url), alt: i.photo.alt ?? i.name, width: i.photo.width ?? 800, height: i.photo.height ?? 1000 }
           : null,
+      ritual: i.ritual ?? null,
+      pairsWith: (i.pairsWith ?? []).map((x) => id(x)),
       defaultGrams: i.defaultGrams ?? null,
       groups: (i.modifierGroups ?? []).map((g) => groupOf.get(id(g))).filter((g): g is CatalogGroup => Boolean(g)),
     }));

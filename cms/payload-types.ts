@@ -301,6 +301,14 @@ export interface MenuItem {
    */
   signature?: boolean | null;
   photo?: (number | null) | Media;
+  /**
+   * Solo productos de la tienda. Opcional: si está vacío, la página del producto no muestra esta parte.
+   */
+  ritual?: string | null;
+  /**
+   * Hasta tres productos de la tienda que se sugieren en la página de este.
+   */
+  pairsWith?: (number | MenuItem)[] | null;
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -1261,6 +1269,8 @@ export interface MenuItemsSelect<T extends boolean = true> {
   origin?: T;
   signature?: T;
   photo?: T;
+  ritual?: T;
+  pairsWith?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
