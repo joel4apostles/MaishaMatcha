@@ -99,7 +99,8 @@ describe("orders and payment", () => {
     );
     expect(results.every((r) => r.ok)).toBe(true);
 
-    const { docs } = await payload.find({ collection: "invoices", sort: "number", limit: 100, depth: 0 });
+    // This file's series only: other test files share the database.
+    const { docs } = await payload.find({ collection: "invoices", sort: "number", limit: 100, depth: 0, where: { series: { equals: "T" } } });
     const numbers = docs.map((d) => d.number);
     expect(numbers).toEqual(Array.from({ length: numbers.length }, (_, i) => i + 1));
     for (let i = 0; i < docs.length; i++) {
@@ -200,7 +201,7 @@ describe("refunds and voids", () => {
   });
 
   it("chains corrective invoices and subtracts cash refunds from the Z report", async () => {
-    const { docs } = await payload.find({ collection: "invoices", sort: "number", limit: 200, depth: 0 });
+    const { docs } = await payload.find({ collection: "invoices", sort: "number", limit: 200, depth: 0, where: { series: { equals: "T" } } });
     const r5 = docs.filter((d) => d.type === "R5");
     expect(r5.length).toBe(2);
     expect(r5.every((d) => d.totalCents < 0 && d.rectifies)).toBe(true);

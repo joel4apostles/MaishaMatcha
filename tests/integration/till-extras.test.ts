@@ -29,7 +29,7 @@ beforeAll(async () => {
   });
   actor = { staffId: barista.id, deviceId: device.id };
   ujiId = (await payload.find({ collection: "menu-items", where: { name: { equals: "Uji" } } })).docs[0].id;
-  await payload.updateGlobal({ slug: "business", data: { nif: "B12345674", invoiceSeries: "T", fullInvoiceSeries: "F" } });
+  await payload.updateGlobal({ slug: "business", data: { nif: "B12345674", invoiceSeries: "X", fullInvoiceSeries: "FX" } });
   const s = await openShift(payload, actor, 5000);
   if (!s.ok) throw new Error(s.error);
   shiftId = s.shiftId;
@@ -57,9 +57,9 @@ describe("full invoice on request", () => {
     expect(await issueFullInvoice(payload, actor, o.orderId, { name: "Ana", taxId: "12345678A", address: "x" })).toMatchObject({ ok: false, error: "bad-tax-id" });
     const r = await issueFullInvoice(payload, actor, o.orderId, { name: "Estudio Ana SL", taxId: "B-1234567-4", address: "Calle Mayor 1, Murcia" });
     if (!r.ok) throw new Error(r.error);
-    expect(r.fullNumber).toMatch(/^F\d{4}-\d{6}$/);
+    expect(r.fullNumber).toMatch(/^FX\d{4}-\d{6}$/);
     const inv = await payload.findByID({ collection: "invoices", id: r.invoiceId, overrideAccess: true, depth: 0 });
-    expect(inv).toMatchObject({ type: "F3", series: "F", totalCents: 1760, customer: { name: "Estudio Ana SL", taxId: "B12345674" } });
+    expect(inv).toMatchObject({ type: "F3", series: "FX", totalCents: 1760, customer: { name: "Estudio Ana SL", taxId: "B12345674" } });
     const f2 = (await payload.find({ collection: "invoices", overrideAccess: true, where: { and: [{ order: { equals: o.orderId } }, { type: { equals: "F2" } }] } })).docs[0];
     expect(inv.replaces).toBe(f2.id);
     // Once per ticket, even if asked twice at once.

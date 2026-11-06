@@ -34,7 +34,7 @@ beforeAll(async () => {
   tinId = tin.id;
   await payload.updateGlobal({
     slug: "business",
-    data: { nif: "B12345678", onlineOrdering: true, slotCapacity: 50, openDays: ["tue", "wed", "thu", "fri", "sat", "sun"], premiumOpen: true, premiumMonthlyCents: 1500, premiumFoundingMonthlyCents: 1200, premiumTaxRate: rate.id },
+    data: { nif: "B12345678", invoiceSeries: "P", onlineOrdering: true, slotCapacity: 50, openDays: ["tue", "wed", "thu", "fri", "sat", "sun"], premiumOpen: true, premiumMonthlyCents: 1500, premiumFoundingMonthlyCents: 1200, premiumTaxRate: rate.id },
   });
 });
 
