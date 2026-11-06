@@ -152,6 +152,26 @@ const poTotal = (lines: { packs: number; unitPriceCents?: number | null }[]) =>
   lines.reduce((s, l) => s + l.packs * (l.unitPriceCents ?? 0), 0);
 
 /** Email the order to the supplier (Resend) and mark it sent. */
+/** The PDF for a purchase order (attached to the supplier email, downloadable by staff). */
+export async function purchaseOrderPdfFor(payload: Payload, poId: number, req?: PayloadRequest) {
+  const { purchaseOrderPdf } = await import("@/lib/po-pdf");
+  const po = await payload.findByID({ collection: "purchase-orders", id: poId, depth: 1, overrideAccess: true, req });
+  const supplier = po.supplier as { name: string; email: string; contactName?: string | null; country?: string | null };
+  const business = await payload.findGlobal({ slug: "business", overrideAccess: true, req });
+  const bytes = await purchaseOrderPdf({
+    label: po.label ?? String(po.id),
+    date: new Date(po.sentAt ?? po.createdAt),
+    business: { name: business.tradeName || "maisha matcha", legalName: business.legalName, nif: business.nif, address: business.address, email: process.env.RESEND_FROM?.match(/<(.+)>/)?.[1] ?? "hola@maishamatcha.es" },
+    supplier: { name: supplier.name, email: supplier.email, contactName: supplier.contactName, country: supplier.country },
+    lines: (po.lines ?? []).map((l) => {
+      const ing = l.ingredient as { name: string; unit: string };
+      return { name: ing.name, packs: l.packs, packSize: l.packSize, unit: ing.unit, unitPriceCents: l.unitPriceCents ?? null };
+    }),
+    note: po.note,
+  });
+  return { bytes, filename: `pedido-${(po.label ?? String(po.id)).toLowerCase()}.pdf` };
+}
+
 export async function sendPurchaseOrder(payload: Payload, poId: number, approverId: number | null, req?: PayloadRequest) {
   const po = await payload.findByID({ collection: "purchase-orders", id: poId, depth: 1, overrideAccess: true, req });
   const supplier = po.supplier as { name: string; email: string };
@@ -172,6 +192,7 @@ export async function sendPurchaseOrder(payload: Payload, poId: number, approver
   let emailStatus = "Sin enviar: falta RESEND_API_KEY.";
   const key = process.env.RESEND_API_KEY;
   if (key) {
+    const pdf = await purchaseOrderPdfFor(payload, poId, req);
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -180,6 +201,7 @@ export async function sendPurchaseOrder(payload: Payload, poId: number, approver
         to: supplier.email,
         subject: `Pedido ${po.label} · ${business.tradeName || "maisha matcha"}`,
         html,
+        attachments: [{ filename: pdf.filename, content: Buffer.from(pdf.bytes).toString("base64") }],
       }),
     }).catch(() => null);
     emailStatus = res?.ok ? `Enviado a ${supplier.email}` : `Error al enviar (${res?.status ?? "red"})`;

@@ -71,6 +71,7 @@ export const PurchaseOrders: CollectionConfig = {
   access: { read: ownerOrManager, create: ownerOrManager, update: ownerOrManager, delete: nobody },
   fields: [
     { name: "label", type: "text", label: "Número", admin: { readOnly: true } },
+    { name: "pdf", type: "ui", admin: { components: { Field: "/cms/components/PoPdfLink#PoPdfLink" } } },
     { name: "supplier", type: "relationship", relationTo: "suppliers", required: true, label: "Proveedor" },
     {
       name: "status",
