@@ -67,6 +67,10 @@ Reduced palette, 2–3 colors maximum, much negative space.
   - Hero word-rise: per-word staggered fade-and-rise on load (CSS only).
   - Manifesto scroll-ink: words go faint (18%) to full ink with scroll.
   - Historia rail: a wood line draws down the timeline with scroll.
+  - Story glyphs (sticky panel, desktop): each era's kanji is written in
+    top to bottom (clip reveal, 1.1s, once per chapter change); the era
+    label rises after it. Large and quiet (matcha/40). Phones show the
+    kanji inline in each chapter's staged entrance.
   - Story chapters: staged entrance on scroll (era rises, title assembles
     word by word, body follows; ~550ms sequence, once per chapter).
   - Hover only: image zoom ≤ 1.04 (0.7s), nav underline slide-in, menu
@@ -82,8 +86,21 @@ Reduced palette, 2–3 colors maximum, much negative space.
 - The Octavio Paz register: matter and light, calm, presence.
 
 ## Composition patterns (sanctioned)
-- Tonal arc: the home page opens dark (image hero) and closes dark (founding
-  band on matcha-ink). Everything between stays washi. No more dark bands.
+- HOME HERO (founder, 2026-11-06, replaces the dark image hero): a light
+  editorial spread on washi. The poetic line is the headline (Fraunces
+  light, --text-hero, word-rise), one sumi CTA + one quiet link, and a real
+  salon photograph framed as a tall portrait at near-native size (never
+  stretched full bleed: the sources are small). The photo unveils once
+  upward and settles from 1.06 to 1 (hero-unveil/hero-settle). No giant
+  wordmark in the hero: the logo lives in the header. The header is washi
+  everywhere. The founder judged the dark split and the green panel "not
+  premium"; do not bring them back.
+- Visit block: a colophon (address large in the serif, hours and
+  directions beside it). No street photography there.
+- Story kanji use the brush face (Yuji Syuku, --font-brush), never a
+  system gothic.
+- Tonal arc (updated 2026-11-06): the home page opens light (editorial
+  hero) and closes on the matcha founding band. No dark bands.
 - Image hero: render at low scrim (≤25%); text lives on a flat matcha-ink
   panel (80%), lower-left. Small text over raw image needs its own chip.
 - Header: sticky single row; transparent with washi text over the home hero,

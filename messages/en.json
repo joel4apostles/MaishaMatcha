@@ -21,7 +21,8 @@
     "hero": {
       "eyebrow": "Murcia · The first matcha salon",
       "line": "Leaf ground on stone, water at the right heat, a long pause.",
-      "photoAlt": "A chasen, a chawan and a maisha matcha tin on the green tiles of the bar."
+      "photoAlt": "A chasen, a chawan and a maisha matcha tin on the green tiles of the bar.",
+      "photoCaption": "The bar · Plaza Cetina, 3"
     },
     "manifesto": {
       "eyebrow": "Manifesto",
@@ -48,7 +49,7 @@
       "alt2": "The stone counter beneath a woven work.",
       "alt3": "The tree beside the timber lattice screens.",
       "renderNote": "Project image. Not a final photograph.",
-      "shopfrontAlt": "The green maisha matcha sign on the stone front at Plaza Cetina, 3."
+      "visitEyebrow": "Visit"
     },
     "founding": {
       "eyebrow": "Founding members",

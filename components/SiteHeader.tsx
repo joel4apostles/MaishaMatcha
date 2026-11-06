@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { AppPathname } from "@/i18n/routing";
@@ -16,26 +15,14 @@ const NAV: { href: AppPathname; key: "menu" | "story" | "events" | "order" }[] =
 ];
 
 /**
- * Sticky header, single 64px row on all viewports. Over the home hero it
- * sits on a flat sumi/50 band (measured: washi text clears 4.6:1 against the
- * hero's brightest pixels); once scrolled, or on any inner page, it turns
- * washi. Colors only transition, no layout shift. Aligned to the page grid
- * (same gutter and 1100px container as Section).
+ * Sticky single-row header on washi everywhere (the home page opens light
+ * since 2026-11-06). 44px targets, mark only on phones, aligned to the page
+ * grid (same gutter and 1100px container as Section).
  */
 export function SiteHeader() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const [atTop, setAtTop] = useState(true);
-
-  useEffect(() => {
-    const onScroll = () => setAtTop(window.scrollY < 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const overlay = isHome && atTop;
 
   // Slide-in underline (flat pseudo-element); stays open on the active page.
   const linkBase =
@@ -43,14 +30,12 @@ export function SiteHeader() {
     "after:absolute after:bottom-2.5 after:left-1.5 after:right-1.5 after:h-px after:origin-left " +
     "after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out " +
     "hover:after:scale-x-100 aria-[current=page]:after:scale-x-100";
-  const linkTone = overlay
-    ? "text-washi hover:text-washi"
-    : "text-sumi/80 hover:text-sumi";
+  const linkTone = "text-sumi/80 hover:text-sumi";
 
   return (
     <header
       data-site-header=""
-      className={`${overlay ? "dark-band border-b border-transparent bg-sumi/50" : "border-b border-wood/20 bg-washi"} sticky top-0 z-40 px-6 transition-colors duration-300 sm:px-8`}
+      className="sticky top-0 z-40 border-b border-wood/20 bg-washi px-6 sm:px-8"
     >
       <nav
         aria-label={t("aria")}
@@ -60,7 +45,7 @@ export function SiteHeader() {
           href="/"
           aria-current={isHome ? "page" : undefined}
           aria-label="maisha matcha"
-          className={`-ml-2 flex min-h-[44px] min-w-[44px] items-center gap-2.5 pl-2 ${overlay ? "text-washi" : "text-matcha"}`}
+          className="-ml-2 flex min-h-[44px] min-w-[44px] items-center gap-2.5 pl-2 text-matcha"
         >
           {/* Phones: the mark alone, so every target can be 44px. */}
           <BrandMark className="h-6 w-auto shrink-0" />
@@ -80,12 +65,9 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
-          <LocaleSwitcher tone={overlay ? "light" : "dark"} />
+          <LocaleSwitcher />
         </div>
       </nav>
-      {/* Without JavaScript the header can't turn opaque on scroll: let it
-          scroll away with the hero instead of floating unreadable over washi. */}
-      <noscript dangerouslySetInnerHTML={{ __html: "<style>[data-site-header]{position:static}</style>" }} />
     </header>
   );
 }

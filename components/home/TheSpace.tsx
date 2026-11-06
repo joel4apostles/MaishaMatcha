@@ -4,7 +4,6 @@ import { site, siteHours, siteMapsUrl } from "@/content/site";
 import salonEstantes from "@/public/images/salon-estantes.jpg";
 import salonBarra from "@/public/images/salon-barra.jpg";
 import salonArbol from "@/public/images/salon-arbol.jpg";
-import shopfront from "@/public/images/shopfront.jpg";
 import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
@@ -56,16 +55,16 @@ export function TheSpace() {
         </div>
       </Reveal>
 
-      {/* The real sign on Plaza Cetina beside where and when: modest in size,
-          so the bright sign never competes with the founding band below. */}
-      <Reveal className="mt-14 grid grid-cols-1 items-start gap-6 border-t border-wood/25 pt-8 md:grid-cols-[minmax(0,520px)_minmax(0,1fr)] md:gap-12">
-        <div className="overflow-hidden rounded-[2px]">
-          <Image src={shopfront} alt={t("shopfrontAlt")} sizes="(min-width: 768px) 520px, 100vw" placeholder="blur" className="h-auto w-full" />
+      {/* Where and when, set like a colophon: the address large in the serif. */}
+      <Reveal className="mt-16 grid grid-cols-1 gap-8 border-t border-wood/25 pt-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-end md:gap-12">
+        <div>
+          <Eyebrow>{t("visitEyebrow")}</Eyebrow>
+          <p className="mt-5 font-serif text-[clamp(2rem,3.4vw+0.5rem,3.25rem)] font-light leading-[1.08] text-sumi">
+            {site.address}
+            <span className="block text-sumi/60">{site.city}</span>
+          </p>
         </div>
-        <div className="flex flex-col gap-1 text-sm text-sumi/80">
-          <span>
-            {site.address} · {site.city}
-          </span>
+        <div className="flex flex-col gap-1.5 text-sumi/80 md:pb-2">
           <span>{siteHours(locale)}</span>
           <a
             href={siteMapsUrl}

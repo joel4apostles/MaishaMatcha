@@ -5,7 +5,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Analytics } from "@vercel/analytics/next";
 import { routing } from "@/i18n/routing";
-import { sans, serif } from "@/lib/fonts";
+import { brush, sans, serif } from "@/lib/fonts";
 import { KeyboardSafeFields } from "@/components/KeyboardSafeFields";
 import "../globals.css";
 
@@ -38,7 +38,7 @@ export default async function LocaleLayout({
   void _pos;
 
   return (
-    <html lang={locale} className={`${serif.variable} ${sans.variable}`}>
+    <html lang={locale} className={`${serif.variable} ${sans.variable} ${brush.variable}`}>
       <body className="min-h-dvh bg-washi font-sans text-sumi antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}

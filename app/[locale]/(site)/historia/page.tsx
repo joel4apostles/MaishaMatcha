@@ -57,7 +57,7 @@ function StoryContent() {
         <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
       </Reveal>
 
-      <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,48rem)_1fr] lg:gap-16">
+      <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,40rem)_1fr] lg:gap-16">
       <div className="relative">
         <TimelineRail />
         <ol className="pl-6 sm:pl-10">
@@ -73,6 +73,13 @@ function StoryContent() {
             />
             {/* Dramatic staged entrance: era, then title word by word, then body. */}
             <StageReveal>
+              {/* Phones and tablets: the era's character sits with its chapter
+                  (desktop shows it large in the sticky panel instead). */}
+              {chapter.glyph ? (
+                <div data-s aria-hidden="true" style={{ "--sd": "0ms" } as CSSProperties} className="mb-4 lg:hidden">
+                  <span className="select-none font-brush text-[5.5rem] leading-none text-matcha/40">{chapter.glyph}</span>
+                </div>
+              ) : null}
               <div data-s style={{ "--sd": "0ms" } as CSSProperties}>
                 <Eyebrow>{chapter.era[locale]}</Eyebrow>
               </div>
