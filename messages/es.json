@@ -80,12 +80,18 @@
   },
   "menu": {
     "eyebrow": "La carta",
-    "title": "Carta",
-    "intro": "Usucha en agua o matcha latte. Los lattes, con la leche que prefieras, también vegetal de avena.",
+    "title": "Tres matchas, tres tierras",
+    "intro": "Cada matcha llega de una región de Japón. En agua, como usucha, o con leche, como latte.",
     "closing": "Cincuenta socios fundadores estrenarán esta carta.",
     "priceNote": "Precios en euros, IVA incluido. 100 % té japonés de origen.",
     "price": "Precio",
-    "sectionsAria": "Secciones de la carta"
+    "sectionsAria": "Secciones de la carta",
+    "phrase": "Wa kei sei jaku: armonía, respeto, pureza, calma.",
+    "prepare": "Crea tu bebida con {name}",
+    "yoursEyebrow": "A tu manera",
+    "yoursTitle": "Leche, extras, tu receta",
+    "yoursBody": "Cualquier matcha o té como latte (+{delta}), con leche o avena. Y si quieres, una capa más.",
+    "photoAlt": "Un matcha latte, la leche bajo el verde."
   },
   "story": {
     "eyebrow": "Historia",

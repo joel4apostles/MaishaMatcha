@@ -80,12 +80,18 @@
   },
   "menu": {
     "eyebrow": "The menu",
-    "title": "Menu",
-    "intro": "Usucha in water or matcha latte. Lattes with the milk you prefer, oat included.",
+    "title": "Three matchas, three lands",
+    "intro": "Each matcha comes from one region of Japan. In water, as usucha, or with milk, as a latte.",
     "closing": "Fifty founding members will taste this menu first.",
-    "priceNote": "Prices in euros, VAT included. 100 % Japanese tea of origin.",
+    "priceNote": "Prices in euros, VAT included. All our tea comes from Japan.",
     "price": "Price",
-    "sectionsAria": "Menu sections"
+    "sectionsAria": "Menu sections",
+    "phrase": "Wa kei sei jaku: harmony, respect, purity, tranquillity.",
+    "prepare": "Create your drink with {name}",
+    "yoursEyebrow": "Your way",
+    "yoursTitle": "Milk, extras, your recipe",
+    "yoursBody": "Any matcha or tea as a latte (+{delta}), with milk or oat. And if you like, one more layer.",
+    "photoAlt": "A matcha latte, milk beneath the green."
   },
   "story": {
     "eyebrow": "Story",

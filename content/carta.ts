@@ -40,6 +40,10 @@ export type CartaItem = {
   description: L;
   groups: string[];
   signature?: boolean;
+  /** Region of Japan, shown on the carta tasting card. */
+  origin?: L;
+  /** Grade, shown as the card label (the description may open with it). */
+  grade?: L;
 };
 
 export type CartaCategory = { slug: string; title: L; items: CartaItem[] };
@@ -133,6 +137,8 @@ export const carta: CartaCategory[] = [
     items: [
       {
         name: "Uji",
+        origin: { es: "Uji, Kioto", en: "Uji, Kyoto" },
+        grade: { es: "Ceremonial", en: "Ceremonial" },
         priceCents: 880,
         color: "#5F7A2C",
         signature: true,
@@ -144,6 +150,8 @@ export const carta: CartaCategory[] = [
       },
       {
         name: "Nishio",
+        origin: { es: "Nishio, Aichi", en: "Nishio, Aichi" },
+        grade: { es: "Ceremonial tradicional", en: "Traditional ceremonial" },
         priceCents: 740,
         color: "#748A38",
         signature: true,
@@ -155,6 +163,8 @@ export const carta: CartaCategory[] = [
       },
       {
         name: "Kagoshima",
+        origin: { es: "Kagoshima, Kiushu", en: "Kagoshima, Kyushu" },
+        grade: { es: "Calidad diaria", en: "Everyday grade" },
         priceCents: 620,
         color: "#8A9A4C",
         signature: true,

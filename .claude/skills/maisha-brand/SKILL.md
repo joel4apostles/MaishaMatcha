@@ -100,6 +100,12 @@ Reduced palette, 2–3 colors maximum, much negative space.
   the line (Yuji Syuku, aria-hidden, sr-only translation), signed by a small
   OUTLINE seal 抹茶 beneath it (never a filled block: it reads as a button).
   Seal presses in once (scale 1.08 to 1, no rotation).
+- CARTA (founder, 2026-11-06, from the reference board): matchas as tasting
+  cards (grade label in leaf #454F0B, name, region, notes, usucha/latte,
+  a quiet link to /crea). Kanji numerals 一二三四 on section headings only
+  (not the jump nav), one vertical phrase 和敬清寂, outline seal at the foot.
+  Price labels sentence case. Never show [POR CONFIRMAR]: a fact we lack
+  (cultivar, harvest) is simply absent until the founder gives it.
 - Language switch: a quiet "ES ⌄" dropdown (endonyms Español / English),
   never two loose letters.
 - Visit block: a colophon (address large in the serif, hours and

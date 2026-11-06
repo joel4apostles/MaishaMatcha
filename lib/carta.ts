@@ -45,3 +45,10 @@ export function signatureItems(): { item: CartaItem; category: CartaCategory }[]
 
 export const itemSlug = (item: CartaItem) =>
   item.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, "-");
+
+/** The description without its opening grade sentence ("Ceremonial. ..."), for cards that show the grade as a label. */
+export function tastingNotes(item: CartaItem, locale: Locale): string {
+  const text = item.description[locale];
+  const grade = item.grade?.[locale];
+  return grade && text.startsWith(`${grade}. `) ? text.slice(grade.length + 2) : text;
+}

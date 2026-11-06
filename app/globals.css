@@ -11,6 +11,7 @@
   --color-gold: #786000; /* the signature accent: wordmark, one CTA, focus */
   --color-wood: #b08d57; /* timber hairlines and borders */
   --color-matcha: #9bab37; /* the brand kit matcha green: bands, mark, hovers */
+  --color-leaf: #454f0b; /* deep green (official logo files): small labels only */
 
   /* Type families (wired to next/font variables in the locale layout).
      Serif = Fraunces, matching the brand kit's warm rounded terminals. */
