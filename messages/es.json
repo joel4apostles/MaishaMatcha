@@ -20,7 +20,8 @@
   "home": {
     "hero": {
       "eyebrow": "Murcia · Primer salón de matcha",
-      "line": "Hoja molida en piedra, agua a su punto, una pausa larga."
+      "line": "Hoja molida en piedra, agua a su punto, una pausa larga.",
+      "photoAlt": "Un chasen, un chawan y una lata de matcha maisha sobre los azulejos verdes de la barra."
     },
     "manifesto": {
       "eyebrow": "Manifiesto",
@@ -46,9 +47,8 @@
       "alt1": "Estanterías de madera iluminadas con cuencos de cerámica.",
       "alt2": "La barra de piedra bajo una obra tejida.",
       "alt3": "El árbol junto a las celosías de madera.",
-      "altMain": "El salón: madera cálida, tatami, la barra de piedra y el árbol.",
       "renderNote": "Imagen del proyecto. No es una imagen final.",
-      "renderNoteShort": "Imagen del proyecto"
+      "shopfrontAlt": "El rótulo verde de maisha matcha sobre la fachada de piedra, en Plaza Cetina, 3."
     },
     "founding": {
       "eyebrow": "Socios fundadores",

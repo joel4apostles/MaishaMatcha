@@ -4,6 +4,7 @@ import { site, siteHours, siteMapsUrl } from "@/content/site";
 import salonEstantes from "@/public/images/salon-estantes.jpg";
 import salonBarra from "@/public/images/salon-barra.jpg";
 import salonArbol from "@/public/images/salon-arbol.jpg";
+import shopfront from "@/public/images/shopfront.jpg";
 import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
@@ -50,11 +51,22 @@ export function TheSpace() {
               </figure>
             ))}
           </div>
+          {/* Honesty: the interior is still a project render. */}
+          <p className="mx-auto mt-3 max-w-[1600px] text-sm text-sumi/70">{t("renderNote")}</p>
         </div>
       </Reveal>
 
+      {/* The real sign on Plaza Cetina: where to find us. */}
+      <Reveal className="mt-14">
+        <figure>
+          <div className="overflow-hidden rounded-[2px]">
+            <Image src={shopfront} alt={t("shopfrontAlt")} sizes="(min-width: 1100px) 1100px, 100vw" placeholder="blur" className="h-auto w-full" />
+          </div>
+        </figure>
+      </Reveal>
+
       {/* Where and when, two screens from the hero on a phone. */}
-      <Reveal className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-wood/25 pt-6 text-sm text-sumi/80">
+      <Reveal className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-wood/25 pt-6 text-sm text-sumi/80">
         <span>
           {site.address} · {site.city}
         </span>

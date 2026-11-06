@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import salonRender from "@/public/images/salon.jpg";
+import stillLife from "@/public/images/hero-still-life.jpg";
 import matchaPowder from "@/public/images/matcha-powder.jpg";
 import { WordReveal } from "@/components/WordReveal";
 import { inkButtonClass } from "@/components/Button";
@@ -9,27 +9,32 @@ import { riseDelay } from "./motion";
 
 export function Hero() {
   const t = useTranslations("home.hero");
-  const space = useTranslations("home.space");
   const cta = useTranslations("cta");
   return (
-    <section className="dark-band relative -mt-16 flex min-h-[100svh] flex-col overflow-hidden px-6 pt-16 sm:px-8">
-      {/* The salon render at near-full warmth. */}
-      <Image
-        src={salonRender}
-        alt={space("altMain")}
-        fill
-        priority
-        placeholder="blur"
-        sizes="100vw"
-        className="object-cover object-[60%_center]"
-      />
-      {/* Light unifying scrim; legibility comes from the ink panel below. */}
-      <div aria-hidden="true" className="absolute inset-0 bg-sumi/25" />
+    <section className="dark-band relative -mt-16 flex min-h-[100svh] flex-col overflow-hidden bg-sumi px-6 pt-16 sm:px-8">
+      {/* A real photograph from the salon: chasen, chawan and a maisha tin on
+          the bar's green tiles. Phones: full bleed. Desktop: the right part of
+          a flat ink field (the source is a portrait, never stretched wide).
+          Phones and tablets: the photo fills the top of the hero so the
+          objects sit just above the panel, never under it. */}
+      <div className="absolute inset-x-0 top-0 bottom-[36%] lg:bottom-0 lg:left-auto lg:w-[44%]">
+        <Image
+          src={stillLife}
+          alt={t("photoAlt")}
+          fill
+          priority
+          placeholder="blur"
+          sizes="(min-width: 1024px) 44vw, 100vw"
+          className="object-cover object-[50%_62%] lg:object-[50%_40%]"
+        />
+      </div>
+      {/* Phones and tablets: a light scrim; legibility comes from the ink panel. */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 bottom-[36%] bg-sumi/15 lg:hidden" />
 
       <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24">
         {/* Brand panel: flat kit matcha, sumi ink — AA-verified on any crop. */}
         <div
-          className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10"
+          className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10 lg:max-w-[min(42rem,calc(56vw-max(2rem,(100vw-1100px)/2)-2.5rem))]"
           style={riseDelay(100)}
         >
           {/* Real matcha powder under a green veil (15% show-through, AA-safe).
@@ -71,11 +76,6 @@ export function Hero() {
         style={riseDelay(1200)}
       />
 
-      {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-4 right-6 rounded-[2px] bg-matcha/90 px-2.5 py-1 text-eyebrow uppercase text-sumi/85 sm:right-8">
-        <span className="sm:hidden">{space("renderNoteShort")}</span>
-        <span className="hidden sm:inline">{space("renderNote")}</span>
-      </span>
     </section>
   );
 }
