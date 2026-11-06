@@ -24,7 +24,7 @@ export function StoryTeaser() {
   return (
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <Reveal>
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <Eyebrow numeral="二">{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
       </Reveal>
 

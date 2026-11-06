@@ -13,7 +13,7 @@ export function Manifesto() {
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
         <Reveal>
-          <Eyebrow>{t("eyebrow")}</Eyebrow>
+          <Eyebrow numeral="一">{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>
         </Reveal>
         <div className="space-y-8">

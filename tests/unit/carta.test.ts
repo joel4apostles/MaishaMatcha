@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { carta, cartaGroups } from "@/content/carta";
-import { cartaExtras, priceLines, signatureItems } from "@/lib/carta";
+import { cartaExtras, priceLines, tastingNotes } from "@/lib/carta";
 
 const find = (name: string) => carta.flatMap((c) => c.items).find((i) => i.name === name)!;
 const plain = (s: string) => s.replace(/\s/g, " ");
@@ -30,8 +30,11 @@ describe("carta", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
-  it("features four signatures on the home page", () => {
-    expect(signatureItems().map(({ item }) => item.name)).toEqual(["Uji", "Nishio", "Kagoshima", "Hojicha"]);
+  it("tasting cards show the grade once (label, not again in the notes)", () => {
+    const uji = carta.find((c) => c.slug === "matcha")!.items[0];
+    expect(uji.grade?.es).toBe("Ceremonial");
+    expect(tastingNotes(uji, "es")).toBe("Dulzor natural, umami profundo y textura sedosa, sin amargor.");
+    expect(tastingNotes(uji, "en").startsWith("Natural sweetness")).toBe(true);
   });
 
   it("uses whole cents everywhere", () => {

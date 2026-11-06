@@ -1,4 +1,4 @@
-import { carta, cartaGroups, type CartaCategory, type CartaGroup, type CartaItem } from "@/content/carta";
+import { cartaGroups, type CartaGroup, type CartaItem } from "@/content/carta";
 import type { Locale } from "@/i18n/routing";
 import { formatEuro } from "@/lib/money";
 
@@ -37,11 +37,6 @@ export function cartaExtras(locale: Locale) {
   }));
 }
 
-export function signatureItems(): { item: CartaItem; category: CartaCategory }[] {
-  return carta.flatMap((category) =>
-    category.items.filter((i) => i.signature).map((item) => ({ item, category })),
-  );
-}
 
 export const itemSlug = (item: CartaItem) =>
   item.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, "-");

@@ -21,7 +21,7 @@ export function TheSpace() {
   return (
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       <Reveal>
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <Eyebrow numeral="四">{t("eyebrow")}</Eyebrow>
         <Headline className="mt-5">{t("title")}</Headline>
         <p className="measure mt-6 text-lg text-sumi/80">{t("body")}</p>
       </Reveal>

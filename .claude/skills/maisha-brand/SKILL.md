@@ -106,6 +106,10 @@ Reduced palette, 2–3 colors maximum, much negative space.
   (not the jump nav), one vertical phrase 和敬清寂, outline seal at the foot.
   Price labels sentence case. Never show [POR CONFIRMAR]: a fact we lack
   (cultivar, harvest) is simply absent until the founder gives it.
+- HOME PATH (2026-11-06): sections marked 一 manifesto, 二 story, 三 carta,
+  四 space, 五 founding (Eyebrow `numeral` prop). The home carta uses the
+  same TastingCard as /carta; on phones the cards are a swipe row (82%).
+- Kanji numerals mark steps on: home, carta, ordering, product "how to use".
 - Language switch: a quiet "ES ⌄" dropdown (endonyms Español / English),
   never two loose letters.
 - Visit block: a colophon (address large in the serif, hours and

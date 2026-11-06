@@ -25,8 +25,11 @@ export function Founding() {
       <div aria-hidden="true" className="absolute inset-0 bg-matcha/85" />
       <Reveal className="relative grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         <div>
-          <p className="text-eyebrow font-medium uppercase text-sumi/85">
-            {t("eyebrow")}
+          <p className="flex items-baseline gap-3 text-eyebrow font-medium uppercase text-sumi/85">
+            <span lang="ja" aria-hidden="true" className="font-brush text-[1.6rem] font-normal normal-case leading-none text-sumi">
+              五
+            </span>
+            <span>{t("eyebrow")}</span>
           </p>
           <h2 className="mt-5 text-balance font-serif text-title font-light text-sumi">
             {t("title")}
