@@ -61,7 +61,7 @@ export function StoryVisual({ items }: { items: StoryVisualItem[] }) {
               {item.glyph}
             </span>
           ) : (
-            <BrandMark className={`h-[clamp(8rem,13vw,12rem)] w-auto text-matcha/50 ${i === active ? "ink-write" : ""}`} />
+            <BrandMark className={`h-[clamp(8rem,13vw,12rem)] w-auto text-matcha/50 opacity-70 ${i === active ? "ink-write" : ""}`} />
           )}
           <span className={`mt-8 text-eyebrow uppercase text-sumi/70 ${i === active ? "ink-write-late" : ""}`}>
             {item.era}

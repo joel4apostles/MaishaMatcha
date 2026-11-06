@@ -64,7 +64,7 @@ export function TheSpace() {
             <span className="block text-sumi/60">{site.city}</span>
           </p>
         </div>
-        <div className="flex flex-col gap-1.5 text-sumi/80 md:pb-2">
+        <div className="flex flex-col gap-1.5 text-sumi/80 md:pb-[0.35rem]">
           <span>{siteHours(locale)}</span>
           <a
             href={siteMapsUrl}

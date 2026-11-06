@@ -18,12 +18,12 @@ export function Hero() {
   const cta = useTranslations("cta");
   return (
     <section className="px-6 sm:px-8">
-      <div className="mx-auto grid min-h-[calc(100svh-4rem)] max-w-[1100px] grid-cols-1 items-center gap-12 py-14 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:gap-16 md:py-20">
+      <div className="mx-auto grid min-h-[calc(100svh-4rem)] max-w-[1100px] grid-cols-1 content-center items-center gap-12 md:items-end py-14 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:gap-16 md:py-20">
         <div>
           <p className="anim-rise text-eyebrow uppercase text-sumi/70" style={riseDelay(0)}>
             {t("eyebrow")}
           </p>
-          <h1 className="mt-8 font-serif text-hero font-light text-sumi">
+          <h1 className="mt-8 text-balance font-serif text-hero font-light text-sumi">
             <WordReveal text={t("line")} baseDelay={150} step={80} />
           </h1>
           <div className="anim-rise mt-12 flex flex-wrap items-center gap-x-8 gap-y-4" style={riseDelay(900)}>

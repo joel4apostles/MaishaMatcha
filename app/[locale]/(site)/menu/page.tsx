@@ -5,7 +5,7 @@ import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
-import { buttonClass, QuietLink } from "@/components/Button";
+import { inkButtonClass, QuietLink } from "@/components/Button";
 import { carta } from "@/content/carta";
 import { cartaExtras, cartaGroup, itemSlug, priceLines } from "@/lib/carta";
 import { pageMetadata } from "@/lib/seo";
@@ -152,7 +152,7 @@ function MenuContent() {
       <Reveal className="mt-16 max-w-3xl border-t border-wood/25 pt-10">
         <p className="font-serif text-2xl font-light text-sumi">{t("closing")}</p>
         <div className="mt-7">
-          <a href={`/${locale}#socios`} className={buttonClass}>
+          <a href={`/${locale}#socios`} className={inkButtonClass}>
             {cta("joinWaitlist")}
           </a>
         </div>

@@ -6,7 +6,7 @@ import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
-import { buttonClass } from "@/components/Button";
+import { inkButtonClass } from "@/components/Button";
 import { EventRsvp } from "@/components/EventRsvp";
 import { listEvents, memberRsvps } from "@/lib/events";
 import { currentMember } from "@/lib/members-server";
@@ -74,7 +74,7 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
         <Reveal className="sm:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-6 rounded-[2px] border border-wood/35 p-7 sm:p-9">
             <p className="measure font-serif text-2xl font-light text-sumi">{t("invite")}</p>
-            <a href={`/${locale}#socios`} className={buttonClass}>
+            <a href={`/${locale}#socios`} className={inkButtonClass}>
               {cta("joinWaitlist")}
             </a>
           </div>

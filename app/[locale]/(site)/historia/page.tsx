@@ -4,7 +4,7 @@ import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import salonArbol from "@/public/images/salon-arbol.jpg";
-import { buttonClass } from "@/components/Button";
+import { inkButtonClass } from "@/components/Button";
 import { StageReveal } from "@/components/StageReveal";
 import { StageWords } from "@/components/StageWords";
 import { Section } from "@/components/Section";
@@ -140,7 +140,7 @@ function StoryContent() {
           {t("closing")}
         </p>
         <div className="mt-7">
-          <a href={`/${locale}#socios`} className={buttonClass}>
+          <a href={`/${locale}#socios`} className={inkButtonClass}>
             {cta("joinWaitlist")}
           </a>
         </div>
