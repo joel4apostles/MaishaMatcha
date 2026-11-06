@@ -231,6 +231,14 @@ customer records (say so in the privacy notice, remove by hand on
 request). A founding fee paid with no place left (or paid twice) is flagged
 "DEVOLVER" on the order and in the audit log: refund it in Stripe.
 
+Pre-push audit 2026-11-06 (security-audit skill): SHIP. Same 5 low + 5
+moderate advisories as accepted above, no secrets tracked, lockfile all
+registry.npmjs.org, every collection spells out access, headers present
+on /es, /pos, /admin. A build and every public page work with NO reachable
+database (ordering shows "no disponible", events fall back to the static
+list). Pending: the live Supabase checks (section 3) once DATABASE_URL
+exists; Payload GraphQL is on (same access rules), disable it if unused.
+
 ## Content editing
 
 Until public pages read from the CMS, `CONTENT.md` remains the team guide:
