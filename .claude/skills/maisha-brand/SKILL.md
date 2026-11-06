@@ -86,23 +86,20 @@ Reduced palette, 2–3 colors maximum, much negative space.
 - The Octavio Paz register: matter and light, calm, presence.
 
 ## Composition patterns (sanctioned)
-- HOME HERO (founder, 2026-11-06, replaces the dark image hero): a light
-  editorial spread on washi. The poetic line is the headline (Fraunces
-  light, --text-hero, word-rise), one sumi CTA + one quiet link, and a real
-  salon photograph framed as a tall portrait at near-native size (never
-  stretched full bleed: the sources are small). The photo unveils once
-  upward and settles from 1.06 to 1 (hero-unveil/hero-settle). No giant
-  wordmark in the hero: the logo lives in the header. The header is washi
-  everywhere. The founder judged the dark split and the green panel "not
-  premium"; do not bring them back.
+- HOME HERO (founder, 2026-11-06, final): the full picture. The salon render
+  full bleed under the transparent header, one flat sumi/45 veil (one
+  layer only: stacked veils leave a visible edge). No panel or box (the
+  founder rejected the green panel AND the light editorial spread as
+  cheap). Poetic line in washi straight on the picture, lower left
+  (Fraunces light, --text-hero, word-rise), one washi-filled CTA + one
+  washi underlined link, honest render note bottom right. The picture
+  settles once from a slight zoom.
 - Visit block: a colophon (address large in the serif, hours and
   directions beside it). No street photography there.
 - Story kanji use the brush face (Yuji Syuku, --font-brush), never a
   system gothic.
-- Tonal arc (updated 2026-11-06): the home page opens light (editorial
-  hero) and closes on the matcha founding band. No dark bands.
-- Image hero: render at low scrim (≤25%); text lives on a flat matcha-ink
-  panel (80%), lower-left. Small text over raw image needs its own chip.
+- Tonal arc (updated 2026-11-06): the home page opens on the full picture
+  (dark veil) and closes on the matcha founding band. No other dark bands.
 - Header: sticky single row; transparent with washi text over the home hero,
   washi background everywhere else. Colors transition, layout never shifts.
 - Footer closes with the monumental wordmark in wood/35. Decorative,
