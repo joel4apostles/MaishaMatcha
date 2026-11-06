@@ -91,9 +91,17 @@ Reduced palette, 2–3 colors maximum, much negative space.
   layer only: stacked veils leave a visible edge). No panel or box (the
   founder rejected the green panel AND the light editorial spread as
   cheap). Poetic line in washi straight on the picture, lower left
-  (Fraunces light, --text-hero, word-rise), one washi-filled CTA + one
-  washi underlined link, honest render note bottom right. The picture
+  (Fraunces light, --text-hero, word-rise), one sumi CTA + one sumi
+  underlined link (on the card), honest render note bottom right. The picture
   settles once from a slight zoom.
+- HERO CARD (founder, 2026-11-06): the matcha card returns on the full
+  picture (powder under matcha/95, sumi ink, shikishi inner hairline at
+  sumi/25). Japanese touches, one each: 一期一会 brushed vertically beside
+  the line (Yuji Syuku, aria-hidden, sr-only translation), signed by a small
+  OUTLINE seal 抹茶 beneath it (never a filled block: it reads as a button).
+  Seal presses in once (scale 1.08 to 1, no rotation).
+- Language switch: a quiet "ES ⌄" dropdown (endonyms Español / English),
+  never two loose letters.
 - Visit block: a colophon (address large in the serif, hours and
   directions beside it). No street photography there.
 - Story kanji use the brush face (Yuji Syuku, --font-brush), never a

@@ -19,11 +19,12 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Murcia · The first matcha salon",
+      "eyebrow": "Murcia · The first matcha salon",
       "line": "Leaf ground on stone, water at the right heat, a long pause.",
       "photoAlt": "A chasen, a chawan and a maisha matcha tin on the green tiles of the bar.",
       "photoCaption": "The ritual",
-      "salonAlt": "The maisha salon: warm wood, the stone bar and the tree at its centre."
+      "salonAlt": "The maisha salon: warm wood, the stone bar and the tree at its centre.",
+      "ichigo": "Ichigo ichie: each meeting happens only once."
     },
     "manifesto": {
       "eyebrow": "Manifesto",
