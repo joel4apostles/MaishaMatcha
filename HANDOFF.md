@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, ~01:40 (Opus 5.5 session)
+Last updated: 2026-11-06, ~02:10 (Opus 5.5 session)
 
 ## Where things stand
 
@@ -15,7 +15,7 @@ Last updated: 2026-11-06, ~01:40 (Opus 5.5 session)
   events use the static list) and /admin returns 500. Next deploy step:
   Supabase + Vercel env (POS-PLAN section 7), then the live Supabase checks
   in the security-audit skill (section 3).
-- **Built locally, tested (125 tests, `npm test`):** counter POS (PIN sign-in,
+- **Built locally, tested (132 tests, `npm test`):** counter POS (PIN sign-in,
   shifts, Z report, cash/card-on-terminal, tickets with AEAT QR, invoice hash
   chain, KDS, refunds/voids with manager PIN, offline cash queue), inventory
   and suppliers (gram deduction, counts, batches, reorder drafts, approve to
@@ -36,7 +36,13 @@ Last updated: 2026-11-06, ~01:40 (Opus 5.5 session)
   units); monthly membership via Stripe subscriptions with the founding
   price. Privacy notice rewritten (provisional, needs legal review).
   Design review SHIP; security review SHIP with all SHOULDs fixed.
-- **Real photos on the site (2026-11-06, LOCAL, 3 commits not pushed):**
+- **Counter extras (2026-11-06, LOCAL, not pushed):** split payment (card
+  + cash, change from cash only), full invoice on request (F3 in series
+  "F" replacing the ticket, NIF/NIE/CIF/VAT validated, /pos/factura/[id]),
+  receipts by email (address not stored). Refunds go back cash first, then
+  card, one row per method; a ticket with a full invoice is not refunded at
+  the till (the gestor issues the corrective). Security review SHIP.
+- **Real photos on the site (2026-11-06, LOCAL, not pushed):**
   hero = bar still life (public/images/hero-still-life.jpg; phones full
   bleed, desktop ink field + right photo column), shop sign beside the
   visit line (shopfront.jpg), still life on /tienda. Design review SHIP.

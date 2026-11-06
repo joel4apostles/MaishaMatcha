@@ -463,7 +463,8 @@
         "bad-amount": "The amount is invalid or above what was paid.",
         "not-paid": "The order is not paid.",
         "paid": "A paid order is refunded, not voided.",
-        "generic": "Could not complete it. Try again."
+        "generic": "Could not complete it. Try again.",
+        "already-full": "This ticket has a full invoice: your accountant issues the correction."
       },
       "fullInvoice": "Full invoice (with tax id)",
       "customerName": "Name or company",

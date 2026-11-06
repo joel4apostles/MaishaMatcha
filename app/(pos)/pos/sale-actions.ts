@@ -157,6 +157,6 @@ export async function emailReceiptAction(orderId: number, email: string) {
   if (!a) return noSession;
   const p = z.email().max(254).safeParse(String(email).trim());
   if (!p.success || !Number.isInteger(orderId)) return invalid;
-  if (!rateLimit(`receipt:${a.deviceId}`, 20)) return { ok: false as const, error: "rate-limited" };
+  if (!rateLimit(`receipt:${a.deviceId}`, 5) || !rateLimit(`receipt-order:${orderId}`, 3)) return { ok: false as const, error: "rate-limited" };
   return emailReceipt(await payloadClient(), orderId, p.data);
 }

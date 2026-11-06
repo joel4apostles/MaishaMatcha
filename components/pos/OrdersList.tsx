@@ -10,7 +10,7 @@ import type { PosStaff } from "@/lib/pos/core";
 import type { shiftOrders } from "@/lib/pos/sales";
 
 type Row = Awaited<ReturnType<typeof shiftOrders>>[number];
-const ERRORS = ["reason-required", "over-limit", "approval-failed", "bad-amount", "not-paid", "paid"];
+const ERRORS = ["already-full", "reason-required", "over-limit", "approval-failed", "bad-amount", "not-paid", "paid"];
 const toCents = (v: string) => Math.round(Number(v.replace(",", ".") || "NaN") * 100);
 
 /** This shift's orders; tap one to void it (unpaid) or refund it (paid). */

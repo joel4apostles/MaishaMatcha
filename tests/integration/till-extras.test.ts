@@ -70,3 +70,33 @@ describe("full invoice on request", () => {
     expect(again.every((a) => !a.ok && a.error === "already-full")).toBe(true);
   });
 });
+
+describe("refunds after split payment and full invoices (security review)", () => {
+  it("returns cash first, then card, one refund row per method", async () => {
+    const o = await sale(); // 17,60
+    await payOrder(payload, actor, { orderId: o.orderId, method: "split", cardCents: 1000, tenderedCents: 760 });
+    const { refundOrder } = await import("@/lib/pos/sales");
+    const owner = await staff(payload, "extras-owner@test.local", "owner", "Olga");
+    const ownerActor = { staffId: owner.id, deviceId: actor.deviceId };
+    const r = await refundOrder(payload, ownerActor, { orderId: o.orderId, amountCents: 1200, reason: "Bebida equivocada" });
+    expect(r.ok).toBe(true);
+    const rows = (await payload.find({ collection: "refunds", overrideAccess: true, where: { order: { equals: o.orderId } } })).docs;
+    expect(rows.map((x) => [x.method, x.amountCents]).sort()).toEqual([["card_terminal", 440], ["cash", 760]]);
+    // What is left can only come back on the card.
+    expect(await refundOrder(payload, ownerActor, { orderId: o.orderId, amountCents: 600, reason: "x" })).toMatchObject({ ok: false, error: "bad-amount" });
+    expect((await refundOrder(payload, ownerActor, { orderId: o.orderId, amountCents: 560, reason: "x" })).ok).toBe(true);
+  });
+
+  it("refuses a till refund on a ticket that has a full invoice", async () => {
+    const o = await sale();
+    await payOrder(payload, actor, { orderId: o.orderId, method: "card_terminal" });
+    const f = await issueFullInvoice(payload, actor, o.orderId, { name: "Ana", taxId: "12345678Z", address: "Calle Mayor 1" });
+    expect(f.ok).toBe(true);
+    const { refundOrder } = await import("@/lib/pos/sales");
+    const owner = (await payload.find({ collection: "users", overrideAccess: true, where: { email: { equals: "extras-owner@test.local" } } })).docs[0];
+    expect(await refundOrder(payload, { staffId: owner.id, deviceId: actor.deviceId }, { orderId: o.orderId, amountCents: 100, reason: "x" })).toMatchObject({
+      ok: false,
+      error: "already-full",
+    });
+  });
+});

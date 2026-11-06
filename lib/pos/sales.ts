@@ -678,7 +678,7 @@ export async function refundOrder(
       req,
       depth: 0,
       overrideAccess: true,
-      limit: 1,
+      limit: 10,
       where: { order: { equals: order.id } },
     });
     const { docs: invoices } = await payload.find({
@@ -686,9 +686,30 @@ export async function refundOrder(
       req,
       depth: 0,
       overrideAccess: true,
-      limit: 1,
-      where: { and: [{ order: { equals: order.id } }, { type: { equals: "F2" } }] },
+      limit: 20,
+      where: { order: { equals: order.id } },
     });
+    // A ticket replaced by a full invoice (F3) needs a corrective of the full
+    // invoice, which the till does not issue yet: refuse rather than let the
+    // records contradict each other. The gestor issues it.
+    if (invoices.some((i) => i.type === "F3")) return { ok: false as const, error: "already-full" as const };
+    const simplified = invoices.find((i) => i.type === "F2");
+
+    // Which money goes back: cash first (up to the cash paid and not yet
+    // refunded in cash), then card. One refund row per method, so the cash
+    // drawer and the Z report stay exact for split payments.
+    const paidBy = (m: string) => pays.filter((p) => p.method === m).reduce((s, p) => s + p.amountCents, 0);
+    const refundedBy = (m: string) => prior.filter((r) => r.method === m).reduce((s, r) => s + r.amountCents, 0);
+    const cashBack = Math.min(input.amountCents, Math.max(0, paidBy("cash") - refundedBy("cash")));
+    const parts: { method: "cash" | "card_terminal" | "online"; amountCents: number }[] = [];
+    if (cashBack > 0) parts.push({ method: "cash", amountCents: cashBack });
+    let rest = input.amountCents - cashBack;
+    for (const m of ["card_terminal", "online"] as const) {
+      const take = Math.min(rest, Math.max(0, paidBy(m) - refundedBy(m)));
+      if (take > 0) parts.push({ method: m, amountCents: take });
+      rest -= take;
+    }
+    if (rest > 0) return { ok: false as const, error: "bad-amount" as const };
 
     // Corrective invoice: negative amounts, IVA split in proportion.
     const share = input.amountCents / order.totalCents;
@@ -697,22 +718,24 @@ export async function refundOrder(
       const tax = -Math.round(r.taxCents * share);
       return { rateBasisPoints: r.rateBasisPoints, grossCents: gross, taxCents: tax, baseCents: gross - tax };
     });
-    const invoice = await issueInvoice(req, { id: order.id, totalCents: -input.amountCents, taxBreakdown: rates }, "R5", invoices[0]?.id);
-    await payload.create({
-      collection: "refunds",
-      req,
-      overrideAccess: true,
-      data: {
-        order: order.id,
-        shift: shift.id,
-        method: pays[0]?.method ?? "cash",
-        amountCents: input.amountCents,
-        reason: why,
-        staff: actor.staffId,
-        approvedBy,
-        invoice: invoice.id,
-      },
-    });
+    const invoice = await issueInvoice(req, { id: order.id, totalCents: -input.amountCents, taxBreakdown: rates }, "R5", simplified?.id);
+    for (const part of parts) {
+      await payload.create({
+        collection: "refunds",
+        req,
+        overrideAccess: true,
+        data: {
+          order: order.id,
+          shift: shift.id,
+          method: part.method,
+          amountCents: part.amountCents,
+          reason: why,
+          staff: actor.staffId,
+          approvedBy,
+          invoice: invoice.id,
+        },
+      });
+    }
     const full = already + input.amountCents === order.totalCents;
     await payload.update({
       collection: "orders",

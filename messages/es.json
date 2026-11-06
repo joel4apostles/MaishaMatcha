@@ -463,7 +463,8 @@
         "bad-amount": "El importe no es válido o supera lo cobrado.",
         "not-paid": "El pedido no está cobrado.",
         "paid": "Un pedido cobrado se devuelve, no se anula.",
-        "generic": "No se ha podido completar. Inténtalo otra vez."
+        "generic": "No se ha podido completar. Inténtalo otra vez.",
+        "already-full": "Este ticket tiene factura completa: la devolución la rectifica tu gestor."
       },
       "fullInvoice": "Factura completa (con NIF)",
       "customerName": "Nombre o razón social",

@@ -265,7 +265,10 @@ import those tickets later.
 4. In Supabase, check the `payload` schema is not under API, Exposed schemas.
 5. Push to main. On the tablet: sign in to /admin as owner, open /pos/registrar.
 
-## 8. Build backlog (founder go-ahead 2026-11-05: "implement every feature")
+## 8. Build backlog
+
+Done 2026-11-06 beyond the table: split payment, full invoice on request (F3), emailed receipts. Not built yet: supplier delivery-note and paper-ticket scanning (OCR, free option: in-browser Tesseract; plan suggested Claude vision, which is paid), PDF purchase orders (emails are HTML today), table ordering by QR (optional), corrective for full invoices (R1 to R4: ask the gestor).
+ (founder go-ahead 2026-11-05: "implement every feature")
 
 Mocks approved by the founder's instruction to build everything. Order of
 work, each step committed with tests before the next:
