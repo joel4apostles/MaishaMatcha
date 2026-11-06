@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { refundOrderAction, voidOrderAction } from "@/app/(pos)/pos/sale-actions";
+import { fullInvoiceAction, refundOrderAction, voidOrderAction } from "@/app/(pos)/pos/sale-actions";
 import { formatEuro } from "@/lib/money";
 import type { PosStaff } from "@/lib/pos/core";
 import type { shiftOrders } from "@/lib/pos/sales";
@@ -24,9 +24,25 @@ export function OrdersList({ rows, approvers }: { rows: Row[]; approvers: PosSta
   const [approverId, setApproverId] = useState<number | null>(approvers[0]?.id ?? null);
   const [pin, setPin] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [invoiceMsg, setInvoiceMsg] = useState<string | null>(null);
+  const [invoiceId, setInvoiceId] = useState<number | null>(null);
+  const requestFull = (form: FormData) =>
+    start(async () => {
+      if (!open) return;
+      setInvoiceMsg(null);
+      const r = await fullInvoiceAction(open.id, {
+        name: String(form.get("name") ?? ""),
+        taxId: String(form.get("taxId") ?? ""),
+        address: String(form.get("address") ?? ""),
+      }).catch(() => ({ ok: false as const, error: "generic" }));
+      if (r.ok) setInvoiceId(r.invoiceId);
+      else setInvoiceMsg(t(`fullErrors.${["bad-tax-id", "missing-customer", "already-full", "refunded", "not-paid", "invalid"].includes(r.error) ? r.error : "generic"}` as "fullErrors.generic"));
+    });
   const [pending, start] = useTransition();
 
   const choose = (r: Row) => {
+    setInvoiceId(null);
+    setInvoiceMsg(null);
     setOpen(r);
     setReason("");
     setAmount(((r.totalCents - r.refundedCents) / 100).toFixed(2).replace(".", ","));
@@ -186,6 +202,44 @@ export function OrdersList({ rows, approvers }: { rows: Row[]; approvers: PosSta
               </div>
             </form>
           )}
+          {open.paymentStatus === "paid" && open.status !== "cancelled" && open.refundedCents === 0 ? (
+            <details className="mt-8 border-t border-wood/30 pt-5">
+              <summary className="flex min-h-[48px] cursor-pointer items-center text-sm underline decoration-wood/60 underline-offset-4">{t("fullInvoice")}</summary>
+              {invoiceId ? (
+                <Link href={`/pos/factura/${invoiceId}`} className="mt-4 inline-flex min-h-[56px] items-center rounded-[2px] bg-sumi px-8 font-medium text-washi">
+                  {t("openInvoice")}
+                </Link>
+              ) : (
+                <form action={requestFull} className="mt-4 space-y-4">
+                  {[
+                    { name: "name", label: t("customerName"), auto: "organization" },
+                    { name: "taxId", label: t("customerTaxId"), auto: "off" },
+                    { name: "address", label: t("customerAddress"), auto: "street-address" },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label htmlFor={`fi-${f.name}`} className="block text-sm text-sumi/80">
+                        {f.label}
+                      </label>
+                      <input
+                        id={`fi-${f.name}`}
+                        name={f.name}
+                        required
+                        autoComplete={f.auto}
+                        autoCapitalize={f.name === "taxId" ? "characters" : "words"}
+                        className="mt-2 min-h-[56px] w-full rounded-[2px] border border-wood/50 bg-transparent px-4 text-base"
+                      />
+                    </div>
+                  ))}
+                  <p role="status" className="min-h-[1.5rem] text-sm text-sumi">
+                    {invoiceMsg}
+                  </p>
+                  <button type="submit" disabled={pending} className="min-h-[56px] rounded-[2px] bg-sumi px-8 font-medium text-washi disabled:opacity-35">
+                    {t("issueFull")}
+                  </button>
+                </form>
+              )}
+            </details>
+          ) : null}
           {open.status === "cancelled" || open.paymentStatus === "refunded" ? (
             <Link href={`/pos/ticket/${open.id}`} className="mt-6 inline-flex min-h-[48px] items-center text-sm underline decoration-wood/60 underline-offset-4">
               Ticket

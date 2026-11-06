@@ -567,9 +567,15 @@ export interface Invoice {
   fullNumber: string;
   series: string;
   number: number;
-  type: 'F2' | 'F1' | 'R5';
+  type: 'F2' | 'F1' | 'F3' | 'R5';
   order: number | Order;
   rectifies?: (number | null) | Invoice;
+  replaces?: (number | null) | Invoice;
+  customer?: {
+    name?: string | null;
+    taxId?: string | null;
+    address?: string | null;
+  };
   issuedAt: string;
   issuerNif?: string | null;
   totalCents: number;
@@ -1619,6 +1625,14 @@ export interface InvoicesSelect<T extends boolean = true> {
   type?: T;
   order?: T;
   rectifies?: T;
+  replaces?: T;
+  customer?:
+    | T
+    | {
+        name?: T;
+        taxId?: T;
+        address?: T;
+      };
   issuedAt?: T;
   issuerNif?: T;
   totalCents?: T;
@@ -1712,6 +1726,10 @@ export interface Business {
    * Prefijo de las facturas simplificadas. Cámbialo solo con tu gestor.
    */
   invoiceSeries?: string | null;
+  /**
+   * Prefijo de las facturas completas (con NIF del cliente). Cámbialo solo con tu gestor.
+   */
+  fullInvoiceSeries?: string | null;
   receiptFooter?: string | null;
   /**
    * Apagado: la web dice que los pedidos online llegan pronto.
@@ -1765,6 +1783,7 @@ export interface BusinessSelect<T extends boolean = true> {
   nif?: T;
   address?: T;
   invoiceSeries?: T;
+  fullInvoiceSeries?: T;
   receiptFooter?: T;
   onlineOrdering?: T;
   openingTime?: T;

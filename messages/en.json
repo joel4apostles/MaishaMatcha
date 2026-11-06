@@ -378,12 +378,19 @@
         "unavailable-option": "An option has sold out.",
         "short-cash": "The cash tendered does not cover the total.",
         "already-paid": "This order was already paid.",
-        "generic": "Could not take the payment. Check the connection and try again; it will never charge twice."
+        "generic": "Could not take the payment. Check the connection and try again; it will never charge twice.",
+        "bad-split": "The card part must be less than the total."
       },
       "offline": "Offline. Cash sales are kept on this tablet and sent when the network returns. Card is not available.",
       "syncing": "Back online. Sending the saved sales.",
       "queued": "{count, plural, one {# sale queued} other {# sales queued}}",
-      "savedOffline": "Saved on the tablet while offline. It will be sent, with its ticket, when the network returns."
+      "savedOffline": "Saved on the tablet while offline. It will be sent, with its ticket, when the network returns.",
+      "split": "Pay part by card",
+      "cardPart": "By card (€)",
+      "cashPart": "In cash: {amount}",
+      "splitHint": "The rest is paid in cash.",
+      "splitCancel": "All in cash",
+      "chargeSplit": "Charge: {card} by card, the rest in cash"
     },
     "kds": {
       "title": "Bar",
@@ -418,7 +425,13 @@
       "cash": "Cash",
       "tendered": "Tendered",
       "change": "Change",
-      "card": "Card"
+      "card": "Card",
+      "emailLabel": "Send by email",
+      "emailSend": "Send",
+      "emailSent": "Sent.",
+      "emailOff": "Email is not set up yet.",
+      "emailInvalid": "Check the email.",
+      "emailFailed": "It could not be sent."
     },
     "orders": {
       "link": "Orders",
@@ -451,7 +464,35 @@
         "not-paid": "The order is not paid.",
         "paid": "A paid order is refunded, not voided.",
         "generic": "Could not complete it. Try again."
+      },
+      "fullInvoice": "Full invoice (with tax id)",
+      "customerName": "Name or company",
+      "customerTaxId": "NIF, NIE, CIF or VAT",
+      "customerAddress": "Address",
+      "issueFull": "Issue invoice",
+      "openInvoice": "See and print the invoice",
+      "fullErrors": {
+        "bad-tax-id": "The tax id is not valid. Check it.",
+        "missing-customer": "Customer details are missing.",
+        "already-full": "This ticket already has a full invoice.",
+        "refunded": "This ticket has a refund: no full invoice.",
+        "not-paid": "Paid tickets only.",
+        "invalid": "Check the details.",
+        "generic": "It could not be issued. Try again."
       }
+    },
+    "invoice": {
+      "title": "Invoice",
+      "print": "Print",
+      "back": "Back to orders",
+      "pendingNif": "NIF pending",
+      "customer": "Customer",
+      "concept": "Item",
+      "amount": "Amount",
+      "base": "Taxable base",
+      "total": "Total",
+      "replaces": "Full invoice issued to replace ticket {number}.",
+      "qr": "Invoice verifiable on the AEAT website"
     }
   },
   "order": {

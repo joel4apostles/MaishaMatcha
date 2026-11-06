@@ -10,6 +10,7 @@ import * as migration_20261105_231006_members_tier_default from './20261105_2310
 import * as migration_20261105_231007_lowercase_order_emails from './20261105_231007_lowercase_order_emails';
 import * as migration_20261105_233005_shop_premium from './20261105_233005_shop_premium';
 import * as migration_20261105_234950_subscription_event_at from './20261105_234950_subscription_event_at';
+import * as migration_20261106_005146_full_invoices from './20261106_005146_full_invoices';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20261105_234950_subscription_event_at.up,
     down: migration_20261105_234950_subscription_event_at.down,
-    name: '20261105_234950_subscription_event_at'
+    name: '20261105_234950_subscription_event_at',
+  },
+  {
+    up: migration_20261106_005146_full_invoices.up,
+    down: migration_20261106_005146_full_invoices.down,
+    name: '20261106_005146_full_invoices'
   },
 ];

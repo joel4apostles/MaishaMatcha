@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { getTranslations } from "next-intl/server";
 import { PrintButton } from "@/components/pos/PrintButton";
+import { EmailReceipt } from "@/components/pos/EmailReceipt";
 import { formatEuro } from "@/lib/money";
 import { currentPosSession, payloadClient } from "@/lib/pos/server";
 
@@ -23,7 +24,7 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
   const order = await payload.findByID({ collection: "orders", id: orderId, depth: 1, overrideAccess: true }).catch(() => null);
   if (!order) notFound();
   const [{ docs: invoices }, { docs: payments }, business] = await Promise.all([
-    payload.find({ collection: "invoices", where: { order: { equals: orderId } }, limit: 1, depth: 0, overrideAccess: true }),
+    payload.find({ collection: "invoices", where: { and: [{ order: { equals: orderId } }, { type: { equals: "F2" } }] }, limit: 1, depth: 0, overrideAccess: true }),
     payload.find({ collection: "payments", where: { order: { equals: orderId } }, limit: 5, depth: 0, overrideAccess: true }),
     payload.findGlobal({ slug: "business", overrideAccess: true, locale: "es" }),
   ]);
@@ -41,6 +42,7 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
   const staffName = typeof order.staff === "object" && order.staff ? order.staff.name : "";
   const rates = (order.taxBreakdown as { rateBasisPoints: number; baseCents: number; taxCents: number }[] | null) ?? [];
   const cash = payments.find((p) => p.method === "cash");
+  const card = payments.find((p) => p.method === "card_terminal");
 
   return (
     <div className="mx-auto w-full max-w-[22rem] px-4 py-8 print:max-w-none print:p-0 print:text-[12px]">
@@ -115,8 +117,12 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
             <dt>{t("change")}</dt>
             <dd className="text-right tabular-nums">{formatEuro(cash.changeCents ?? 0)}</dd>
           </dl>
-        ) : payments[0] ? (
-          <p className="mt-3 border-t border-dashed border-sumi/40 pt-3">{t("card")}</p>
+        ) : null}
+        {card ? (
+          <p className={`mt-3 flex justify-between ${cash ? "" : "border-t border-dashed border-sumi/40 pt-3"}`}>
+            <span>{t("card")}</span>
+            <span className="tabular-nums">{formatEuro(card.amountCents)}</span>
+          </p>
         ) : null}
 
         {qrSvg ? (
@@ -133,6 +139,7 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
 
         {business.receiptFooter ? <p className="mt-4 text-center text-xs">{business.receiptFooter}</p> : null}
       </article>
+      {order.paymentStatus !== "unpaid" ? <EmailReceipt orderId={orderId} /> : null}
     </div>
   );
 }

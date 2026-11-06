@@ -45,6 +45,9 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
   const [sheet, setSheet] = useState<DraftLine | null>(null);
   const [mode, setMode] = useState<Mode>("order");
   const [tendered, setTendered] = useState("");
+  // Split: the part paid on the card terminal; the rest is cash.
+  const [cardPart, setCardPart] = useState("");
+  const [splitting, setSplitting] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
@@ -91,6 +94,9 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
   );
   const count = lines.reduce((s, l) => s + l.quantity, 0);
   const tenderedCents = Math.round(Number(tendered.replace(",", ".") || "0") * 100);
+  const cardCents = splitting ? Math.round(Number(cardPart.replace(",", ".") || "0") * 100) : 0;
+  const cashDue = total - cardCents;
+  const splitValid = !splitting || (cardCents > 0 && cardCents < total);
 
   const tap = (item: CatalogItem) => {
     if (!item.available) return;
@@ -110,12 +116,15 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
     setService("here");
     setMode("order");
     setTendered("");
+    setCardPart("");
+    setSplitting(false);
     setError(null);
     setDone(null);
     setKey(newKey());
   }, []);
 
-  const charge = async (method: "cash" | "card_terminal") => {
+  const charge = async (choice: "cash" | "card_terminal") => {
+    const method = choice === "cash" && splitting ? "split" : choice;
     setBusy(true);
     setError(null);
     try {
@@ -123,7 +132,8 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
         idempotencyKey: key,
         service,
         method,
-        tenderedCents: method === "cash" ? tenderedCents : undefined,
+        tenderedCents: method === "card_terminal" ? undefined : tenderedCents,
+        cardCents: method === "split" ? cardCents : undefined,
         lines: lines.map((l) => ({
           menuItemId: l.item.id,
           quantity: l.quantity,
@@ -137,11 +147,11 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
         setMode("done");
         setOnline(true);
       } else {
-        const errors = ["no-shift", "no-session", "invalid", "missing-required", "unavailable-item", "unavailable-option", "short-cash", "already-paid"];
+        const errors = ["no-shift", "no-session", "invalid", "missing-required", "unavailable-item", "unavailable-option", "short-cash", "already-paid", "bad-split"];
         setError(t(`errors.${errors.includes(r.error) ? r.error : "generic"}` as "errors.generic"));
       }
     } catch {
-      // Network failure. Cash can be kept on the tablet; card cannot.
+      // Network failure. Cash can be kept on the tablet; card (or a split) cannot.
       if (method === "cash") {
         enqueue({
           idempotencyKey: key,
@@ -204,7 +214,7 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
 
   // --------------------------------------------------------- cash / card
   if (mode === "cash" || mode === "card") {
-    const change = tenderedCents - total;
+    const change = tenderedCents - cashDue;
     const press = (k: string) =>
       setTendered((v) => (k === "del" ? v.slice(0, -1) : k === "," ? (v.includes(",") ? v : `${v || "0"},`) : (v.split(",")[1]?.length ?? 0) >= 2 ? v : v + k));
     return (
@@ -218,7 +228,53 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
           <p className="mt-2 font-serif text-[3.5rem] font-light leading-none tabular-nums">{formatEuro(total)}</p>
           {mode === "cash" ? (
             <>
-              <p className="mt-10 text-eyebrow uppercase text-sumi/70">{t("tendered")}</p>
+              {/* Split: part on the card terminal, the rest in cash. */}
+              <div className="mt-6">
+                {splitting ? (
+                  <div className="flex flex-wrap items-end gap-4">
+                    <div>
+                      <label htmlFor="card-part" className="block text-eyebrow uppercase text-sumi/70">
+                        {t("cardPart")}
+                      </label>
+                      <input
+                        id="card-part"
+                        inputMode="decimal"
+                        autoComplete="off"
+                        value={cardPart}
+                        onChange={(e) => setCardPart(e.target.value.replace(/[^0-9,.]/g, ""))}
+                        className="mt-2 min-h-[56px] w-40 rounded-[2px] border border-wood/50 bg-transparent px-4 font-serif text-xl tabular-nums"
+                      />
+                    </div>
+                    <p className="pb-3 text-sumi/80">
+                      {splitValid && cardCents ? t("cashPart", { amount: formatEuro(cashDue) }) : t("splitHint")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSplitting(false);
+                        setCardPart("");
+                        setTendered("");
+                      }}
+                      className="min-h-[44px] pb-2 text-sm underline decoration-wood/60 underline-offset-4"
+                    >
+                      {t("splitCancel")}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={!online}
+                    onClick={() => {
+                      setSplitting(true);
+                      setTendered("");
+                    }}
+                    className="min-h-[44px] text-sm underline decoration-wood/60 underline-offset-4 disabled:opacity-35"
+                  >
+                    {t("split")}
+                  </button>
+                )}
+              </div>
+              <p className="mt-8 text-eyebrow uppercase text-sumi/70">{t("tendered")}</p>
               <p className="mt-2 font-serif text-[3rem] font-light leading-none tabular-nums" aria-live="polite">
                 {tendered ? `${tendered} €` : "—"}
               </p>
@@ -245,14 +301,14 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
           {mode === "cash" ? (
             <>
               <div className="grid grid-cols-4 gap-2.5">
-                {quickTenders(total).map((v) => (
+                {quickTenders(splitValid && cashDue > 0 ? cashDue : total).map((v) => (
                   <button
                     key={v}
                     type="button"
                     onClick={() => setTendered((v / 100).toFixed(2).replace(".", ","))}
                     className="min-h-[56px] rounded-[2px] border border-wood/45 text-base"
                   >
-                    {v === total ? t("exact") : formatEuro(v)}
+                    {v === (splitting ? cashDue : total) ? t("exact") : formatEuro(v)}
                   </button>
                 ))}
               </div>
@@ -274,11 +330,11 @@ export function Till({ catalog }: { catalog: CatalogItem[] }) {
               </p>
               <button
                 type="button"
-                disabled={busy || !tendered || change < 0}
+                disabled={busy || !tendered || change < 0 || !splitValid}
                 onClick={() => charge("cash")}
                 className="mt-auto min-h-[72px] rounded-[2px] bg-sumi text-lg font-medium text-washi disabled:opacity-35"
               >
-                {t("charge")}
+                {splitting && cardCents > 0 ? t("chargeSplit", { card: formatEuro(cardCents) }) : t("charge")}
               </button>
             </>
           ) : (

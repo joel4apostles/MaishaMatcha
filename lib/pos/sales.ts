@@ -38,6 +38,11 @@ export type SaleError =
   | "already-paid"
   | "cancelled"
   | "short-cash"
+  | "bad-split"
+  | "bad-tax-id"
+  | "missing-customer"
+  | "already-full"
+  | "refunded"
   | "bad-amount"
   | "not-paid"
   | "reason-required"
@@ -263,9 +268,11 @@ async function issueInvoice(
   order: { id: number; totalCents: number; taxBreakdown?: unknown },
   type: InvoiceType = "F2",
   rectifies?: number,
+  extra: { replaces?: number; customer?: { name: string; taxId: string; address: string } } = {},
 ) {
   const business = await req.payload.findGlobal({ slug: "business", req, overrideAccess: true });
-  const series = business.invoiceSeries || "T";
+  // Full invoices have their own series (and so their own number line and chain).
+  const series = type === "F3" || type === "F1" ? business.fullInvoiceSeries || "F" : business.invoiceSeries || "T";
   const now = new Date();
   const year = Number(now.toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", year: "numeric" }));
   // Gap-free per series and year; the row lock serialises the hash chain.
@@ -306,6 +313,8 @@ async function issueInvoice(
       qrUrl: qrUrl({ issuerNif, fullNumber, issuedAt: now, totalCents: order.totalCents }),
       aeatStatus: "pending",
       rectifies,
+      replaces: extra.replaces,
+      customer: extra.customer,
     },
   });
 }
@@ -317,7 +326,7 @@ export const issueInvoiceFor = (req: PayloadRequest, order: { id: number; totalC
 export async function payOrder(
   payload: Payload,
   actor: Actor,
-  input: { orderId: number; method: "cash" | "card_terminal"; tenderedCents?: number },
+  input: { orderId: number; method: "cash" | "card_terminal" | "split"; tenderedCents?: number; cardCents?: number },
 ): Promise<Result<{ invoiceNumber: string; changeCents: number }>> {
   const shift = await currentShift(payload, actor.deviceId);
   if (!shift) return { ok: false, error: "no-shift" };
@@ -332,26 +341,34 @@ export async function payOrder(
     if (order.paymentStatus !== "unpaid") return { ok: false as const, error: "already-paid" as const };
     if (order.status === "cancelled") return { ok: false as const, error: "cancelled" as const };
 
+    // Split: part on the card terminal, the rest in cash (change only from cash).
+    const cardPart = input.method === "split" ? (input.cardCents ?? 0) : input.method === "card_terminal" ? order.totalCents : 0;
+    if (input.method === "split" && (!Number.isInteger(cardPart) || cardPart <= 0 || cardPart >= order.totalCents)) {
+      return { ok: false as const, error: "bad-split" as const };
+    }
+    const cashPart = order.totalCents - cardPart;
     let change = 0;
-    if (input.method === "cash") {
-      const c = cashChange(order.totalCents, input.tenderedCents ?? -1);
+    if (cashPart > 0) {
+      const c = cashChange(cashPart, input.tenderedCents ?? -1);
       if (c === null) return { ok: false as const, error: "short-cash" as const };
       change = c;
     }
-    await payload.create({
-      collection: "payments",
-      req,
-      overrideAccess: true,
-      data: {
-        order: order.id,
-        shift: shift.id,
-        method: input.method,
-        amountCents: order.totalCents,
-        tenderedCents: input.method === "cash" ? input.tenderedCents : undefined,
-        changeCents: input.method === "cash" ? change : undefined,
-        staff: actor.staffId,
-      },
-    });
+    if (cardPart > 0) {
+      await payload.create({
+        collection: "payments",
+        req,
+        overrideAccess: true,
+        data: { order: order.id, shift: shift.id, method: "card_terminal", amountCents: cardPart, staff: actor.staffId },
+      });
+    }
+    if (cashPart > 0) {
+      await payload.create({
+        collection: "payments",
+        req,
+        overrideAccess: true,
+        data: { order: order.id, shift: shift.id, method: "cash", amountCents: cashPart, tenderedCents: input.tenderedCents, changeCents: change, staff: actor.staffId },
+      });
+    }
     const invoice = await issueInvoice(req, order);
     // Stock leaves with the sale, in the same transaction.
     touched = await deductForOrder(req, order);
@@ -369,6 +386,49 @@ export async function payOrder(
     await draftReorders(payload, touched).catch((err) => console.error("[inventory] reorder draft failed", err));
   }
   return result;
+}
+
+// ------------------------------------------------------------ full invoice
+
+export type FullInvoiceCustomer = { name: string; taxId: string; address: string };
+
+/**
+ * A customer asks for a full invoice (factura completa) for a ticket: a new
+ * F3 invoice in the full series, naming the customer, that replaces the
+ * simplified one. Once per ticket; never for a refunded or cancelled sale.
+ */
+export async function issueFullInvoice(
+  payload: Payload,
+  actor: Actor,
+  orderId: number,
+  customer: FullInvoiceCustomer,
+): Promise<Result<{ invoiceId: number; fullNumber: string }>> {
+  const { checkTaxId } = await import("@/lib/nif");
+  const tax = checkTaxId(customer.taxId);
+  const name = customer.name.trim();
+  const address = customer.address.trim();
+  if (!tax.ok) return { ok: false, error: "bad-tax-id" };
+  if (!name || !address) return { ok: false, error: "missing-customer" };
+  return inTransaction(payload, actor.staffId, async (req) => {
+    await query(payload, sql`select id from ${table(payload, "orders")} where id = ${orderId} for update`, req);
+    const order = await payload.findByID({ collection: "orders", id: orderId, req, depth: 0, overrideAccess: true }).catch(() => null);
+    if (!order) return { ok: false as const, error: "not-found" as const };
+    if (order.paymentStatus !== "paid" || order.status === "cancelled") return { ok: false as const, error: "not-paid" as const };
+    const invoices = await payload.find({ collection: "invoices", req, depth: 0, limit: 50, overrideAccess: true, where: { order: { equals: orderId } } });
+    if (invoices.docs.some((i) => i.type === "F3")) return { ok: false as const, error: "already-full" as const };
+    if (invoices.docs.some((i) => i.type === "R5")) return { ok: false as const, error: "refunded" as const };
+    const simplified = invoices.docs.find((i) => i.type === "F2");
+    if (!simplified) return { ok: false as const, error: "not-paid" as const };
+    const inv = await issueInvoice(req, order, "F3", undefined, {
+      replaces: simplified.id,
+      customer: { name: name.slice(0, 120), taxId: tax.value, address: address.slice(0, 200) },
+    });
+    await writeAudit(
+      req,
+      { action: "invoice.full", entity: "invoices", entityId: inv.id, reason: `Sustituye a ${simplified.fullNumber}`, actorId: actor.staffId, deviceId: actor.deviceId },
+    );
+    return { ok: true as const, invoiceId: inv.id, fullNumber: inv.fullNumber };
+  });
 }
 
 // ------------------------------------------------------------ close shift

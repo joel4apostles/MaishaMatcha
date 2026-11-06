@@ -12,7 +12,8 @@ import { createHash } from "node:crypto";
  * This implements the record format. Sending records to the AEAT (and the
  * software producer's declaration) is a separate, still-pending module.
  */
-export type InvoiceType = "F1" | "F2" | "R5";
+/** F2 simplified ticket, F3 full invoice replacing a simplified one, F1 full, R5 corrective. */
+export type InvoiceType = "F1" | "F2" | "F3" | "R5";
 
 export type FingerprintInput = {
   issuerNif: string;

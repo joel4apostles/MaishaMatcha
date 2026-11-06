@@ -34,11 +34,23 @@ export const Invoices: CollectionConfig = {
       options: [
         { label: "F2 · Simplificada", value: "F2" },
         { label: "F1 · Completa", value: "F1" },
+        { label: "F3 · Completa en sustitución de simplificada", value: "F3" },
         { label: "R5 · Rectificativa simplificada", value: "R5" },
       ],
     },
     { name: "order", type: "relationship", relationTo: "orders", required: true, label: "Pedido" },
     { name: "rectifies", type: "relationship", relationTo: "invoices", label: "Rectifica a" },
+    { name: "replaces", type: "relationship", relationTo: "invoices", label: "Sustituye a (simplificada)" },
+    {
+      type: "group",
+      name: "customer",
+      label: "Destinatario (factura completa)",
+      fields: [
+        { name: "name", type: "text", label: "Nombre o razón social" },
+        { name: "taxId", type: "text", label: "NIF / NIE / CIF / VAT" },
+        { name: "address", type: "text", label: "Domicilio" },
+      ],
+    },
     { name: "issuedAt", type: "date", required: true, label: "Fecha de expedición" },
     { name: "issuerNif", type: "text", label: "NIF del emisor" },
     { name: "totalCents", type: "number", required: true, label: "Importe total (céntimos)" },

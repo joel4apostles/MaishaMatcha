@@ -25,6 +25,13 @@ export const Business: GlobalConfig = {
       defaultValue: "T",
       admin: { description: "Prefijo de las facturas simplificadas. Cámbialo solo con tu gestor." },
     },
+    {
+      name: "fullInvoiceSeries",
+      type: "text",
+      label: "Serie de facturas completas",
+      defaultValue: "F",
+      admin: { description: "Prefijo de las facturas completas (con NIF del cliente). Cámbialo solo con tu gestor." },
+    },
     { name: "receiptFooter", type: "textarea", label: "Pie del ticket", localized: true },
     {
       type: "collapsible",

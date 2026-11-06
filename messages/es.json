@@ -378,12 +378,19 @@
         "unavailable-option": "Una opción se ha agotado.",
         "short-cash": "El importe entregado no cubre el total.",
         "already-paid": "Este pedido ya estaba cobrado.",
-        "generic": "No se ha podido cobrar. Comprueba la conexión e inténtalo otra vez; no se cobrará dos veces."
+        "generic": "No se ha podido cobrar. Comprueba la conexión e inténtalo otra vez; no se cobrará dos veces.",
+        "bad-split": "La parte con tarjeta debe ser menor que el total."
       },
       "offline": "Sin conexión. Las ventas en efectivo se guardan en esta tablet y se envían al volver la red. La tarjeta no está disponible.",
       "syncing": "Conexión recuperada. Enviando las ventas guardadas.",
       "queued": "{count, plural, one {# venta en cola} other {# ventas en cola}}",
-      "savedOffline": "Guardado en la tablet sin conexión. Se enviará y tendrá su ticket al volver la red."
+      "savedOffline": "Guardado en la tablet sin conexión. Se enviará y tendrá su ticket al volver la red.",
+      "split": "Pagar una parte con tarjeta",
+      "cardPart": "Con tarjeta (€)",
+      "cashPart": "En efectivo: {amount}",
+      "splitHint": "El resto se paga en efectivo.",
+      "splitCancel": "Todo en efectivo",
+      "chargeSplit": "Cobrar: {card} con tarjeta y el resto en efectivo"
     },
     "kds": {
       "title": "Barra",
@@ -418,7 +425,13 @@
       "cash": "Efectivo",
       "tendered": "Entregado",
       "change": "Cambio",
-      "card": "Tarjeta"
+      "card": "Tarjeta",
+      "emailLabel": "Enviar por email",
+      "emailSend": "Enviar",
+      "emailSent": "Enviado.",
+      "emailOff": "El email aún no está configurado.",
+      "emailInvalid": "Revisa el email.",
+      "emailFailed": "No se ha podido enviar."
     },
     "orders": {
       "link": "Pedidos",
@@ -451,7 +464,35 @@
         "not-paid": "El pedido no está cobrado.",
         "paid": "Un pedido cobrado se devuelve, no se anula.",
         "generic": "No se ha podido completar. Inténtalo otra vez."
+      },
+      "fullInvoice": "Factura completa (con NIF)",
+      "customerName": "Nombre o razón social",
+      "customerTaxId": "NIF, NIE, CIF o VAT",
+      "customerAddress": "Domicilio",
+      "issueFull": "Emitir factura",
+      "openInvoice": "Ver y imprimir la factura",
+      "fullErrors": {
+        "bad-tax-id": "El NIF no es válido. Revísalo.",
+        "missing-customer": "Faltan datos del cliente.",
+        "already-full": "Este ticket ya tiene factura completa.",
+        "refunded": "Este ticket tiene una devolución: no admite factura completa.",
+        "not-paid": "Solo tickets cobrados.",
+        "invalid": "Revisa los datos.",
+        "generic": "No se ha podido emitir. Inténtalo otra vez."
       }
+    },
+    "invoice": {
+      "title": "Factura",
+      "print": "Imprimir",
+      "back": "Volver a pedidos",
+      "pendingNif": "NIF pendiente",
+      "customer": "Destinatario",
+      "concept": "Concepto",
+      "amount": "Importe",
+      "base": "Base imponible",
+      "total": "Total",
+      "replaces": "Factura completa emitida en sustitución del ticket {number}.",
+      "qr": "Factura verificable en la sede electrónica de la AEAT"
     }
   },
   "order": {

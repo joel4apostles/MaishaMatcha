@@ -2,6 +2,7 @@ import type { Payload, PayloadRequest } from "payload";
 
 export type AuditAction =
   | "price.change"
+  | "invoice.full"
   | "availability.change"
   | "stock.adjustment"
   | "stock.waste"
