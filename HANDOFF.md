@@ -5,99 +5,84 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, ~02:30 (Opus 5.5 session)
+Last updated: 2026-11-06, evening (Opus 5.5 session)
 
 ## Where things stand
 
-- **Live site** (maisha-matcha.vercel.app): everything below was PUSHED
-  2026-11-06 (890ecb1) and deployed by Vercel. Without DATABASE_URL the
-  public pages work (ordering shows "no disponible", the shop "abre pronto",
-  events use the static list) and /admin returns 500. Next deploy step:
-  Supabase + Vercel env (POS-PLAN section 7), then the live Supabase checks
-  in the security-audit skill (section 3).
-- **Built locally, tested (137 tests, `npm test`):** counter POS (PIN sign-in,
-  shifts, Z report, cash/card-on-terminal, tickets with AEAT QR, invoice hash
-  chain, KDS, refunds/voids with manager PIN, offline cash queue), inventory
-  and suppliers (gram deduction, counts, batches, reorder drafts, approve to
-  email, receiving), owner dashboard + accountant CSVs, **web ordering**
-  (`/es/pedir`, `/en/order`: pickup slots with capacity, pay at pickup or
-  Stripe Checkout confirmed by webhook, private status page
-  `/es/pedido/<token>`, emails, KDS shows "Web" + pickup time), and the
-  **recipe builder** linking to an order plus recipes saved on the device.
-- **Customers (2026-11-06):** optional accounts at `/es/cuenta` (emailed
-  sign-in link + confirm button, no passwords; guest ordering unchanged),
-  founding membership via Stripe (closed until Empresa has price, IVA,
-  places and the switch), event bookings on CMS events with locked seats,
-  email letters (Campaigns: owner approves, opted-in only, one-click
-  unsubscribe). Security review: SHIP, all SHOULDs fixed (9334a8e).
-  Carta and story stay in code on purpose (see CLAUDE.md "Content split").
-- **Shop + monthly membership (2026-11-06):** /es/tienda sells products the
-  team uploads in /admin (category marked Tienda; photo, price, stock
-  units); monthly membership via Stripe subscriptions with the founding
-  price. Privacy notice rewritten (provisional, needs legal review).
-  Design review SHIP; security review SHIP with all SHOULDs fixed.
-- **Later 2026-11-06 (LOCAL, not pushed yet):** founder said the dark hero
-  and the sign photo were "not premium": home hero is now a light editorial
-  spread (poetic headline + framed real photo that unveils once), header
-  always washi, visit block typographic, story kanji in a brush font
-  (Yuji Syuku) written in top to bottom. Brand skill updated (HOME HERO).
-  Also: PDF purchase orders (pdf-lib, attached + /api/purchase-orders/[id]/pdf),
-  scanning at /pos/escanear (delivery notes + paper tickets, tesseract.js
-  SELF-HOSTED in public/vendor/tesseract, person confirms), table ordering
-  by QR (/es/pedir?mesa=N, printable /pos/mesas, Empresa switch), strict
-  CSP on /pos and /kds. Security + design reviews SHIP, findings fixed.
-- **Counter extras (2026-11-06, PUSHED):** split payment (card
-  + cash, change from cash only), full invoice on request (F3 in series
-  "F" replacing the ticket, NIF/NIE/CIF/VAT validated, /pos/factura/[id]),
-  receipts by email (address not stored). Refunds go back cash first, then
-  card, one row per method; a ticket with a full invoice is not refunded at
-  the till (the gestor issues the corrective). Security review SHIP.
-- **Real photos on the site (2026-11-06, PUSHED, since reworked above):**
-  hero = bar still life (public/images/hero-still-life.jpg; phones full
-  bleed, desktop ink field + right photo column), shop sign beside the
-  visit line (shopfront.jpg), still life on /tienda. Design review SHIP.
-  The sources are WhatsApp exports (765 px): ask Joel for originals. The
-  interior triptych stays as renders ("Imagen del proyecto") until the
-  real salon is finished (the renders show wood; the real bar is green tile).
-- Online ordering is OFF until the owner ticks it in /admin > Empresa.
-  Security review of web ordering: SHIP; all findings fixed (44ea242).
-  Every flow browser-verified at 390 and 1440, both locales.
-- Phase 2 mocks: claude.ai artifact "maisha barra mocks"
-  (https://claude.ai/artifact/PQdSsim5kdGCvjw3tmDDap).
+- **Everything is PUSHED** (main = origin/main at 60fcd57) and deployed by
+  Vercel to maisha-matcha.vercel.app. Without DATABASE_URL the public
+  pages work (ordering "no disponible", shop "abre pronto", static events)
+  and /admin returns 500. 144 tests pass (`npm test`).
+- **Design pass (founder-led, 2026-11-06), all live:**
+  - Hero: full picture (salon.jpg) under the transparent header, matcha
+    card mounted like a shikishi, 一期一会 brushed vertically, outline seal.
+    The light editorial hero was rejected ("cheap"); do not bring it back.
+  - Language switch is a dropdown (ES ⌄, Español / English).
+  - Carta (/es/menu): matchas as tasting cards (grade, origin, notes,
+    usucha/latte, link to /crea), kanji section numerals, 和敬清寂.
+    Shared card: `components/TastingCard.tsx`.
+  - Ordering (/es/pedir): carta-style rows, option sheet as a real modal
+    (tiles, milk only for lattes, extras checklist), "Lo de siempre" for
+    signed-in members (`usualOrder` in lib/members.ts).
+  - Shop: a page per product (/tienda/[slug], /en/shop/[slug]) with
+    optional "Cómo se usa" (ritual) and "Combina con" (pairsWith) fields in
+    /admin (migration 20261106_101604_shop_product_pages); basket kept in
+    sessionStorage; products in the sitemap.
+  - Home: sections numbered 一 to 五; the carta preview shows the three
+    TastingCards (swipe row on phones).
+  - Reference board + carta mocks: claude.ai artifact
+    https://claude.ai/artifact/9P5bNWS8KzWNNwkFCvjPir (private; it holds
+    the 8-shot photo list).
+- Built earlier and live: counter POS, inventory/suppliers, web ordering
+  with Stripe, accounts, founding + monthly membership, events, letters,
+  table QR ordering, scanning, PDF purchase orders. Online ordering stays
+  OFF until the owner ticks it in /admin > Empresa.
+- Local dev DB only (not in git): DEMO shop products (ids 10 to 12) and
+  test member orders.
+
+## In progress
+
+Nothing mid-task. The design plan's page list is done.
 
 ## Next
 
+- Design: photo shoot from the shot list on the reference board (then
+  replace renders and WhatsApp exports); design pass on /historia,
+  /eventos, /cuenta; optional design-reviewer run on the new home.
 - Founder: Supabase project (EU) + Vercel env, Production only:
   DATABASE_URL, PAYLOAD_SECRET, FIRST_OWNER_EMAIL, NEXT_PUBLIC_SITE_URL,
   RESEND_API_KEY/RESEND_AUDIENCE_ID, STRIPE_SECRET_KEY/STRIPE_WEBHOOK_SECRET
-  (webhook events: checkout.session.completed, .async_payment_succeeded,
-  .expired, .async_payment_failed, invoice.paid, customer.subscription.*;
-  enable the customer portal). NIF + legal name in Empresa. For the
-  founding membership: price, IVA rate, number of places, perks. Real
-  event dates and capacities in /admin > Eventos. Monthly membership: price,
-  founding price, IVA, perks (ES and EN). Shop: products with photos and
-  stock, in both languages. Confirm
-  prices (OJ 9,50, Yuzu 9,80), milks, allergens, open days, recipe grams
-  and costs, map pin.
-- Blocked on founder: Stripe Terminal (2i), AEAT submission (2j),
-  CafeRadar stamps.
-- Engineering queue: full script-src CSP with nonces, real-iPhone keyboard
-  test, privacy notice update (accounts, Stripe, letters), design-reviewer
-  pass on /cuenta, /pedir and /eventos.
+  (events listed in CLAUDE.md; enable the customer portal). Empresa: NIF,
+  legal name, founding/monthly prices, IVA, places, perks. Real products
+  (names in Latin letters, photos, stock, ES and EN). Cultivar, harvest,
+  allergens; "Calidad diaria" vs "Para cada día"; is the carta seasonal.
+  Confirm prices (OJ 9,50, Yuzu 9,80), milks, open days, map pin.
+- Blocked on founder: Stripe Terminal, AEAT submission, corrective
+  invoices R1 to R4, CafeRadar stamps.
+- Engineering: live Supabase checks (security-audit section 3), full
+  script-src CSP with nonces, real-iPhone keyboard test, legal review of
+  the privacy notice.
 
 ## Environment gotchas
 
 - Postgres for dev/tests: `npm run db:up` (Docker Desktop must be running).
-- Use Node 24: `export PATH=$HOME/.nvm/versions/node/v24.16.0/bin:$PATH`
-  (Node 20 lacks a global WebSocket; the CDP e2e scripts need 24).
+- Use Node 24: `export PATH=$HOME/.nvm/versions/node/v24.16.0/bin:$PATH`.
 - System `python3` and `/usr/bin/git` fail until the Xcode license is
   accepted: use Node for edits and
   `/Applications/Xcode.app/Contents/Developer/usr/bin/git`.
+- Payload Local API scripts: a temporary `.tmp-*.mts` in the repo root run
+  with `PAYLOAD_SECRET=... npx tsx` (scratchpad scripts fail on top-level
+  await and the @/ aliases). Delete it after.
+- The seed skips existing items: fix old dev-DB copy with SQL.
+- e2e: CDP scripts (Node 24); member sign-in links are HMAC-signed with the
+  dev PAYLOAD_SECRET, so scripts can sign in. True mobile viewport needs
+  `Emulation.setDeviceMetricsOverride`.
 - Production-like local run: `PAYLOAD_SECRET` (32+ chars) and
   `NEXT_PUBLIC_SITE_URL` AT BUILD TIME. e2e DB `maisha_e2e`, server on 3100.
 - Sales/report tests group by Madrid calendar day: a run that straddles
   midnight can fail twice and pass on rerun.
 - Headless Chrome full-page capture hangs on long desktop pages: capture
   per viewport. The Mac sleeps after 1 minute idle: `caffeinate -dimsu`.
-- Commits are authored by Joel alone (no Claude co-author trailer).
+- Commits are authored by Joel alone (no Claude co-author trailer); ask
+  before each push (push to main deploys).
 - Never `npm run build` while `next dev` runs (shared `.next`).
