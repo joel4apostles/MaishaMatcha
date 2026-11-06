@@ -90,7 +90,9 @@ export default buildConfig({
       titleSuffix: " · maisha matcha",
     },
     components: {
-      beforeDashboard: ["/cms/components/OwnerDashboard#OwnerDashboard"],
+      // Our own admin home: today, the launch checklist, what is pending, and
+      // every collection as a compact list with counts (no tile grid).
+      views: { dashboard: { Component: "/cms/components/OwnerDashboard#OwnerDashboardView" } },
       graphics: {
         Icon: "/cms/components/AdminIcon#AdminIcon",
         Logo: "/cms/components/AdminLogo#AdminLogo",
