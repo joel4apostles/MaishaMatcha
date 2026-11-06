@@ -17,24 +17,24 @@ export function Hero() {
           a flat ink field (the source is a portrait, never stretched wide).
           Phones and tablets: the photo fills the top of the hero so the
           objects sit just above the panel, never under it. */}
-      <div className="absolute inset-x-0 top-0 bottom-[36%] lg:bottom-0 lg:left-auto lg:w-[44%]">
+      <div className="absolute inset-x-0 top-0 bottom-[36%] md:left-1/2 md:w-[600px] md:-translate-x-1/2 lg:top-16 lg:bottom-0 lg:left-auto lg:right-0 lg:w-[42%] lg:translate-x-0">
         <Image
           src={stillLife}
           alt={t("photoAlt")}
           fill
           priority
           placeholder="blur"
-          sizes="(min-width: 1024px) 44vw, 100vw"
-          className="object-cover object-[50%_62%] lg:object-[50%_40%]"
+          sizes="(min-width: 1024px) 42vw, (min-width: 768px) 600px, 100vw"
+          className="object-cover object-[50%_68%] lg:object-[15%_45%]"
         />
       </div>
       {/* Phones and tablets: a light scrim; legibility comes from the ink panel. */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 bottom-[36%] bg-sumi/15 lg:hidden" />
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 bottom-[36%] bg-sumi/15 md:left-1/2 md:w-[600px] md:-translate-x-1/2 lg:hidden" />
 
-      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24">
+      <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24 lg:justify-center lg:pb-16">
         {/* Brand panel: flat kit matcha, sumi ink — AA-verified on any crop. */}
         <div
-          className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10 lg:max-w-[min(42rem,calc(56vw-max(2rem,(100vw-1100px)/2)-2.5rem))]"
+          className="brand-band anim-rise relative max-w-2xl overflow-hidden rounded-[2px] p-6 sm:p-10 lg:max-w-[min(40rem,calc(58vw-max(2rem,(100vw-1100px)/2)-6rem))]"
           style={riseDelay(100)}
         >
           {/* Real matcha powder under a green veil (15% show-through, AA-safe).

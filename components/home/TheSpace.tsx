@@ -56,29 +56,26 @@ export function TheSpace() {
         </div>
       </Reveal>
 
-      {/* The real sign on Plaza Cetina: where to find us. */}
-      <Reveal className="mt-14">
-        <figure>
-          <div className="overflow-hidden rounded-[2px]">
-            <Image src={shopfront} alt={t("shopfrontAlt")} sizes="(min-width: 1100px) 1100px, 100vw" placeholder="blur" className="h-auto w-full" />
-          </div>
-        </figure>
-      </Reveal>
-
-      {/* Where and when, two screens from the hero on a phone. */}
-      <Reveal className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-wood/25 pt-6 text-sm text-sumi/80">
-        <span>
-          {site.address} · {site.city}
-        </span>
-        <span>{siteHours(locale)}</span>
-        <a
-          href={siteMapsUrl}
-          rel="noreferrer"
-          target="_blank"
-          className="inline-flex min-h-[44px] items-center text-sumi underline decoration-wood/50 underline-offset-4 hover:decoration-sumi/70"
-        >
-          {footer("directions")}
-        </a>
+      {/* The real sign on Plaza Cetina beside where and when: modest in size,
+          so the bright sign never competes with the founding band below. */}
+      <Reveal className="mt-14 grid grid-cols-1 items-end gap-6 border-t border-wood/25 pt-8 md:grid-cols-[minmax(0,520px)_minmax(0,1fr)] md:gap-12">
+        <div className="overflow-hidden rounded-[2px]">
+          <Image src={shopfront} alt={t("shopfrontAlt")} sizes="(min-width: 768px) 520px, 100vw" placeholder="blur" className="h-auto w-full" />
+        </div>
+        <div className="flex flex-col gap-1 text-sm text-sumi/80">
+          <span>
+            {site.address} · {site.city}
+          </span>
+          <span>{siteHours(locale)}</span>
+          <a
+            href={siteMapsUrl}
+            rel="noreferrer"
+            target="_blank"
+            className="inline-flex min-h-[44px] w-fit items-center text-sumi underline decoration-wood/50 underline-offset-4 hover:decoration-sumi/70"
+          >
+            {footer("directions")}
+          </a>
+        </div>
       </Reveal>
     </Section>
   );

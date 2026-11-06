@@ -25,7 +25,7 @@ export function LocaleSwitcher({ tone = "dark" }: { tone?: "light" | "dark" }) {
   const activeClass = tone === "light" ? "text-washi" : "text-sumi";
   const idleClass =
     tone === "light"
-      ? "text-washi/70 transition-colors hover:text-washi"
+      ? "text-washi/85 transition-colors hover:text-washi"
       : "text-sumi/70 transition-colors hover:text-sumi";
   const dotClass = tone === "light" ? "text-washi/40" : "text-wood/50";
 
