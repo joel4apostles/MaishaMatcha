@@ -107,6 +107,7 @@ export const Orders: CollectionConfig = {
     { name: "payOnline", type: "checkbox", defaultValue: false, label: "Pago online", admin: { readOnly: true } },
     { name: "customerEmail", type: "email", label: "Email del cliente" },
     { name: "customerPhone", type: "text", label: "Teléfono del cliente" },
+    { name: "table", type: "number", min: 1, max: 60, label: "Mesa", admin: { readOnly: true } },
     { name: "pickupAt", type: "date", label: "Recogida", admin: { date: { pickerAppearance: "dayAndTime" } } },
     { name: "readyNotifiedAt", type: "date", label: "Aviso de listo enviado", admin: { readOnly: true } },
     {

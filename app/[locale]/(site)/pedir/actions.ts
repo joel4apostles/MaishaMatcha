@@ -22,7 +22,8 @@ const schema = z.object({
   email: z.email().max(254),
   phone: z.string().trim().max(30).optional().nullable(),
   note: z.string().trim().max(MAX_NOTE).optional().nullable(),
-  pickupAt: z.iso.datetime(),
+  pickupAt: z.iso.datetime().optional().nullable(),
+  table: z.number().int().min(1).max(60).optional().nullable(),
   payOnline: z.boolean(),
   lines: z
     .array(
@@ -58,6 +59,7 @@ export async function placeOrderAction(input: z.infer<typeof schema>): Promise<{
   });
   if (!placed.ok) return { ok: false, error: placed.error };
 
+  if (!p.data.table && !p.data.pickupAt) return { ok: false, error: "invalid" };
   const statusPath = `/${p.data.locale}/${p.data.locale === "es" ? "pedido" : "order-status"}/${placed.token}`;
   if (!payOnline || !base) {
     await sendConfirmation(payload, placed.orderId).catch(() => undefined);

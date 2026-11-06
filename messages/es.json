@@ -408,7 +408,8 @@
       "empty": "Nada pendiente.",
       "offline": "Sin conexión. Reintentando...",
       "web": "Web",
-      "pickupAt": "Recoge {time}"
+      "pickupAt": "Recoge {time}",
+      "table": "Mesa {table}"
     },
     "ticket": {
       "title": "Factura simplificada",
@@ -533,9 +534,19 @@
         "no-shift": "Abre un turno para registrar ventas.",
         "missing-required": "Falta una opción obligatoria.",
         "unavailable-item": "Un producto no está disponible.",
-        "generic": "No se ha podido guardar. Inténtalo otra vez."
+        "generic": "No se ha podido guardar. Inténtalo otra vez.",
+        "over-ordered": "Hay más envases de los pedidos: revísalo en el pedido, en Administración."
       },
       "link": "Escanear"
+    },
+    "tables": {
+      "title": "Mesas",
+      "print": "Imprimir",
+      "back": "Volver a la barra",
+      "off": "Los pedidos desde la mesa están desactivados. Actívalos en Administración, Empresa.",
+      "table": "Mesa {n}",
+      "hint": "Escanea y pide desde aquí",
+      "link": "Mesas"
     }
   },
   "order": {
@@ -598,7 +609,8 @@
       "unpaid": "Se paga al recoger",
       "awaiting": "Esperando la confirmación del pago...",
       "notFound": "No encontramos este pedido.",
-      "live": "Esta página se actualiza sola."
+      "live": "Esta página se actualiza sola.",
+      "atTable": "Te lo servimos en la mesa {table}."
     },
     "toCarta": "Ver la carta",
     "signedInAs": "Pides como {name}.",
@@ -606,7 +618,12 @@
     "addShort": "Añadir",
     "less": "Uno menos de {name}",
     "more": "Uno más de {name}",
-    "shopPaysOnline": "Los productos de la tienda se pagan con tarjeta al pedir."
+    "shopPaysOnline": "Los productos de la tienda se pagan con tarjeta al pedir.",
+    "tableEyebrow": "Mesa {table}",
+    "tableTitle": "Pide desde tu mesa",
+    "tableIntro": "Elige y te lo traemos. Sin esperas en la barra.",
+    "tableClosed": "Ahora no se puede pedir desde la mesa",
+    "tableServed": "Te lo servimos en la mesa {table}"
   },
   "account": {
     "eyebrow": "Tu cuenta",

@@ -33,6 +33,7 @@ export function OnlineOrder({
   initialLines = [],
   customer = null,
   variant = "carta",
+  table = null,
 }: {
   catalog: CatalogItem[];
   slots: Slot[];
@@ -41,6 +42,8 @@ export function OnlineOrder({
   customer?: { name: string; email: string } | null;
   /** "shop": products as photo cards (the tienda); "carta": hairline rows. */
   variant?: "carta" | "shop";
+  /** Ordered from a table's QR: no pickup time, served at the table. */
+  table?: number | null;
 }) {
   const t = useTranslations("order");
   const locale = useLocale() as "es" | "en";
@@ -124,7 +127,7 @@ export function OnlineOrder({
   const submit = (form: FormData) =>
     start(async () => {
       setError(null);
-      if (!slot) return;
+      if (!slot && table == null) return;
       try {
         const r = await placeOrderAction({
           idempotencyKey: key.current,
@@ -133,7 +136,8 @@ export function OnlineOrder({
           email: String(form.get("email") ?? ""),
           phone: String(form.get("phone") ?? "") || null,
           note: String(form.get("note") ?? "") || null,
-          pickupAt: slot,
+          pickupAt: table == null ? slot : null,
+          table,
           payOnline: payOnline || hasShopItem,
           lines: lines.map((l) => ({ menuItemId: l.item.id, quantity: l.quantity, modifierKeys: l.modifierKeys })),
         });
@@ -270,33 +274,37 @@ export function OnlineOrder({
             </p>
 
             <form action={submit} className="mt-8 space-y-6">
-              <div>
-                <label htmlFor="o-slot" className="text-eyebrow uppercase text-sumi/70">
-                  {t("pickup")}
-                </label>
-                {slots.some((x) => x.available) ? (
-                  <select
-                    id="o-slot"
-                    value={slot ?? ""}
-                    onChange={(e) => setSlot(e.target.value)}
-                    className={`${field} cursor-pointer tabular-nums`}
-                  >
-                    {days.map((d) => (
-                      <optgroup key={d} label={d === todayMadrid ? t("today") : t("tomorrow")}>
-                        {slots
-                          .filter((x) => x.day === d)
-                          .map((x) => (
-                            <option key={x.start} value={x.start} disabled={!x.available}>
-                              {(d === todayMadrid ? t("today") : t("tomorrow")) + ", " + x.label + (x.available ? "" : ` · ${t("full")}`)}
-                            </option>
-                          ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="mt-3 text-sumi/80">{t("noSlots")}</p>
-                )}
-              </div>
+              {table != null ? (
+                <p className="text-eyebrow uppercase text-sumi/70">{t("tableServed", { table })}</p>
+              ) : (
+                <div>
+                  <label htmlFor="o-slot" className="text-eyebrow uppercase text-sumi/70">
+                    {t("pickup")}
+                  </label>
+                  {slots.some((x) => x.available) ? (
+                    <select
+                      id="o-slot"
+                      value={slot ?? ""}
+                      onChange={(e) => setSlot(e.target.value)}
+                      className={`${field} cursor-pointer tabular-nums`}
+                    >
+                      {days.map((d) => (
+                        <optgroup key={d} label={d === todayMadrid ? t("today") : t("tomorrow")}>
+                          {slots
+                            .filter((x) => x.day === d)
+                            .map((x) => (
+                              <option key={x.start} value={x.start} disabled={!x.available}>
+                                {(d === todayMadrid ? t("today") : t("tomorrow")) + ", " + x.label + (x.available ? "" : ` · ${t("full")}`)}
+                              </option>
+                            ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="mt-3 text-sumi/80">{t("noSlots")}</p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label htmlFor="o-name" className="text-eyebrow uppercase text-sumi/70">
@@ -353,7 +361,7 @@ export function OnlineOrder({
               </p>
               <button
                 type="submit"
-                disabled={pending || !slot}
+                disabled={pending || (!slot && table == null)}
                 className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[2px] bg-sumi px-7 text-sm font-medium tracking-wide text-washi disabled:opacity-40"
               >
                 {pending ? t("sending") : (payOnline || hasShopItem) && stripe ? t("submitPay", { total: formatEuro(total, locale) }) : t("submitPickup")}

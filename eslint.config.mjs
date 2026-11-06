@@ -12,5 +12,7 @@ export default defineConfig([
     "cms/payload-types.ts",
     "app/(payload)/admin/importMap.js",
     "migrations/**",
+    // Vendored minified third-party builds (see the folder README).
+    "public/vendor/**",
   ]),
 ]);

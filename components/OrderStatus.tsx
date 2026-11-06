@@ -12,6 +12,7 @@ export type PublicOrder = {
   paymentStatus: string;
   payOnline: boolean;
   pickupAt: string | null;
+  table?: number | null;
   totalCents: number;
   firstName: string;
   lines: { name: string; quantity: number; modifiers: string[] }[];
@@ -56,7 +57,11 @@ export function OrderStatus({ token, initial }: { token: string; initial: Public
           ))}
         </ol>
       ) : null}
-      {time ? <p className="mt-8 text-sumi/80">{t("pickup", { time })}</p> : null}
+      {order.table ? (
+        <p className="mt-8 text-sumi/80">{t("atTable", { table: order.table })}</p>
+      ) : time ? (
+        <p className="mt-8 text-sumi/80">{t("pickup", { time })}</p>
+      ) : null}
       <ul className="mt-6 border-t border-wood/25">
         {order.lines.map((l, i) => (
           <li key={i} className="border-b border-wood/25 py-3">

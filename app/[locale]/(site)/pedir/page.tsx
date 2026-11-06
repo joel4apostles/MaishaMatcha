@@ -7,7 +7,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { QuietLink } from "@/components/Button";
 import { OnlineOrder } from "@/components/OnlineOrder";
-import { availableSlots } from "@/lib/online";
+import { availableSlots, onlineSettings, openNow } from "@/lib/online";
 import { loadCatalog } from "@/lib/pos/sales";
 import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import { fromParam, recipeModifierKeys, resolveRecipe } from "@/lib/recipe";
@@ -25,12 +25,19 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({ locale: locale as Locale, path: "/pedir", title: t("title"), description: t("description") });
 }
 
-async function load(locale: "es" | "en") {
+async function load(locale: "es" | "en", table: number | null) {
   try {
     const payload = await getPayload({ config });
+    const catalog = async () => (await loadCatalog(payload, locale, "online")).filter((i) => !i.shop);
+    // From a table's QR: valid table, switched on, salon open now.
+    if (table != null) {
+      const { settings, tables } = await onlineSettings(payload);
+      if (!tables || table < 1 || table > tables || !openNow(settings, new Date())) return { state: "closed" as const };
+      return { state: "open" as const, slots: [], catalog: await catalog() };
+    }
     const { enabled, slots } = await availableSlots(payload);
     if (!enabled) return { state: "closed" as const };
-    return { state: "open" as const, slots, catalog: (await loadCatalog(payload, locale, "online")).filter((i) => !i.shop) };
+    return { state: "open" as const, slots, catalog: await catalog() };
   } catch {
     return { state: "unavailable" as const };
   }
@@ -51,23 +58,24 @@ export default async function OrderPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ r?: string | string[] }>;
+  searchParams: Promise<{ r?: string | string[]; mesa?: string | string[] }>;
 }) {
   const { locale } = await params;
-  const { r } = await searchParams;
+  const { r, mesa } = await searchParams;
+  const table = typeof mesa === "string" && /^\d{1,2}$/.test(mesa) ? Number(mesa) : null;
   setRequestLocale(locale as Locale);
   const t = await getTranslations({ locale: locale as Locale, namespace: "order" });
-  const [data, member] = await Promise.all([load(locale as "es" | "en"), currentMember()]);
+  const [data, member] = await Promise.all([load(locale as "es" | "en", table), currentMember()]);
 
   return (
     <Section>
-      <Eyebrow>{t("eyebrow")}</Eyebrow>
+      <Eyebrow>{table != null ? t("tableEyebrow", { table }) : t("eyebrow")}</Eyebrow>
       <Headline as="h1" className="mt-5 text-display">
-        {data.state === "closed" ? t("closedTitle") : t("title")}
+        {data.state === "closed" ? (table != null ? t("tableClosed") : t("closedTitle")) : table != null ? t("tableTitle") : t("title")}
       </Headline>
       {data.state === "open" ? (
         <>
-          <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
+          <p className="measure mt-6 text-lg text-sumi/80">{table != null ? t("tableIntro") : t("intro")}</p>
           {member ? (
             <p className="mt-4 text-sumi/75">{t("signedInAs", { name: member.name.split(" ")[0] })}</p>
           ) : (
@@ -82,6 +90,7 @@ export default async function OrderPage({
               stripe={stripeEnabled()}
               customer={member ? { name: member.name, email: member.email } : null}
               initialLines={recipeLine(data.catalog, typeof r === "string" ? r : undefined)}
+              table={table}
             />
           </div>
         </>

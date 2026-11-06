@@ -14,20 +14,24 @@ export type ScanPo = {
   lines: { index: number; name: string; orderedPacks: number; receivedPacks: number }[];
 };
 
-// Text recognition runs in the browser (photos never leave the tablet).
-// The pinned build is loaded on first use with its integrity hash.
-const TESSERACT_SRC = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js";
-const TESSERACT_SRI = "sha384-2BQ3U3OdKOb0Uczxqr41I9UvZkzr4V9Hv8uSzMMZAlmhsFClvdZX5wi5fDCzG+tM";
-type Tess = { recognize: (img: File, lang: string, opts?: { logger?: (m: { status: string; progress: number }) => void }) => Promise<{ data: { text: string } }> };
+// Text recognition runs in the browser (photos never leave the tablet),
+// entirely from files on this site (public/vendor/tesseract): nothing
+// executable comes from a CDN on the counter (strict CSP on /pos).
+const VENDOR = "/vendor/tesseract";
+type TessOpts = {
+  logger?: (m: { status: string; progress: number }) => void;
+  workerPath: string;
+  corePath: string;
+  langPath: string;
+};
+type Tess = { recognize: (img: File, lang: string, opts: TessOpts) => Promise<{ data: { text: string } }> };
 
 function loadTesseract(): Promise<Tess> {
   const w = window as unknown as { Tesseract?: Tess };
   if (w.Tesseract) return Promise.resolve(w.Tesseract);
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = TESSERACT_SRC;
-    s.integrity = TESSERACT_SRI;
-    s.crossOrigin = "anonymous";
+    s.src = `${VENDOR}/tesseract.min.js`;
     s.onload = () => (w.Tesseract ? resolve(w.Tesseract) : reject(new Error("tesseract")));
     s.onerror = () => reject(new Error("tesseract"));
     document.head.appendChild(s);
@@ -69,6 +73,9 @@ export function Scanner({ orders, canReceive, hasShift, catalog }: { orders: Sca
     try {
       const tess = await loadTesseract();
       const { data } = await tess.recognize(file, "spa+eng", {
+        workerPath: `${VENDOR}/worker.min.js`,
+        corePath: `${VENDOR}/tesseract-core-simd-lstm.wasm.js`,
+        langPath: VENDOR,
         logger: (m) => m.status === "recognizing text" && setProgress(Math.round(m.progress * 100)),
       });
       setText(data.text);
@@ -99,10 +106,15 @@ export function Scanner({ orders, canReceive, hasShift, catalog }: { orders: Sca
     start(async () => {
       if (!po) return;
       const r = await receiveScannedAction({
+        idempotencyKey: key,
         poId: po.id,
         packs: po.lines.map((l) => ({ index: l.index, packs: Math.max(0, Number(packs[l.index] || 0)) })),
       }).catch(() => ({ ok: false as const, error: "generic" }));
-      setMsg(r.ok ? t("received") : t(`errors.${["forbidden", "not-open", "nothing", "invalid"].includes(r.error) ? r.error : "generic"}` as "errors.generic"));
+      if (r.ok) {
+        setMsg(t("received"));
+        setPacks({});
+        setKey(crypto.randomUUID());
+      } else setMsg(t(`errors.${["forbidden", "not-open", "nothing", "invalid", "over-ordered"].includes(r.error) ? r.error : "generic"}` as "errors.generic"));
     });
 
   const ticketTotal = ticket.reduce((s, l) => {

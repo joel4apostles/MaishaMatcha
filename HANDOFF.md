@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, ~02:10 (Opus 5.5 session)
+Last updated: 2026-11-06, ~02:30 (Opus 5.5 session)
 
 ## Where things stand
 
@@ -15,7 +15,7 @@ Last updated: 2026-11-06, ~02:10 (Opus 5.5 session)
   events use the static list) and /admin returns 500. Next deploy step:
   Supabase + Vercel env (POS-PLAN section 7), then the live Supabase checks
   in the security-audit skill (section 3).
-- **Built locally, tested (132 tests, `npm test`):** counter POS (PIN sign-in,
+- **Built locally, tested (137 tests, `npm test`):** counter POS (PIN sign-in,
   shifts, Z report, cash/card-on-terminal, tickets with AEAT QR, invoice hash
   chain, KDS, refunds/voids with manager PIN, offline cash queue), inventory
   and suppliers (gram deduction, counts, batches, reorder drafts, approve to
@@ -36,13 +36,23 @@ Last updated: 2026-11-06, ~02:10 (Opus 5.5 session)
   units); monthly membership via Stripe subscriptions with the founding
   price. Privacy notice rewritten (provisional, needs legal review).
   Design review SHIP; security review SHIP with all SHOULDs fixed.
-- **Counter extras (2026-11-06, LOCAL, not pushed):** split payment (card
+- **Later 2026-11-06 (LOCAL, not pushed yet):** founder said the dark hero
+  and the sign photo were "not premium": home hero is now a light editorial
+  spread (poetic headline + framed real photo that unveils once), header
+  always washi, visit block typographic, story kanji in a brush font
+  (Yuji Syuku) written in top to bottom. Brand skill updated (HOME HERO).
+  Also: PDF purchase orders (pdf-lib, attached + /api/purchase-orders/[id]/pdf),
+  scanning at /pos/escanear (delivery notes + paper tickets, tesseract.js
+  SELF-HOSTED in public/vendor/tesseract, person confirms), table ordering
+  by QR (/es/pedir?mesa=N, printable /pos/mesas, Empresa switch), strict
+  CSP on /pos and /kds. Security + design reviews SHIP, findings fixed.
+- **Counter extras (2026-11-06, PUSHED):** split payment (card
   + cash, change from cash only), full invoice on request (F3 in series
   "F" replacing the ticket, NIF/NIE/CIF/VAT validated, /pos/factura/[id]),
   receipts by email (address not stored). Refunds go back cash first, then
   card, one row per method; a ticket with a full invoice is not refunded at
   the till (the gestor issues the corrective). Security review SHIP.
-- **Real photos on the site (2026-11-06, LOCAL, not pushed):**
+- **Real photos on the site (2026-11-06, PUSHED, since reworked above):**
   hero = bar still life (public/images/hero-still-life.jpg; phones full
   bleed, desktop ink field + right photo column), shop sign beside the
   visit line (shopfront.jpg), still life on /tienda. Design review SHIP.

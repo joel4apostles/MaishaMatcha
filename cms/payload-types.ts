@@ -225,6 +225,7 @@ export interface Order {
   payOnline?: boolean | null;
   customerEmail?: string | null;
   customerPhone?: string | null;
+  table?: number | null;
   pickupAt?: string | null;
   readyNotifiedAt?: string | null;
   publicToken?: string | null;
@@ -1161,6 +1162,7 @@ export interface OrdersSelect<T extends boolean = true> {
   payOnline?: T;
   customerEmail?: T;
   customerPhone?: T;
+  table?: T;
   pickupAt?: T;
   readyNotifiedAt?: T;
   publicToken?: T;
@@ -1743,6 +1745,11 @@ export interface Business {
    * HH:MM
    */
   closingTime?: string | null;
+  /**
+   * Cada mesa tiene su QR (imprímelos en la barra: Mesas). Funciona en horario de apertura.
+   */
+  tableOrdering?: boolean | null;
+  tableCount?: number | null;
   openDays?: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[] | null;
   slotMinutes?: number | null;
   slotCapacity?: number | null;
@@ -1788,6 +1795,8 @@ export interface BusinessSelect<T extends boolean = true> {
   onlineOrdering?: T;
   openingTime?: T;
   closingTime?: T;
+  tableOrdering?: T;
+  tableCount?: T;
   openDays?: T;
   slotMinutes?: T;
   slotCapacity?: T;

@@ -98,8 +98,8 @@ export function KitchenDisplay({ initial }: { initial: Order[] }) {
                     </div>
                     <p className="text-sm text-sumi/75">
                       {[
-                        o.channel === "online" ? t("web") : null,
-                        o.pickupAt
+                        o.channel === "online" ? (o.table ? t("table", { table: o.table }) : t("web")) : null,
+                        o.pickupAt && !o.table
                           ? t("pickupAt", { time: new Date(o.pickupAt).toLocaleTimeString("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }) })
                           : null,
                         o.service === "takeaway" ? t("takeaway") : t("here"),

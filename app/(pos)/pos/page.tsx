@@ -68,6 +68,11 @@ export default async function PosPage() {
         </Link>
       ) : null}
       {staff.role !== "barista" ? (
+        <Link href="/pos/mesas" className="hidden min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4 sm:inline-flex">
+          {t("tables.link")}
+        </Link>
+      ) : null}
+      {staff.role !== "barista" ? (
         <Link href="/admin" className="hidden min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4 sm:inline-flex">
           {t("home.backOffice")}
         </Link>

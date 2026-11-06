@@ -408,7 +408,8 @@
       "empty": "Nothing pending.",
       "offline": "Offline. Retrying...",
       "web": "Web",
-      "pickupAt": "Pickup {time}"
+      "pickupAt": "Pickup {time}",
+      "table": "Table {table}"
     },
     "ticket": {
       "title": "Simplified invoice",
@@ -533,9 +534,19 @@
         "no-shift": "Open a shift to record sales.",
         "missing-required": "A required option is missing.",
         "unavailable-item": "A product is not available.",
-        "generic": "It could not be saved. Try again."
+        "generic": "It could not be saved. Try again.",
+        "over-ordered": "More packs than ordered: check it on the order in the back office."
       },
       "link": "Scan"
+    },
+    "tables": {
+      "title": "Tables",
+      "print": "Print",
+      "back": "Back to the bar",
+      "off": "Table ordering is off. Turn it on in the back office, Business.",
+      "table": "Table {n}",
+      "hint": "Scan to order from here",
+      "link": "Tables"
     }
   },
   "order": {
@@ -598,7 +609,8 @@
       "unpaid": "Pay at pickup",
       "awaiting": "Waiting for the payment confirmation...",
       "notFound": "We could not find this order.",
-      "live": "This page updates by itself."
+      "live": "This page updates by itself.",
+      "atTable": "Served at table {table}."
     },
     "toCarta": "See the carta",
     "signedInAs": "Ordering as {name}.",
@@ -606,7 +618,12 @@
     "addShort": "Add",
     "less": "One less {name}",
     "more": "One more {name}",
-    "shopPaysOnline": "Shop products are paid by card when ordering."
+    "shopPaysOnline": "Shop products are paid by card when ordering.",
+    "tableEyebrow": "Table {table}",
+    "tableTitle": "Order from your table",
+    "tableIntro": "Choose, and we bring it to you. No waiting at the bar.",
+    "tableClosed": "Table ordering is not available right now",
+    "tableServed": "Served at table {table}"
   },
   "account": {
     "eyebrow": "Your account",

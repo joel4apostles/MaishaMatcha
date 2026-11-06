@@ -16,7 +16,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   return new NextResponse(Buffer.from(pdf.bytes), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${pdf.filename}"`,
+      "Content-Disposition": `inline; filename="${pdf.filename.replace(/[^a-z0-9.-]/g, "")}"`,
       "Cache-Control": "private, no-store",
     },
   });

@@ -12,7 +12,7 @@ import { emailFrame, escapeHtml, sendEmail } from "@/lib/email";
 import { formatEuro } from "@/lib/money";
 import { priceOrder, type LineInput } from "@/lib/pos/pricing";
 import { issueInvoiceFor, loadCatalog } from "@/lib/pos/sales";
-import { isBookable, pickupSlots, type SlotSettings } from "@/lib/slots";
+import { isBookable, madridInstant, pickupSlots, type SlotSettings } from "@/lib/slots";
 import { cancelOrderOnce, takeUnits } from "@/lib/units";
 import { stripeEnabled } from "@/lib/stripe";
 
@@ -30,11 +30,20 @@ export async function onlineSettings(payload: Payload) {
     slotCapacity: b.slotCapacity ?? 6,
     leadMinutes: b.leadMinutes ?? 15,
   };
-  return { enabled: Boolean(b.onlineOrdering), settings };
+  return { enabled: Boolean(b.onlineOrdering), settings, tables: b.tableOrdering ? (b.tableCount ?? 0) : 0 };
 }
 
 /** An unpaid card checkout stops holding its slot after this long. */
 export const CHECKOUT_HOLD_MINUTES = 30;
+/** The salon is open at this instant (an open day, between opening and closing). */
+export function openNow(s: SlotSettings, now: Date) {
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(now);
+  const day = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(`${date}T12:00:00Z`).getUTCDay()];
+  if (!s.openDays.includes(day)) return false;
+  const t = now.getTime();
+  return t >= madridInstant(date, s.openingTime).getTime() && t < madridInstant(date, s.closingTime).getTime();
+}
+
 /** Most units of one shop product per order. */
 export const MAX_SHOP_UNITS = 5;
 /** Most open web orders one email may hold at once. */
@@ -76,7 +85,10 @@ export async function availableSlots(payload: Payload, now = new Date()) {
 
 export type PlaceInput = {
   lines: LineInput[];
-  pickupAt: string;
+  /** A pickup slot; not used for an order from a table. */
+  pickupAt?: string | null;
+  /** Ordered from a table's QR code: served there, no pickup slot. */
+  table?: number | null;
   name: string;
   email: string;
   phone?: string | null;
@@ -91,8 +103,16 @@ export type PlaceResult =
   | { ok: false; error: "closed" | "slot-full" | "invalid" | string };
 
 export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now = new Date()): Promise<PlaceResult> {
-  const { enabled, settings } = await onlineSettings(payload);
-  if (!enabled) return { ok: false, error: "closed" };
+  const { enabled, settings, tables } = await onlineSettings(payload);
+  const tableNo = input.table ?? null;
+  if (tableNo != null) {
+    // Table orders: switched on, a real table, and the salon open right now.
+    if (!tables || !Number.isInteger(tableNo) || tableNo < 1 || tableNo > tables) return { ok: false, error: "closed" };
+    if (!openNow(settings, now)) return { ok: false, error: "closed" };
+  } else {
+    if (!enabled) return { ok: false, error: "closed" };
+    if (!input.pickupAt) return { ok: false, error: "invalid" };
+  }
 
   const existing = await payload.find({
     collection: "orders",
@@ -141,7 +161,7 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
     const seq = table(payload, "sequences");
     await query(payload, sql`insert into ${seq} (key, value, updated_at, created_at) values ('order-label', 0, now(), now()) on conflict (key) do nothing`, req);
     const rows = await query(payload, sql`update ${seq} set value = value + 1 where key = 'order-label' returning value`, req);
-    if (!isBookable(settings, now, await takenSlots(payload, now), input.pickupAt)) {
+    if (tableNo == null && !isBookable(settings, now, await takenSlots(payload, now), input.pickupAt!)) {
       await killTransaction(req);
       return { ok: false, error: "slot-full" };
     }
@@ -158,10 +178,11 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
       data: {
         label,
         channel: "online",
-        service: "takeaway",
+        service: tableNo != null ? "here" : "takeaway",
         status: "received",
         paymentStatus: "unpaid",
         payOnline: input.payOnline,
+        table: tableNo ?? undefined,
         lines: priced.lines,
         totalCents: priced.totalCents,
         taxBreakdown: priced.taxBreakdown,
@@ -169,7 +190,7 @@ export async function placeOnlineOrder(payload: Payload, input: PlaceInput, now 
         customerName: input.name.trim(),
         customerEmail: input.email.trim().toLowerCase(),
         customerPhone: input.phone?.trim() || undefined,
-        pickupAt: input.pickupAt,
+        pickupAt: tableNo != null ? now.toISOString() : input.pickupAt,
         statusChangedAt: now.toISOString(),
         publicToken: token,
         idempotencyKey: input.idempotencyKey,
@@ -256,6 +277,7 @@ export async function orderByToken(payload: Payload, token: string) {
     paymentStatus: o.paymentStatus,
     payOnline: Boolean(o.payOnline),
     pickupAt: o.pickupAt ?? null,
+    table: o.table ?? null,
     totalCents: o.totalCents,
     firstName: (o.customerName ?? "").split(" ")[0],
     lines: (o.lines ?? []).map((l) => ({

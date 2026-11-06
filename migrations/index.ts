@@ -11,6 +11,7 @@ import * as migration_20261105_231007_lowercase_order_emails from './20261105_23
 import * as migration_20261105_233005_shop_premium from './20261105_233005_shop_premium';
 import * as migration_20261105_234950_subscription_event_at from './20261105_234950_subscription_event_at';
 import * as migration_20261106_005146_full_invoices from './20261106_005146_full_invoices';
+import * as migration_20261106_012347_table_orders from './20261106_012347_table_orders';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20261106_005146_full_invoices.up,
     down: migration_20261106_005146_full_invoices.down,
-    name: '20261106_005146_full_invoices'
+    name: '20261106_005146_full_invoices',
+  },
+  {
+    up: migration_20261106_012347_table_orders.up,
+    down: migration_20261106_012347_table_orders.down,
+    name: '20261106_012347_table_orders'
   },
 ];

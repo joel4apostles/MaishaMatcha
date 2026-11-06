@@ -25,6 +25,27 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * The counter (POS, KDS) holds a staff session: there, scripts, workers and
+ * connections may only come from this site (the scanner's text recognition
+ * is self-hosted in public/vendor/tesseract). Inline scripts stay allowed
+ * because Next's bootstrap needs them without nonces; wasm needs
+ * 'wasm-unsafe-eval'. Dev adds 'unsafe-eval' for React's dev tooling.
+ */
+const posCsp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob:${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}`,
+  "worker-src 'self' blob:",
+  "connect-src 'self' blob: data:",
+  "img-src 'self' data: blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "form-action 'self'",
+].join("; ");
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // This project lives inside a parent folder that also has a lockfile;
@@ -43,6 +64,10 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      // Later rules win for the same header: the counter gets the strict CSP.
+      { source: "/pos/:path*", headers: [{ key: "Content-Security-Policy", value: posCsp }] },
+      { source: "/pos", headers: [{ key: "Content-Security-Policy", value: posCsp }] },
+      { source: "/kds", headers: [{ key: "Content-Security-Policy", value: posCsp }] },
     ];
   },
 };

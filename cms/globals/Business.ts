@@ -52,6 +52,19 @@ export const Business: GlobalConfig = {
           ],
         },
         {
+          type: "row",
+          fields: [
+            {
+              name: "tableOrdering",
+              type: "checkbox",
+              defaultValue: false,
+              label: "Pedidos desde la mesa (QR)",
+              admin: { description: "Cada mesa tiene su QR (imprímelos en la barra: Mesas). Funciona en horario de apertura." },
+            },
+            { name: "tableCount", type: "number", min: 1, max: 60, defaultValue: 8, label: "Número de mesas" },
+          ],
+        },
+        {
           name: "openDays",
           type: "select",
           hasMany: true,

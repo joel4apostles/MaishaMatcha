@@ -565,6 +565,7 @@ export async function kitchenQueue(payload: Payload) {
     statusChangedAt: o.statusChangedAt ?? o.createdAt,
     staffName: typeof o.staff === "object" && o.staff ? o.staff.name : (o.customerName ?? null),
     pickupAt: o.pickupAt ?? null,
+    table: o.table ?? null,
     paid: o.paymentStatus === "paid",
     note: o.note ?? null,
     lines: (o.lines ?? []).map((l) => ({

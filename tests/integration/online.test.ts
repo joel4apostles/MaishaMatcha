@@ -123,3 +123,21 @@ describe("abuse limits (security review)", () => {
     expect(await placeOnlineOrder(payload, input({ idempotencyKey: key, email: "other@example.com" }), NOW)).toEqual({ ok: false, error: "invalid" });
   });
 });
+
+describe("orders from a table's QR", () => {
+  it("needs the switch, a real table and the salon open; skips the pickup slot", async () => {
+    const tableInput = (table: number) => input({ table, pickupAt: null, idempotencyKey: randomUUID() });
+    await payload.updateGlobal({ slug: "business", data: { tableOrdering: false } });
+    expect(await placeOnlineOrder(payload, tableInput(3), NOW)).toEqual({ ok: false, error: "closed" });
+    await payload.updateGlobal({ slug: "business", data: { tableOrdering: true, tableCount: 4, openingTime: "08:00", closingTime: "18:00" } });
+    expect(await placeOnlineOrder(payload, tableInput(9), NOW)).toEqual({ ok: false, error: "closed" });
+    // 21:00 in Madrid: closed.
+    expect(await placeOnlineOrder(payload, tableInput(3), new Date("2027-03-02T20:00:00.000Z"))).toEqual({ ok: false, error: "closed" });
+    const ok = await placeOnlineOrder(payload, tableInput(3), NOW);
+    if (!ok.ok) throw new Error(ok.error);
+    const o = await payload.findByID({ collection: "orders", id: ok.orderId, overrideAccess: true });
+    expect(o).toMatchObject({ table: 3, service: "here", channel: "online" });
+    expect((await orderByToken(payload, ok.token))?.table).toBe(3);
+    await payload.updateGlobal({ slug: "business", data: { tableOrdering: false } });
+  });
+});

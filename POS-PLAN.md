@@ -267,7 +267,7 @@ import those tickets later.
 
 ## 8. Build backlog
 
-Done 2026-11-06 beyond the table: split payment, full invoice on request (F3), emailed receipts. Not built yet: supplier delivery-note and paper-ticket scanning (OCR, free option: in-browser Tesseract; plan suggested Claude vision, which is paid), PDF purchase orders (emails are HTML today), table ordering by QR (optional), corrective for full invoices (R1 to R4: ask the gestor).
+Done 2026-11-06 beyond the table: split payment, full invoice on request (F3), emailed receipts. Also done 2026-11-06: PDF purchase orders, delivery-note and paper-ticket scanning (free in-browser OCR, self-hosted, human confirm), table ordering by QR. Not built: corrective for full invoices (R1 to R4: ask the gestor), Stripe Terminal, AEAT submission, CafeRadar stamps.
  (founder go-ahead 2026-11-05: "implement every feature")
 
 Mocks approved by the founder's instruction to build everything. Order of
