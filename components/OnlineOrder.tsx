@@ -10,6 +10,7 @@ import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
 import { Link } from "@/i18n/navigation";
 import { productSlug, restoreLines } from "@/lib/shop";
+import { Numeral } from "@/components/Numeral";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
 /** Section markers, as on the carta: kanji numerals in the brush face. */
@@ -311,11 +312,9 @@ export function OnlineOrder({
         ) : null}
         {categories.map((c, ci) => (
           <section key={c} aria-labelledby={`oc-${ci}`}>
-            <h2 id={`oc-${ci}`} className="flex items-baseline gap-3 text-eyebrow uppercase text-sumi/70">
+            <h2 id={`oc-${ci}`} className="flex items-center gap-3 text-eyebrow uppercase text-sumi/70">
               {variant === "carta" ? (
-                <span lang="ja" aria-hidden="true" className="font-brush text-[1.6rem] normal-case leading-none text-sumi">
-                  {NUMERALS[ci] ?? ""}
-                </span>
+                <Numeral>{NUMERALS[ci] ?? ""}</Numeral>
               ) : null}
               {c}
             </h2>

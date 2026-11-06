@@ -29,10 +29,11 @@
     "manifesto": {
       "eyebrow": "Manifesto",
       "title": "Quiet luxury",
-      "p1": "Luxury is not in the price, nor in who can pay it. It is in the experience: how something feels to the touch, to the hand.",
-      "p2": "It is matter and it is light. Cool stone, grained wood, the rising steam. Morning settling on green.",
-      "p3": "It is the balance between matter and light. Comfort, calm, tea drunk without hurry.",
+      "p1": "Luxury is not in the price. It is in the experience: how a thing feels in the hand.",
+      "p2": "Cool stone, grained wood, the rising steam. Morning settling on green.",
+      "p3": "The balance between matter and light. Comfort, calm, tea drunk without hurry.",
       "quote": "Lo que no es piedra es luz.",
+      "quoteNote": "What is not stone is light.",
       "quoteAuthor": "Octavio Paz"
     },
     "menuPreview": {

@@ -15,6 +15,7 @@ import { stripeEnabled } from "@/lib/stripe";
 import { pageMetadata } from "@/lib/seo";
 import type { CatalogItem } from "@/lib/pos/pricing";
 import type { Locale } from "@/i18n/routing";
+import { Numeral } from "@/components/Numeral";
 
 // Stock changes by the minute.
 export const dynamic = "force-dynamic";
@@ -108,11 +109,9 @@ export default async function ProductPage({ params }: { params: Promise<{ locale
                 <h2 id="ritual-title" className="text-eyebrow uppercase text-sumi/70">{t("ritualTitle")}</h2>
                 <ol className="mt-6 space-y-5">
                   {steps.map((step, i) => (
-                    <li key={i} className="grid grid-cols-[2rem_minmax(0,1fr)] items-baseline gap-3">
-                      <span lang="ja" aria-hidden="true" className="font-brush text-[1.6rem] leading-none text-sumi">
-                        {NUMERALS[i] ?? i + 1}
-                      </span>
-                      <p className="text-sumi/85">{step}</p>
+                    <li key={i} className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-4">
+                      <Numeral>{NUMERALS[i] ?? i + 1}</Numeral>
+                      <p className="pt-1 text-sumi/85">{step}</p>
                     </li>
                   ))}
                 </ol>

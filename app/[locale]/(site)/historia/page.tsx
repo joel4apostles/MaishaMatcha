@@ -16,6 +16,7 @@ import { StoryVisual } from "@/components/StoryVisual";
 import { story } from "@/content/story";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
+import { Numeral } from "@/components/Numeral";
 
 export async function generateMetadata({
   params,
@@ -84,13 +85,7 @@ function StoryContent() {
                   className="relative pb-14 last:pb-0 sm:pb-20"
                 >
                   {/* The path's marker: the numeral sits on the rail, cutting it. */}
-                  <span
-                    lang="ja"
-                    aria-hidden="true"
-                    className="absolute -left-9 top-0 -translate-x-1/2 select-none bg-washi py-1.5 font-brush text-[1.4rem] leading-none text-sumi sm:-left-12"
-                  >
-                    {NUMERALS[i]}
-                  </span>
+                  <Numeral className="absolute -left-9 top-0 -translate-x-1/2 bg-washi sm:-left-12">{NUMERALS[i]}</Numeral>
                   {/* Dramatic staged entrance: era, then title word by word, then body. */}
                   <StageReveal>
                     {/* Phones and tablets: the era's character sits with its chapter

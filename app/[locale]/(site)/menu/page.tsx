@@ -13,6 +13,7 @@ import { formatEuro } from "@/lib/money";
 import { pageMetadata } from "@/lib/seo";
 import drinkPhoto from "@/public/images/drink-real.jpg";
 import type { Locale } from "@/i18n/routing";
+import { Numeral } from "@/components/Numeral";
 
 export async function generateMetadata({
   params,
@@ -47,10 +48,8 @@ const hairline = "border-wood/35";
 
 function Numbered({ index, children, id }: { index: number; children: React.ReactNode; id: string }) {
   return (
-    <h2 id={id} className="flex items-baseline gap-3 text-eyebrow uppercase text-sumi/70">
-      <span lang="ja" aria-hidden="true" className="font-brush text-[1.6rem] normal-case leading-none text-sumi">
-        {NUMERALS[index]}
-      </span>
+    <h2 id={id} className="flex items-center gap-3 text-eyebrow uppercase text-sumi/70">
+      <Numeral>{NUMERALS[index]}</Numeral>
       {children}
     </h2>
   );

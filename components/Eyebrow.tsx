@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Numeral } from "./Numeral";
 
 /**
  * Small-caps eyebrow: 0.75rem, 0.15em tracking. Quiet, never an accent color.
@@ -18,12 +19,10 @@ export function Eyebrow({
   return (
     <p
       id={id}
-      className={`text-eyebrow font-medium uppercase text-sumi/70 ${numeral ? "flex items-baseline gap-3" : ""} ${className}`.trim()}
+      className={`text-eyebrow font-medium uppercase text-sumi/70 ${numeral ? "flex items-center gap-3" : ""} ${className}`.trim()}
     >
       {numeral ? (
-        <span lang="ja" aria-hidden="true" className="font-brush text-[1.6rem] font-normal normal-case leading-none text-sumi">
-          {numeral}
-        </span>
+        <Numeral>{numeral}</Numeral>
       ) : null}
       {numeral ? <span>{children}</span> : children}
     </p>
