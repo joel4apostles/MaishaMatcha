@@ -17,12 +17,15 @@ export function EventRsvp({
   mine,
   signedIn,
   allowed,
+  className = "mt-6 border-t border-wood/25 pt-4",
 }: {
   eventId: number;
   remaining: number;
   mine: number;
   signedIn: boolean;
   allowed: boolean;
+  /** Wrapper spacing; the events programme sets its own. */
+  className?: string;
 }) {
   const t = useTranslations("rsvp");
   const router = useRouter();
@@ -41,7 +44,7 @@ export function EventRsvp({
     });
 
   return (
-    <div className="mt-6 border-t border-wood/25 pt-4">
+    <div className={className}>
       <p className="text-sm text-sumi/75">{mine ? t("reserved", { count: mine }) : t("remaining", { count: remaining })}</p>
       {!signedIn ? (
         <Link href={{ pathname: "/cuenta", query: { next: back } }} className={`${quietLinkClass} mt-2`}>
