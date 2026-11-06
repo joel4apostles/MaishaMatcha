@@ -5,14 +5,16 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, ~01:00 (Opus 5.5 session)
+Last updated: 2026-11-06, ~01:15 (Opus 5.5 session)
 
 ## Where things stand
 
-- **Live site** (maisha-matcha.vercel.app) is still the 2026-09-17 deploy.
-  `main` is 28 commits ahead of origin, NOT pushed. Pushing deploys: run
-  the `security-audit` skill, then the go-live checklist in `POS-PLAN.md`
-  section 7 (Supabase + Vercel env first).
+- **Live site** (maisha-matcha.vercel.app): everything below was PUSHED
+  2026-11-06 (890ecb1) and deployed by Vercel. Without DATABASE_URL the
+  public pages work (ordering shows "no disponible", the shop "abre pronto",
+  events use the static list) and /admin returns 500. Next deploy step:
+  Supabase + Vercel env (POS-PLAN section 7), then the live Supabase checks
+  in the security-audit skill (section 3).
 - **Built locally, tested (125 tests, `npm test`):** counter POS (PIN sign-in,
   shifts, Z report, cash/card-on-terminal, tickets with AEAT QR, invoice hash
   chain, KDS, refunds/voids with manager PIN, offline cash queue), inventory
