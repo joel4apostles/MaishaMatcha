@@ -63,7 +63,7 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col items-start md:items-end">
-          <LocaleSwitcher />
+          <LocaleSwitcher placement="up" />
         </div>
       </div>
 
