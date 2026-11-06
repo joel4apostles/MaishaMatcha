@@ -58,7 +58,7 @@ export function TheSpace() {
 
       {/* The real sign on Plaza Cetina beside where and when: modest in size,
           so the bright sign never competes with the founding band below. */}
-      <Reveal className="mt-14 grid grid-cols-1 items-end gap-6 border-t border-wood/25 pt-8 md:grid-cols-[minmax(0,520px)_minmax(0,1fr)] md:gap-12">
+      <Reveal className="mt-14 grid grid-cols-1 items-start gap-6 border-t border-wood/25 pt-8 md:grid-cols-[minmax(0,520px)_minmax(0,1fr)] md:gap-12">
         <div className="overflow-hidden rounded-[2px]">
           <Image src={shopfront} alt={t("shopfrontAlt")} sizes="(min-width: 768px) 520px, 100vw" placeholder="blur" className="h-auto w-full" />
         </div>

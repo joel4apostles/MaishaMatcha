@@ -17,7 +17,7 @@ export function Hero() {
           a flat ink field (the source is a portrait, never stretched wide).
           Phones and tablets: the photo fills the top of the hero so the
           objects sit just above the panel, never under it. */}
-      <div className="absolute inset-x-0 top-0 bottom-[36%] md:left-1/2 md:w-[600px] md:-translate-x-1/2 lg:top-16 lg:bottom-0 lg:left-auto lg:right-0 lg:w-[42%] lg:translate-x-0">
+      <div className="absolute inset-x-0 top-0 bottom-[36%] md:top-16 md:left-1/2 md:w-[600px] md:-translate-x-1/2 lg:bottom-0 lg:left-auto lg:right-0 lg:w-[42%] lg:translate-x-0">
         <Image
           src={stillLife}
           alt={t("photoAlt")}
@@ -29,7 +29,7 @@ export function Hero() {
         />
       </div>
       {/* Phones and tablets: a light scrim; legibility comes from the ink panel. */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 bottom-[36%] bg-sumi/15 md:left-1/2 md:w-[600px] md:-translate-x-1/2 lg:hidden" />
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 bottom-[36%] bg-sumi/15 md:top-16 md:left-1/2 md:w-[600px] md:-translate-x-1/2 lg:hidden" />
 
       <div className="relative mx-auto flex w-full max-w-[1100px] flex-1 flex-col justify-end pb-16 pt-20 sm:pb-24 lg:justify-center lg:pb-16">
         {/* Brand panel: flat kit matcha, sumi ink — AA-verified on any crop. */}
