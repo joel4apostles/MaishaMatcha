@@ -20,7 +20,8 @@ export type AuditAction =
   | "order.refund"
   | "pos.approval"
   | "pos.approval.failed"
-  | "po.sent";
+  | "po.sent"
+  | "po.received";
 
 type Entry = {
   action: AuditAction;

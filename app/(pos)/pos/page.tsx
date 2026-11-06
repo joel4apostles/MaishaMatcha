@@ -59,6 +59,9 @@ export default async function PosPage() {
           {t("orders.link")}
         </Link>
       ) : null}
+      <Link href="/pos/escanear" className="inline-flex min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4">
+        {t("scan.link")}
+      </Link>
       {shift ? (
         <Link href="/pos/cierre" className="inline-flex min-h-[44px] items-center text-sm underline decoration-wood/50 underline-offset-4">
           {t("shift.closeLink")}
