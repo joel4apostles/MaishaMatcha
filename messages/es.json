@@ -631,7 +631,12 @@
     "tableTitle": "Pide desde tu mesa",
     "tableIntro": "Elige y te lo traemos. Sin esperas en la barra.",
     "tableClosed": "Ahora no se puede pedir desde la mesa",
-    "tableServed": "Te lo servimos en la mesa {table}"
+    "tableServed": "Te lo servimos en la mesa {table}",
+    "phrase": "Ippuku: una pausa para un té.",
+    "usualEyebrow": "Lo de siempre",
+    "usualAdd": "Añadir · {price}",
+    "usualAdded": "Añadido a tu pedido",
+    "addedLine": "Añadido: {name}, {price}"
   },
   "account": {
     "eyebrow": "Tu cuenta",

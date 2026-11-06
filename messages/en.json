@@ -631,7 +631,12 @@
     "tableTitle": "Order from your table",
     "tableIntro": "Choose, and we bring it to you. No waiting at the bar.",
     "tableClosed": "Table ordering is not available right now",
-    "tableServed": "Served at table {table}"
+    "tableServed": "Served at table {table}",
+    "phrase": "Ippuku: a pause for a cup of tea.",
+    "usualEyebrow": "Your usual",
+    "usualAdd": "Add · {price}",
+    "usualAdded": "Added to your order",
+    "addedLine": "Added: {name}, {price}"
   },
   "account": {
     "eyebrow": "Your account",

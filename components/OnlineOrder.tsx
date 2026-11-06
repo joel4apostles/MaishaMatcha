@@ -10,6 +10,8 @@ import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import type { Slot } from "@/lib/slots";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
+/** Section markers, as on the carta: kanji numerals in the brush face. */
+const NUMERALS = ["一", "二", "三", "四", "五", "六", "七", "八"];
 const KNOWN = ["closed", "too-many", "too-many-units", "pay-online", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option"];
 
 const unitOf = (l: Line) =>
@@ -17,6 +19,11 @@ const unitOf = (l: Line) =>
   l.item.groups.flatMap((g) => g.options).filter((o) => l.modifierKeys.includes(o.key)).reduce((s, o) => s + o.priceDeltaCents, 0);
 const summaryOf = (l: Line) =>
   l.item.groups.flatMap((g) => g.options).filter((o) => l.modifierKeys.includes(o.key)).map((o) => o.label).join(" · ");
+
+const LATTE_KEYS = new Set(["prep.latte", "prep.te-latte"]);
+/** Milk only makes sense in a latte: hide it (and drop it) otherwise. */
+const milkApplies = (keys: string[]) => keys.some((k) => LATTE_KEYS.has(k));
+const visibleGroups = (l: Line) => l.item.groups.filter((g) => g.slug !== "leche" || milkApplies(l.modifierKeys));
 
 const field =
   "mt-2 block min-h-[48px] w-full border-b border-wood/40 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
@@ -31,6 +38,7 @@ export function OnlineOrder({
   slots,
   stripe,
   initialLines = [],
+  usual = [],
   customer = null,
   variant = "carta",
   table = null,
@@ -39,6 +47,8 @@ export function OnlineOrder({
   slots: Slot[];
   stripe: boolean;
   initialLines?: LineInput[];
+  /** "Lo de siempre": a signed-in member's last order, already re-priced. */
+  usual?: LineInput[];
   customer?: { name: string; email: string } | null;
   /** "shop": products as photo cards (the tienda); "carta": hairline rows. */
   variant?: "carta" | "shop";
@@ -54,6 +64,18 @@ export function OnlineOrder({
     }),
   );
   const [sheet, setSheet] = useState<Line | null>(null);
+  const usualLines = useMemo(
+    () =>
+      usual.flatMap((l, i) => {
+        const item = catalog.find((c) => c.id === l.menuItemId);
+        return item ? [{ uid: `usual-${i}`, item, quantity: l.quantity, modifierKeys: l.modifierKeys }] : [];
+      }),
+    [usual, catalog],
+  );
+  const [usualUids, setUsualUids] = useState<string[]>([]);
+  const [announce, setAnnounce] = useState("");
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
   const [missing, setMissing] = useState<string | null>(null);
   const [slot, setSlot] = useState<string | null>(slots.find((s) => s.available)?.start ?? null);
   const [payOnline, setPayOnline] = useState(stripe);
@@ -73,6 +95,7 @@ export function OnlineOrder({
   }, []);
 
   const categories = useMemo(() => [...new Set(catalog.map((i) => i.category))], [catalog]);
+  const usualAdded = usualUids.length > 0 && lines.some((l) => usualUids.includes(l.uid));
   const total = lines.reduce((s, l) => s + unitOf(l) * l.quantity, 0);
   // Shop products are paid online whenever card payment is on.
   const hasShopItem = stripe && lines.some((l) => l.item.shop);
@@ -81,19 +104,61 @@ export function OnlineOrder({
 
   const open = (item: CatalogItem) => {
     if (!item.available) return;
+    openerRef.current = document.activeElement as HTMLElement | null;
     const keys = item.groups.filter((g) => g.required && g.selection === "single").map((g) => g.options.find((o) => o.available)?.key ?? "").filter(Boolean);
     const draft = { uid: crypto.randomUUID(), item, quantity: 1, modifierKeys: keys };
-    if (item.groups.length === 0)
+    if (item.groups.length === 0) {
       setLines((ls) => {
         // The same plain product twice is one line with quantity 2.
         const same = ls.find((l) => l.item.id === item.id && l.modifierKeys.length === 0);
         return same ? ls.map((l) => (l === same ? { ...l, quantity: Math.min(l.quantity + 1, item.shop ? 5 : 20) } : l)) : [...ls, draft];
       });
-    else {
+      setAnnounce(t("addedLine", { name: item.name, price: formatEuro(item.priceCents, locale) }));
+    } else {
       setMissing(null);
       setSheet(draft);
     }
   };
+
+  const closeSheet = () => {
+    setSheet(null);
+    openerRef.current?.focus();
+  };
+
+  // The sheet is a real modal: focus inside, Tab kept in, Escape closes,
+  // the page behind does not scroll, focus returns to the row after.
+  const sheetOpen = sheet != null;
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const root = dialogRef.current;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    root?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setSheet(null);
+        openerRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab" || !root) return;
+      const items = [...root.querySelectorAll<HTMLElement>("button:not([disabled]), [tabindex=\"0\"]")];
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [sheetOpen]);
 
   const toggle = (slug: string, key2: string) => {
     if (!sheet) return;
@@ -109,7 +174,17 @@ export function OnlineOrder({
         : cur.includes(key2)
           ? [...others, ...cur.filter((k) => k !== key2)]
           : [...others, ...cur, key2];
-    setSheet({ ...sheet, modifierKeys: next });
+    let keys = next;
+    const milk = sheet.item.groups.find((x) => x.slug === "leche");
+    if (milk) {
+      const milkKeys = new Set(milk.options.map((o) => o.key));
+      if (!milkApplies(keys)) keys = keys.filter((k) => !milkKeys.has(k));
+      else if (!keys.some((k) => milkKeys.has(k))) {
+        const first = milk.options.find((o) => o.available);
+        if (first) keys = [...keys, first.key];
+      }
+    }
+    setSheet({ ...sheet, modifierKeys: keys });
   };
 
   const confirm = () => {
@@ -121,7 +196,8 @@ export function OnlineOrder({
       return;
     }
     setLines((ls) => [...ls, sheet]);
-    setSheet(null);
+    setAnnounce(t("addedLine", { name: sheet.item.name, price: formatEuro(unitOf(sheet) * sheet.quantity, locale) }));
+    closeSheet();
   };
 
   const submit = (form: FormData) =>
@@ -150,10 +226,47 @@ export function OnlineOrder({
 
   return (
     <div className="grid grid-cols-1 gap-14 pb-24 md:grid-cols-[minmax(0,1fr)_22rem] md:gap-16 md:pb-0">
-      <div className="space-y-12">
-        {categories.map((c) => (
-          <section key={c} aria-labelledby={`oc-${c}`}>
-            <h2 id={`oc-${c}`} className="text-eyebrow font-medium uppercase text-sumi/70">
+      <div className="space-y-16">
+        {variant === "carta" && usualLines.length ? (
+          <section aria-labelledby="oc-usual" className="brand-band rounded-[2px] bg-matcha p-2.5">
+            <div className="rounded-[1px] border border-sumi/25 px-6 py-6 sm:px-8">
+              <h2 id="oc-usual" className="text-eyebrow uppercase text-sumi/85">{t("usualEyebrow")}</h2>
+              <ul className="mt-4 space-y-1.5">
+                {usualLines.map((l) => (
+                  <li key={l.uid} className="font-serif text-xl font-light text-sumi">
+                    {l.quantity > 1 ? `${l.quantity} × ` : ""}
+                    {l.item.name}
+                    {summaryOf(l) ? <span className="font-sans text-base text-sumi/85"> · {summaryOf(l)}</span> : null}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <button
+                  type="button"
+                  disabled={usualAdded}
+                  onClick={() => {
+                    const added = usualLines.map((l) => ({ ...l, uid: crypto.randomUUID() }));
+                    setLines((ls) => [...ls, ...added]);
+                    setUsualUids(added.map((l) => l.uid));
+                    setAnnounce(t("usualAdded"));
+                  }}
+                  className="inline-flex min-h-[48px] items-center justify-center rounded-[2px] bg-sumi px-6 text-sm font-medium tracking-wide text-washi disabled:opacity-60"
+                >
+                  {t("usualAdd", { price: formatEuro(usualLines.reduce((s, l) => s + unitOf(l) * l.quantity, 0), locale) })}
+                </button>
+                <p role="status" className="text-sm text-sumi">{usualAdded ? t("usualAdded") : ""}</p>
+              </div>
+            </div>
+          </section>
+        ) : null}
+        {categories.map((c, ci) => (
+          <section key={c} aria-labelledby={`oc-${ci}`}>
+            <h2 id={`oc-${ci}`} className="flex items-baseline gap-3 text-eyebrow uppercase text-sumi/70">
+              {variant === "carta" ? (
+                <span lang="ja" aria-hidden="true" className="font-brush text-[1.6rem] normal-case leading-none text-sumi">
+                  {NUMERALS[ci] ?? ""}
+                </span>
+              ) : null}
               {c}
             </h2>
             {variant === "shop" ? (
@@ -193,23 +306,29 @@ export function OnlineOrder({
                   ))}
               </ul>
             ) : (
-            <ul className="mt-4 border-t border-wood/25">
+            <ul className="mt-6 border-t border-wood/35">
               {catalog
                 .filter((i) => i.category === c)
                 .map((item) => (
-                  <li key={item.id} className="border-b border-wood/25">
+                  <li key={item.id} className="border-b border-wood/30">
                     <button
                       type="button"
                       disabled={!item.available}
                       onClick={() => open(item)}
-                      className="flex min-h-[64px] w-full items-center justify-between gap-4 py-4 text-left disabled:opacity-55"
+                      className="group grid min-h-[72px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 py-5 text-left disabled:opacity-55 sm:gap-x-5"
                     >
-                      <span className="flex items-center gap-3 font-serif text-xl font-light">
-                        <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full ring-1 ring-sumi/20" style={{ backgroundColor: item.color }} />
-                        {item.name}
+                      <span aria-hidden="true" className="size-9 shrink-0 rounded-full ring-1 ring-sumi/15" style={{ backgroundColor: item.color }} />
+                      <span className="min-w-0">
+                        <span className="block font-serif text-[1.5rem] font-light leading-tight text-sumi">{item.name}</span>
+                        {item.description ? <span className="mt-1 block text-sm text-sumi/75">{item.description}</span> : null}
                       </span>
-                      <span className="shrink-0 text-sumi/80 tabular-nums">
-                        {item.available ? formatEuro(item.priceCents, locale) : t("soldOut")}
+                      <span className="flex shrink-0 items-center gap-3">
+                        <span className="text-sumi/85 tabular-nums">{item.available ? formatEuro(item.priceCents, locale) : t("soldOut")}</span>
+                        {item.available ? (
+                          <span aria-hidden="true" className="grid size-8 place-items-center rounded-full border border-sumi/40 text-sumi transition-colors group-hover:border-sumi group-hover:bg-sumi group-hover:text-washi">
+                            <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 10h12M10 4v12" /></svg>
+                          </span>
+                        ) : null}
                       </span>
                     </button>
                   </li>
@@ -220,8 +339,8 @@ export function OnlineOrder({
         ))}
       </div>
 
-      <div ref={checkoutRef} id="tu-pedido" className="scroll-mt-24 md:sticky md:top-24 md:self-start">
-        <h2 className="font-serif text-2xl font-light">{t("yourOrder")}</h2>
+      <div ref={checkoutRef} id="tu-pedido" className="scroll-mt-24 border-t border-wood/35 pt-8 md:sticky md:top-24 md:self-start md:border md:px-7 md:pb-7">
+        <h2 className="font-serif text-[1.75rem] font-light">{t("yourOrder")}</h2>
         {lines.length === 0 ? <p className="mt-3 text-sumi/70">{t("empty")}</p> : null}
         <ul className="mt-3">
           {lines.map((l) => (
@@ -374,7 +493,7 @@ export function OnlineOrder({
 
       {/* Phones: the order stays in reach. */}
       {lines.length && !sheet && !checkoutSeen ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-wood/30 bg-washi px-6 py-3 md:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-wood/30 bg-washi px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
           <a href="#tu-pedido" className="flex min-h-[48px] items-center justify-between">
             <span>
               {t("yourOrder")} · {lines.reduce((s, l) => s + l.quantity, 0)}
@@ -384,57 +503,112 @@ export function OnlineOrder({
         </div>
       ) : null}
 
+      <p role="status" aria-live="polite" className="sr-only">{announce}</p>
+
       {sheet ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-sumi/25 sm:items-center sm:p-6" onClick={() => setSheet(null)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-sumi/25 sm:items-center sm:p-6" onClick={closeSheet}>
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="o-sheet"
             onClick={(e) => e.stopPropagation()}
             className="flex max-h-[90dvh] w-full max-w-xl flex-col bg-washi sm:rounded-[2px]"
           >
-            <div className="flex items-start justify-between border-b border-wood/30 px-6 pb-3 pt-5">
-              <h2 id="o-sheet" className="font-serif text-2xl font-light">
-                {sheet.item.name}
-              </h2>
-              <button type="button" onClick={() => setSheet(null)} aria-label={t("close")} className="flex h-11 w-11 items-center justify-center">
+            <div className="flex items-start justify-between gap-4 border-b border-wood/30 px-6 pb-4 pt-6">
+              <div className="flex min-w-0 items-center gap-4">
+                <span aria-hidden="true" className="size-10 shrink-0 rounded-full ring-1 ring-sumi/15" style={{ backgroundColor: sheet.item.color }} />
+                <div className="min-w-0">
+                  <h2 id="o-sheet" className="font-serif text-[1.75rem] font-light leading-tight">
+                    {sheet.item.name}
+                  </h2>
+                  {sheet.item.description ? <p className="mt-1 text-sm text-sumi/75">{sheet.item.description}</p> : null}
+                </div>
+              </div>
+              <button type="button" data-autofocus onClick={closeSheet} aria-label={t("close")} className="flex h-11 w-11 shrink-0 items-center justify-center">
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                   <path d="M4 4l12 12M16 4L4 16" />
                 </svg>
               </button>
             </div>
             <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
-              {sheet.item.groups.map((g) => (
+              {visibleGroups(sheet).map((g) => (
                 <fieldset key={g.slug}>
-                  <legend className="mb-2 text-sm text-sumi/75">
+                  <legend className="mb-3 text-eyebrow uppercase text-sumi/70">
                     {g.label}
-                    {g.required ? ` · ${t("required")}` : g.selection === "multiple" ? ` · ${t("multiple")}` : ""}
+                    {g.required ? "" : g.selection === "multiple" ? ` · ${t("multiple")}` : ""}
                   </legend>
-                  <div className="flex flex-wrap gap-2">
-                    {g.options.map((o) => {
-                      const on = sheet.modifierKeys.includes(o.key);
-                      return (
-                        <button
-                          key={o.key}
-                          type="button"
-                          disabled={!o.available}
-                          aria-pressed={on}
-                          onClick={() => toggle(g.slug, o.key)}
-                          className={`min-h-[44px] rounded-[2px] border px-3 text-sm ${on ? "border-sumi bg-sumi text-washi" : "border-wood/45"} disabled:border-dashed disabled:opacity-50`}
-                        >
-                          {o.label}
-                          {o.priceDeltaCents ? ` · +${formatEuro(o.priceDeltaCents, locale)}` : ""}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {g.selection === "single" ? (
+                    <div
+                      role="radiogroup"
+                      aria-label={g.label}
+                      className="grid grid-cols-2 gap-2.5"
+                      onKeyDown={(e) => {
+                        // Arrow keys move the choice, as in a native radio group.
+                        const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+                        if (!step) return;
+                        e.preventDefault();
+                        const opts = g.options.filter((o) => o.available);
+                        const cur = opts.findIndex((o) => sheet.modifierKeys.includes(o.key));
+                        const next = opts[(cur + step + opts.length) % opts.length];
+                        if (!next) return;
+                        toggle(g.slug, next.key);
+                        requestAnimationFrame(() => (e.currentTarget.querySelector(`[data-key="${next.key}"]`) as HTMLElement | null)?.focus());
+                      }}
+                    >
+                      {g.options.map((o, oi) => {
+                        const on = sheet.modifierKeys.includes(o.key);
+                        const anyOn = g.options.some((x) => sheet.modifierKeys.includes(x.key));
+                        return (
+                          <button
+                            key={o.key}
+                            data-key={o.key}
+                            type="button"
+                            role="radio"
+                            disabled={!o.available}
+                            aria-checked={on}
+                            tabIndex={on || (!anyOn && oi === 0) ? 0 : -1}
+                            onClick={() => toggle(g.slug, o.key)}
+                            className={`flex min-h-[56px] flex-col items-start justify-center rounded-[2px] border px-4 py-2 text-left transition-colors ${on ? "border-sumi bg-sumi text-washi" : "border-sumi/30 text-sumi hover:border-sumi/70"} disabled:border-dashed disabled:opacity-50`}
+                          >
+                            <span>{o.label}</span>
+                            {o.priceDeltaCents ? <span className="text-sm opacity-80 tabular-nums">+{formatEuro(o.priceDeltaCents, locale)}</span> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="border-t border-wood/30">
+                      {g.options.map((o) => {
+                        const on = sheet.modifierKeys.includes(o.key);
+                        return (
+                          <button
+                            key={o.key}
+                            type="button"
+                            disabled={!o.available}
+                            aria-pressed={on}
+                            onClick={() => toggle(g.slug, o.key)}
+                            className="grid min-h-[52px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3.5 border-b border-wood/30 text-left disabled:opacity-50"
+                          >
+                            <span aria-hidden="true" className={`grid size-5 place-items-center rounded-[2px] border ${on ? "border-sumi bg-sumi text-washi" : "border-sumi/45"}`}>
+                              {on ? (
+                                <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M4 10.5l4 4 8-9" /></svg>
+                              ) : null}
+                            </span>
+                            <span>{o.label}</span>
+                            {o.priceDeltaCents ? <span className="text-sm text-sumi/75 tabular-nums">+{formatEuro(o.priceDeltaCents, locale)}</span> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </fieldset>
               ))}
               <p role="status" className="min-h-[1.25rem] text-sm text-sumi">
                 {missing}
               </p>
             </div>
-            <div className="border-t border-wood/30 px-6 py-4">
+            <div className="border-t border-wood/30 px-6 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
               <button
                 type="button"
                 onClick={confirm}

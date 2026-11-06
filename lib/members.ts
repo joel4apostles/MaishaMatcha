@@ -2,6 +2,7 @@ import type { Payload } from "payload";
 import { emailFrame, escapeHtml, sendEmail } from "@/lib/email";
 import { signToken, verifyToken } from "@/lib/pos/token";
 import { appSecret } from "@/lib/secret";
+import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 
 /**
  * Customer accounts, passwordless. A sign-in link is a signed, short-lived
@@ -154,4 +155,45 @@ export async function memberOrders(payload: Payload, member: { id: number; email
     membership: o.kind === "membership" || o.kind === "subscription",
     kind: o.kind ?? "sale",
   }));
+}
+
+/**
+ * "Lo de siempre": the member's last online sale that was not cancelled,
+ * rebuilt as order lines against today's catalog. Lines whose product or
+ * options no longer exist (or are sold out) are dropped; prices always come
+ * from the catalog, never from the old order.
+ */
+export async function usualOrder(payload: Payload, member: { id: number; email: string }, catalog: CatalogItem[]): Promise<LineInput[]> {
+  const { docs } = await payload.find({
+    collection: "orders",
+    overrideAccess: true,
+    depth: 0,
+    limit: 1,
+    sort: "-createdAt",
+    where: {
+      and: [
+        { channel: { equals: "online" } },
+        { kind: { not_equals: "membership" } },
+        { kind: { not_equals: "subscription" } },
+        { status: { not_equals: "cancelled" } },
+        { or: [{ member: { equals: member.id } }, { customerEmail: { equals: member.email } }] },
+      ],
+    },
+  });
+  return docs[0] ? usualLines(docs[0].lines ?? [], catalog) : [];
+}
+
+type StoredLine = { menuItem?: number | { id: number } | null; quantity: number; modifiers?: unknown };
+
+export function usualLines(lines: StoredLine[], catalog: CatalogItem[]): LineInput[] {
+  const byId = new Map(catalog.map((c) => [c.id, c]));
+  return lines.flatMap((l) => {
+    const id = typeof l.menuItem === "object" && l.menuItem ? l.menuItem.id : l.menuItem;
+    if (typeof id !== "number" || !byId.has(id)) return [];
+    const keys = Array.isArray(l.modifiers)
+      ? l.modifiers.flatMap((m) => (m && typeof m === "object" && typeof (m as { key?: unknown }).key === "string" ? [(m as { key: string }).key] : []))
+      : [];
+    const line = { menuItemId: id, quantity: Math.min(Math.max(1, l.quantity), 20), modifierKeys: keys };
+    return priceLine(byId, line).ok ? [line] : [];
+  });
 }

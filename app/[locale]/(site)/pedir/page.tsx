@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { getPayload } from "payload";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import config from "@payload-config";
-import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
-import { Headline } from "@/components/Headline";
 import { QuietLink } from "@/components/Button";
 import { OnlineOrder } from "@/components/OnlineOrder";
 import { availableSlots, onlineSettings, openNow } from "@/lib/online";
@@ -13,6 +11,7 @@ import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 import { fromParam, recipeModifierKeys, resolveRecipe } from "@/lib/recipe";
 import { stripeEnabled } from "@/lib/stripe";
 import { currentMember } from "@/lib/members-server";
+import { usualOrder } from "@/lib/members";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
 
@@ -66,42 +65,65 @@ export default async function OrderPage({
   setRequestLocale(locale as Locale);
   const t = await getTranslations({ locale: locale as Locale, namespace: "order" });
   const [data, member] = await Promise.all([load(locale as "es" | "en", table), currentMember()]);
+  // "Lo de siempre": a signed-in member's last order, re-priced on today's carta.
+  const usual =
+    member && data.state === "open"
+      ? await getPayload({ config })
+          .then((payload) => usualOrder(payload, member, data.catalog))
+          .catch(() => [])
+      : [];
+  const closed = data.state === "closed";
 
   return (
-    <Section>
-      <Eyebrow>{table != null ? t("tableEyebrow", { table }) : t("eyebrow")}</Eyebrow>
-      <Headline as="h1" className="mt-5 text-display">
-        {data.state === "closed" ? (table != null ? t("tableClosed") : t("closedTitle")) : table != null ? t("tableTitle") : t("title")}
-      </Headline>
-      {data.state === "open" ? (
-        <>
-          <p className="measure mt-6 text-lg text-sumi/80">{table != null ? t("tableIntro") : t("intro")}</p>
-          {member ? (
-            <p className="mt-4 text-sumi/75">{t("signedInAs", { name: member.name.split(" ")[0] })}</p>
-          ) : (
-            <div className="mt-3">
-              <QuietLink href="/cuenta">{t("haveAccount")}</QuietLink>
-            </div>
-          )}
-          <div className="mt-14">
-            <OnlineOrder
-              catalog={data.catalog}
-              slots={data.slots}
-              stripe={stripeEnabled()}
-              customer={member ? { name: member.name, email: member.email } : null}
-              initialLines={recipeLine(data.catalog, typeof r === "string" ? r : undefined)}
-              table={table}
-            />
+    <div className="px-6 sm:px-8">
+      <div className="mx-auto max-w-[1100px] pb-24 sm:pb-32">
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] gap-6 pt-10 pb-8 sm:gap-12 sm:pt-24 sm:pb-16">
+          <div>
+            <Eyebrow>{table != null ? t("tableEyebrow", { table }) : t("eyebrow")}</Eyebrow>
+            <h1 className="mt-6 max-w-[14ch] text-balance font-serif text-hero font-light text-sumi">
+              {closed ? (table != null ? t("tableClosed") : t("closedTitle")) : table != null ? t("tableTitle") : t("title")}
+            </h1>
+            <p className="measure mt-7 text-lg text-sumi/80">
+              {data.state === "open" ? (table != null ? t("tableIntro") : t("intro")) : closed ? t("closedBody") : t("unavailable")}
+            </p>
+            {data.state === "open" ? (
+              member ? (
+                <p className="mt-4 text-sumi/75">{t("signedInAs", { name: member.name.split(" ")[0] })}</p>
+              ) : (
+                <div className="mt-3">
+                  <QuietLink href="/cuenta">{t("haveAccount")}</QuietLink>
+                </div>
+              )
+            ) : (
+              <div className="mt-8">
+                <QuietLink href="/menu">{t("toCarta")}</QuietLink>
+              </div>
+            )}
           </div>
-        </>
-      ) : (
-        <>
-          <p className="measure mt-6 text-lg text-sumi/80">{data.state === "closed" ? t("closedBody") : t("unavailable")}</p>
-          <div className="mt-8">
-            <QuietLink href="/menu">{t("toCarta")}</QuietLink>
+          <div>
+            <span
+              lang="ja"
+              aria-hidden="true"
+              className="ink-write block select-none font-brush text-[clamp(1.9rem,2vw+1.2rem,3.25rem)] leading-[1.12] text-sumi [writing-mode:vertical-rl]"
+              style={{ animationDelay: "300ms" }}
+            >
+              一服
+            </span>
+            <span className="sr-only">{t("phrase")}</span>
           </div>
-        </>
-      )}
-    </Section>
+        </header>
+        {data.state === "open" ? (
+          <OnlineOrder
+            catalog={data.catalog}
+            slots={data.slots}
+            stripe={stripeEnabled()}
+            customer={member ? { name: member.name, email: member.email } : null}
+            initialLines={recipeLine(data.catalog, typeof r === "string" ? r : undefined)}
+            usual={usual}
+            table={table}
+          />
+        ) : null}
+      </div>
+    </div>
   );
 }
