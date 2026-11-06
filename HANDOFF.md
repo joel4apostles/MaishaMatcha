@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-06, ~01:15 (Opus 5.5 session)
+Last updated: 2026-11-06, ~01:40 (Opus 5.5 session)
 
 ## Where things stand
 
@@ -36,14 +36,16 @@ Last updated: 2026-11-06, ~01:15 (Opus 5.5 session)
   units); monthly membership via Stripe subscriptions with the founding
   price. Privacy notice rewritten (provisional, needs legal review).
   Design review SHIP; security review SHIP with all SHOULDs fixed.
-- **Founder photos (2026-11-03 / 10-25/26)** in ~/Downloads: real bar,
-  shopfront, product still lifes. One still life is on /tienda
-  (public/images/shop-still-life.jpg). The salon photos show construction
-  (cardboard on windows); use them for the Space section once finished.
+- **Real photos on the site (2026-11-06, LOCAL, 3 commits not pushed):**
+  hero = bar still life (public/images/hero-still-life.jpg; phones full
+  bleed, desktop ink field + right photo column), shop sign beside the
+  visit line (shopfront.jpg), still life on /tienda. Design review SHIP.
+  The sources are WhatsApp exports (765 px): ask Joel for originals. The
+  interior triptych stays as renders ("Imagen del proyecto") until the
+  real salon is finished (the renders show wood; the real bar is green tile).
 - Online ordering is OFF until the owner ticks it in /admin > Empresa.
   Security review of web ordering: SHIP; all findings fixed (44ea242).
   Every flow browser-verified at 390 and 1440, both locales.
-- Design-reviewer re-review of the macron fix was never recorded: re-run it.
 - Phase 2 mocks: claude.ai artifact "maisha barra mocks"
   (https://claude.ai/artifact/PQdSsim5kdGCvjw3tmDDap).
 
