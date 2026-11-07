@@ -39,7 +39,13 @@
     },
     "menuPreview": {
       "eyebrow": "La carta",
-      "title": "Tés de Japón"
+      "title": "Tés de Japón",
+      "line": "Batido en el cuenco, vertido sobre hielo, leche y lo que elijas.",
+      "videoAlt": "Un barista vierte matcha desde un cuenco negro sobre hielo, leche y ube en un vaso maisha.",
+      "videoCaption": "En la barra",
+      "videoPause": "Pausa",
+      "videoPlay": "Ver",
+      "videoAgain": "Ver de nuevo"
     },
     "space": {
       "eyebrow": "El espacio",

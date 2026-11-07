@@ -39,7 +39,13 @@
     },
     "menuPreview": {
       "eyebrow": "The menu",
-      "title": "Teas from Japan"
+      "title": "Teas from Japan",
+      "line": "Whisked in the bowl, poured over ice, milk and whatever you choose.",
+      "videoAlt": "A barista pours matcha from a black bowl over ice, milk and ube in a maisha cup.",
+      "videoCaption": "At the bar",
+      "videoPause": "Pause",
+      "videoPlay": "Play",
+      "videoAgain": "Watch again"
     },
     "space": {
       "eyebrow": "The space",
