@@ -151,13 +151,12 @@ restart dev. And after ANY `npm install`, repair the lockfile:
   ("Maisha Proposed Brand Identity", Concept 1) via PyMuPDF path
   serialization, silhouettes verified by pixel IoU (0.988 / 0.979) against
   the kit's own render. Favicon = `app/icon.svg` (+ `apple-icon.png`),
-  auto-wired by Next conventions. `PhotoDrink.tsx` is the recipe-builder
-  visual: the kit's real drink photograph (`public/images/drink-real.jpg`,
-  the 736×1308 image inside the brand identity PDF) re-tinted live to
-  `blendColor(recipe)` via `mix-blend-color`, plus a warm veil that lifts
-  when the drink is frío. The old animated SVG glass (`DrinkGlass.tsx`)
-  was removed 2026-11-05; recover it from git history (before commit
-  "Code hygiene") if Phase 6 wants it.
+  auto-wired by Next conventions. `CupDrink.tsx` is the recipe-builder visual
+  (2026-11-07): an SVG of the real clear Maisha cup built live from the
+  recipe (purée at the bottom, milk, tea over ice with marbling, Coconut
+  Cloud cap; usucha alone is a black chawan), each new layer pours in once.
+  Captioned as an illustration. The old photo re-tint (PhotoDrink) and
+  `blendColor` were removed.
 - `cms/` — Payload: `collections/` (Users, Media, MenuCategories, MenuItems,
   ModifierGroups, Modifiers, TaxRates, PosDevices, AuditLog, Events, StoryChapters, InventoryItems, StockMovements
   append-only ledger + cached-stock hook, Orders, Members), `seed.ts`,

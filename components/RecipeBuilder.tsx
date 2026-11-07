@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { inkButtonClass, quietLinkClass } from "@/components/Button";
 import { Link } from "@/i18n/navigation";
-import { PhotoDrink } from "@/components/PhotoDrink";
+import { CupDrink } from "@/components/CupDrink";
 import type { Locale } from "@/i18n/routing";
 import { itemSlug } from "@/lib/carta";
 import { formatEuro } from "@/lib/money";
@@ -15,7 +15,6 @@ import {
   addSaved,
   parseSaved,
   type RecipeIds,
-  blendColor,
   builderExtras,
   builderMilks,
   builderTeas,
@@ -311,11 +310,14 @@ export function RecipeBuilder() {
         <div className="rounded-[2px] border border-wood/40 p-7 sm:p-9">
           <p className="text-eyebrow uppercase text-sumi/70">{t("cardTitle")}</p>
 
-          <div className="mt-6 flex items-center gap-5">
-            {/* The drink, photographic: re-tints live to every choice. */}
-            <PhotoDrink color={blendColor(recipe)} className="h-36 w-24 shrink-0" />
-            <p className="font-serif text-2xl font-light leading-snug text-sumi">{chosen}</p>
-          </div>
+          {/* The drink as the bar builds it: each choice pours its layer in. */}
+          <figure className="mt-6">
+            <div className="flex justify-center rounded-[2px] bg-wood/10 py-6">
+              <CupDrink recipe={recipe} className="h-64 w-auto sm:h-72" />
+            </div>
+            <figcaption className="mt-2 text-xs text-sumi/70">{t("illustration")}</figcaption>
+          </figure>
+          <p className="mt-5 font-serif text-2xl font-light leading-snug text-sumi">{chosen}</p>
 
           <dl className="mt-7 space-y-2 border-t border-wood/25 pt-5 text-sm">
             <div className="flex items-baseline justify-between gap-4">
@@ -438,7 +440,7 @@ export function RecipeBuilder() {
         }`}
       >
         <div className="mx-auto flex max-w-[1100px] items-center justify-between gap-4">
-          <PhotoDrink color={blendColor(recipe)} className="h-12 w-8 shrink-0" />
+          <CupDrink recipe={recipe} className="h-12 w-auto shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm text-sumi/75">{code}</p>
             <p className="font-serif text-xl text-sumi tabular-nums" aria-live="polite">

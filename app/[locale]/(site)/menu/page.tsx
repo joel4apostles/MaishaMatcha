@@ -11,7 +11,7 @@ import { cartaExtras, cartaGroup, itemSlug, priceLines } from "@/lib/carta";
 import { TastingCard } from "@/components/TastingCard";
 import { formatEuro } from "@/lib/money";
 import { pageMetadata } from "@/lib/seo";
-import drinkPhoto from "@/public/images/drink-real.jpg";
+import drinkPhoto from "@/public/images/drinks-layered.jpg";
 import type { Locale } from "@/i18n/routing";
 import { Numeral } from "@/components/Numeral";
 

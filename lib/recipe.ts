@@ -112,19 +112,6 @@ export function optionSuffix(o: CartaOption): string {
   return suffix(o);
 }
 
-/** The drink's colour: the tea, softened by milk, touched by extras. Flat. */
-export function blendColor(r: Recipe): string {
-  const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-  const layers: [number[], number][] = [[hex(r.tea.color), 1]];
-  if (r.milk?.hue) layers.push([hex(r.milk.hue), 0.8]);
-  for (const e of r.extras) if (e.hue) layers.push([hex(e.hue), 0.35]);
-  const total = layers.reduce((s, [, w]) => s + w, 0);
-  const mix = [0, 1, 2].map((ch) =>
-    Math.round(layers.reduce((s, [c, w]) => s + c[ch] * w, 0) / total),
-  );
-  return `#${mix.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
-}
-
 /** The carta modifier keys of a recipe: the same keys the till and the web order use. */
 export function recipeModifierKeys(r: Recipe): string[] {
   return [r.prep.key, ...(r.milk ? [r.milk.key] : []), ...r.extras.map((e) => e.key)];
