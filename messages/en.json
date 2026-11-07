@@ -21,9 +21,7 @@
     "hero": {
       "eyebrow": "Murcia · The first matcha salon",
       "line": "Leaf ground on stone, water at the right heat, a long pause.",
-      "photoAlt": "A chasen, a chawan and a maisha matcha tin on the green tiles of the bar.",
-      "photoCaption": "The ritual",
-      "salonAlt": "The maisha salon: warm wood, the stone bar and the tree at its centre.",
+      "salonAlt": "The maisha bar: green tile, tea tools and the white wall with the logo.",
       "ichigo": "Ichigo ichie: each meeting happens only once."
     },
     "manifesto": {
@@ -43,14 +41,13 @@
     "space": {
       "eyebrow": "The space",
       "title": "A tea room in Murcia",
-      "body": "Tatami and warm wood. Handmade ceramics: chawan, chasen, chashaku. On the wall, a woven work. At the centre, a tree. Nothing more.",
-      "caption1": "the box of light",
-      "caption2": "the counter",
-      "caption3": "the tree",
-      "alt1": "Lit timber shelving holding ceramic bowls.",
-      "alt2": "The stone counter beneath a woven work.",
-      "alt3": "The tree beside the timber lattice screens.",
-      "renderNote": "Project image. Not a final photograph.",
+      "body": "Green tile, pale wood and a white wall with our leaf. The bar is in plain sight: every tea is whisked here. By the glass, a bench to stay a while.",
+      "caption1": "the bar",
+      "caption2": "the whisk",
+      "caption3": "the bench",
+      "alt1": "The maisha room: the green-tiled bar before the white wall with the logo.",
+      "alt2": "A bamboo whisk on a wooden tray, on the green-tiled bar.",
+      "alt3": "A bench with cushions by the glass, under a pale wooden frame.",
       "visitEyebrow": "Visit"
     },
     "founding": {
@@ -99,7 +96,9 @@
     "intro": "Eight moments on the path of matcha.",
     "closing": "The story continues in Murcia, with fifty founding members.",
     "phrase": "On ko chi shin: look at the old to understand the new.",
-    "toCarta": "The three matchas, on the menu"
+    "toCarta": "The three matchas, on the menu",
+    "photoAlt": "Small tea jars on a wooden tray, on the green-tiled bar.",
+    "photoCaption": "the bar, up close"
   },
   "events": {
     "eyebrow": "Events",

@@ -21,9 +21,7 @@
     "hero": {
       "eyebrow": "Murcia · Primer salón de matcha",
       "line": "Hoja molida en piedra, agua a su punto, una pausa larga.",
-      "photoAlt": "Un chasen, un chawan y una lata de matcha maisha sobre los azulejos verdes de la barra.",
-      "photoCaption": "El ritual",
-      "salonAlt": "La sala de maisha: madera cálida, la barra de piedra y el árbol en el centro.",
+      "salonAlt": "La barra de maisha: azulejo verde, utensilios de té y la pared blanca con el logotipo.",
       "ichigo": "Ichigo ichie: cada encuentro sucede una sola vez."
     },
     "manifesto": {
@@ -43,14 +41,13 @@
     "space": {
       "eyebrow": "El espacio",
       "title": "Una sala de té en Murcia",
-      "body": "Tatami y madera cálida. Cerámica hecha a mano: chawan, chasen, chashaku. En la pared, una obra tejida. En el centro, un árbol. Nada más.",
-      "caption1": "la caja de luz",
-      "caption2": "la barra",
-      "caption3": "el árbol",
-      "alt1": "Estanterías de madera iluminadas con cuencos de cerámica.",
-      "alt2": "La barra de piedra bajo una obra tejida.",
-      "alt3": "El árbol junto a las celosías de madera.",
-      "renderNote": "Imagen del proyecto. No es una imagen final.",
+      "body": "Azulejo verde, madera clara y una pared blanca con nuestra hoja. La barra está a la vista: aquí se bate cada té. Junto al cristal, un banco para quedarse.",
+      "caption1": "la barra",
+      "caption2": "el chasen",
+      "caption3": "el banco",
+      "alt1": "La sala de maisha: la barra de azulejo verde frente a la pared blanca con el logotipo.",
+      "alt2": "Un chasen sobre una bandeja de madera, en la barra de azulejo verde.",
+      "alt3": "Un banco con cojines junto al cristal, bajo un marco de madera clara.",
       "visitEyebrow": "Visítanos"
     },
     "founding": {
@@ -99,7 +96,9 @@
     "intro": "Ocho momentos en el camino del matcha.",
     "closing": "La historia continúa en Murcia, con cincuenta socios fundadores.",
     "phrase": "On ko chi shin: mirar lo antiguo para entender lo nuevo.",
-    "toCarta": "Los tres matchas, en la carta"
+    "toCarta": "Los tres matchas, en la carta",
+    "photoAlt": "Pequeños botes de té sobre una bandeja de madera, en la barra de azulejo verde.",
+    "photoCaption": "la barra, de cerca"
   },
   "events": {
     "eyebrow": "Eventos",

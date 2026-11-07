@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import salonRender from "@/public/images/salon.jpg";
+import salonPhoto from "@/public/images/salon-hero.jpg";
 import matchaPowder from "@/public/images/matcha-powder.jpg";
 import { WordReveal } from "@/components/WordReveal";
 import { inkButtonClass } from "@/components/Button";
@@ -17,18 +17,17 @@ import { riseDelay } from "./motion";
  */
 export function Hero() {
   const t = useTranslations("home.hero");
-  const space = useTranslations("home.space");
   const cta = useTranslations("cta");
   return (
     <section className="dark-band relative -mt-16 flex min-h-[100svh] flex-col overflow-hidden bg-sumi px-5 pt-16 sm:px-8">
       <Image
-        src={salonRender}
+        src={salonPhoto}
         alt={t("salonAlt")}
         fill
         priority
         placeholder="blur"
         sizes="100vw"
-        className="hero-settle object-cover object-[70%_75%] md:object-[60%_center]"
+        className="hero-settle object-cover object-[50%_40%] md:object-[50%_41%]"
       />
       <div aria-hidden="true" className="absolute inset-0 bg-sumi/25" />
 
@@ -91,10 +90,6 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Honesty note: project render, not a final photograph. */}
-      <span className="absolute bottom-4 right-5 rounded-[2px] bg-sumi/60 px-2.5 py-1 text-[0.6875rem] uppercase tracking-[0.12em] text-washi/90 sm:right-8">
-        {space("renderNote")}
-      </span>
     </section>
   );
 }

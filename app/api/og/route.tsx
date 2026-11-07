@@ -15,11 +15,11 @@ export async function GET(request: Request) {
   const eyebrow =
     locale === "en" ? "MURCIA · MATCHA SALON" : "MURCIA · SALÓN DE MATCHA";
 
-  // The salon render as the backdrop, fetched from our own origin. If it
+  // The salon photograph as the backdrop, fetched from our own origin. If it
   // fails, fall back to the flat washi + lattice composition.
   let bgSrc: string | null = null;
   try {
-    const res = await fetch(new URL("/images/salon.jpg", origin));
+    const res = await fetch(new URL("/images/og-salon.jpg", origin));
     if (res.ok) {
       const buf = Buffer.from(await res.arrayBuffer());
       bgSrc = `data:image/jpeg;base64,${buf.toString("base64")}`;

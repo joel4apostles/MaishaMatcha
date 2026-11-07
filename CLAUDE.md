@@ -141,11 +141,11 @@ restart dev. And after ANY `npm install`, repair the lockfile:
   Keyframes (`word-rise`, `rise`) + `--text-hero`/`--text-poem` tokens live in
   `app/globals.css`. See the maisha-brand skill for the sanctioned motion
   vocabulary — one effect per place, nothing loops.
-- Imagery: `public/images/salon*.jpg` are extracted from the founder's design
-  deck (page 10 render + crops) — the deck's OTHER photos are third-party
-  references (Aesop/Blue Bottle/nendo/artists) and must NOT be published
-  without permission. Space section uses next/image static imports with blur
-  placeholders and an honest "project render" caption.
+- Imagery: `public/images/salon-*.jpg` are REAL photos of the finished salon
+  (founder folder "FOTOS MAISHA MATCHA", 2026-11-06), rotated, resized and
+  stripped of EXIF/GPS with sharp. The old project renders are gone; the
+  founder deck's OTHER photos are third-party references and must NOT be
+  published. Copy describing the space must match what the photos show.
 - Brand assets: `components/BrandMark.tsx` (icon) + `BrandWordmark.tsx`
   (serif lockup) are exact vectors extracted from the brand kit PDF
   ("Maisha Proposed Brand Identity", Concept 1) via PyMuPDF path

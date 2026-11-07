@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { site, siteHours, siteMapsUrl } from "@/content/site";
-import salonEstantes from "@/public/images/salon-estantes.jpg";
-import salonBarra from "@/public/images/salon-barra.jpg";
-import salonArbol from "@/public/images/salon-arbol.jpg";
+import salonSala from "@/public/images/salon-sala.jpg";
+import salonChasen from "@/public/images/salon-chasen.jpg";
+import salonBanco from "@/public/images/salon-banco.jpg";
 import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
@@ -14,9 +14,9 @@ export function TheSpace() {
   const footer = useTranslations("footer");
   const locale = useLocale();
   const details = [
-    { src: salonEstantes, alt: t("alt1"), caption: t("caption1") },
-    { src: salonBarra, alt: t("alt2"), caption: t("caption2") },
-    { src: salonArbol, alt: t("alt3"), caption: t("caption3") },
+    { src: salonSala, alt: t("alt1"), caption: t("caption1") },
+    { src: salonChasen, alt: t("alt2"), caption: t("caption2") },
+    { src: salonBanco, alt: t("alt3"), caption: t("caption3") },
   ];
   return (
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
@@ -41,7 +41,7 @@ export function TheSpace() {
                     alt={image.alt}
                     sizes="(min-width: 640px) 33vw, 82vw"
                     placeholder="blur"
-                    className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    className="aspect-[3/4] h-auto w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
                 </div>
                 <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">
@@ -50,8 +50,6 @@ export function TheSpace() {
               </figure>
             ))}
           </div>
-          {/* Honesty: the interior is still a project render. */}
-          <p className="mx-auto mt-3 max-w-[1600px] text-sm text-sumi/70">{t("renderNote")}</p>
         </div>
       </Reveal>
 

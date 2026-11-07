@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
-import salonArbol from "@/public/images/salon-arbol.jpg";
+import salonDetalle from "@/public/images/salon-detalle.jpg";
 import { inkButtonClass, quietLinkClass } from "@/components/Button";
 import { Link } from "@/i18n/navigation";
 import { StageReveal } from "@/components/StageReveal";
@@ -48,7 +48,6 @@ const NUMERALS = ["一", "二", "三", "四", "五", "六", "七", "八"];
 
 function StoryContent() {
   const t = useTranslations("story");
-  const space = useTranslations("home.space");
   const cta = useTranslations("cta");
   const locale = useLocale() as Locale;
   return (
@@ -119,14 +118,14 @@ function StoryContent() {
                       <figure>
                         <div className="overflow-hidden rounded-[2px]">
                           <Image
-                            src={salonArbol}
-                            alt={space("alt3")}
+                            src={salonDetalle}
+                            alt={t("photoAlt")}
                             sizes="(min-width: 640px) 384px, 100vw"
                             placeholder="blur"
                             className="h-auto w-full"
                           />
                         </div>
-                        <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">{space("caption3")}</figcaption>
+                        <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">{t("photoCaption")}</figcaption>
                       </figure>
                     </Reveal>
                   ) : null}
