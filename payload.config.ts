@@ -60,7 +60,8 @@ const db = postgresAdapter({
   migrationDir: path.resolve(dirname, "migrations"),
 });
 
-const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
+// No trailing slash: CSRF compares it with the browser Origin header exactly.
+const siteURL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
 
 /** Groups each collection in the dashboard and hides the developer API tab. */
 function inSalonOrder(list: [CollectionConfig, string][]): CollectionConfig[] {

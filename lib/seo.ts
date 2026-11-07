@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { getPathname } from "@/i18n/navigation";
 import { routing, type AppPathname, type Locale } from "@/i18n/routing";
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://maishamatcha.es";
+// A trailing slash pasted into the env would double every path ("//es").
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://maishamatcha.es").replace(/\/+$/, "");
 
 const ogLocale: Record<Locale, string> = { es: "es_ES", en: "en_US" };
 
