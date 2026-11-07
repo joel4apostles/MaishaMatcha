@@ -18,7 +18,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { formatEuro } from "@/lib/money";
 
 const field =
-  "mt-2 block min-h-[48px] w-full border-b border-wood/40 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
+  "mt-2 block min-h-[48px] w-full border-b border-sumi/50 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
 const label = "text-eyebrow uppercase text-sumi/70";
 const quietButton =
   "inline-flex min-h-[44px] items-center justify-center rounded-[2px] border border-wood/50 px-5 text-sm font-medium text-sumi hover:border-sumi/60 disabled:opacity-40";
@@ -126,6 +126,11 @@ export function AccountPanel({
     : "";
 
   const isFounding = member.tier === "founding";
+  // Nothing to offer yet: one quiet line instead of two closed doors.
+  const foundingClosed = !isFounding && !justPaid && !(founding?.open && founding.priceCents);
+  const premiumClosed =
+    premium.status !== "active" && premium.status !== "past_due" && !premium.justSubscribed && !(premium.open && premium.priceCents);
+  const bothClosed = foundingClosed && premiumClosed;
   const statusText = (o: Order) =>
     o.kind === "subscription" ? t("subscription") : o.membership ? t("membership") : (["received", "preparing", "ready", "collected", "cancelled"].includes(o.status) ? st(o.status as "received") : o.status);
 
@@ -159,6 +164,13 @@ export function AccountPanel({
             {t("orderAgain")}
           </Link>
         </section>
+        {bothClosed ? (
+          <section aria-labelledby="a-membership" className="border-t border-wood/35 pt-10">
+            <SectionTitle id="a-membership" numeral="二">{t("membershipTitle")}</SectionTitle>
+            <p className="mt-4 text-sumi/80">{t("bothClosed")}</p>
+          </section>
+        ) : (
+          <>
         <section aria-labelledby="a-founding" className="border-t border-wood/35 pt-10">
           <SectionTitle id="a-founding" numeral="二">{t("foundingTitle")}</SectionTitle>
           {isFounding ? (
@@ -244,12 +256,14 @@ export function AccountPanel({
             {premiumMsg}
           </p>
         </section>
+          </>
+        )}
 
       </div>
 
       <div className="space-y-14 md:border-l md:border-wood/35 md:pl-16">
         <section aria-labelledby="a-prefs">
-          <SectionTitle id="a-prefs" numeral="四">{t("prefsTitle")}</SectionTitle>
+          <SectionTitle id="a-prefs" numeral={bothClosed ? "三" : "四"}>{t("prefsTitle")}</SectionTitle>
           <form
             action={(form) =>
               start(async () => {

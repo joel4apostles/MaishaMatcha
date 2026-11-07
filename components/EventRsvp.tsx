@@ -61,7 +61,7 @@ export function EventRsvp({
             id={`seats-${eventId}`}
             value={seats}
             onChange={(e) => setSeats(Number(e.target.value))}
-            className="min-h-[44px] cursor-pointer border-b border-wood/40 bg-transparent px-1 text-base"
+            className="min-h-[44px] cursor-pointer border-b border-sumi/50 bg-transparent px-1 text-base"
           >
             <option value={1}>1</option>
             <option value={2}>2</option>

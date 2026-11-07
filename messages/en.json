@@ -704,7 +704,9 @@
     "benefitUsual": "The usual: your last order, in one tap.",
     "benefitEvents": "Bookings for events.",
     "benefitFounding": "Becoming a founding member, when it opens.",
-    "orderAgain": "Place an order"
+    "orderAgain": "Place an order",
+    "bothClosed": "The founding membership and the monthly subscription are not open yet.",
+    "membershipTitle": "Membership and subscription"
   },
   "rsvp": {
     "seats": "Seats",

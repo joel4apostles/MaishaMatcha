@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const toneStyles = {
   light: {
     field:
-      "w-full border-b border-wood/40 bg-transparent py-2.5 text-sumi placeholder:text-sumi/70 transition-colors duration-300 focus:border-gold aria-[invalid=true]:border-b-2 aria-[invalid=true]:border-sumi",
+      "w-full border-b border-sumi/50 bg-transparent py-2.5 text-sumi placeholder:text-sumi/70 transition-colors duration-300 focus:border-gold aria-[invalid=true]:border-b-2 aria-[invalid=true]:border-sumi",
     label: "text-eyebrow uppercase text-sumi/70",
     error: "mt-2 border-l-2 border-sumi pl-2.5 text-sm text-sumi",
     formError: "text-sm text-sumi/70",

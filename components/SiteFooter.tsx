@@ -38,7 +38,7 @@ export function SiteFooter() {
 
         <div>
           <p className={label}>{t("hoursLabel")}</p>
-          <p className="mt-3 text-sm leading-relaxed text-pretty text-sumi/80">{siteHours(locale)}</p>
+          <p className="mt-3 text-sm leading-relaxed text-balance text-sumi/80">{siteHours(locale)}</p>
           <p className={`${label} mt-10`}>{t("followLabel")}</p>
           <div className="mt-1 flex flex-col items-start">
             <a href={site.instagramUrl} className={quietLink} rel="noreferrer" target="_blank">

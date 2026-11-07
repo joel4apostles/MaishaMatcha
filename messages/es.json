@@ -645,7 +645,7 @@
     "eyebrow": "Tu cuenta",
     "title": "Entrar",
     "signInIntro": "No necesitas cuenta para pedir. Si la quieres, entras con un enlace que te enviamos por email.",
-    "email": "Email",
+    "email": "Correo",
     "name": "Nombre (opcional)",
     "send": "Enviarme el enlace",
     "sending": "Enviando...",
@@ -704,7 +704,9 @@
     "benefitUsual": "Lo de siempre: tu último pedido, en un toque.",
     "benefitEvents": "Reservas en los eventos.",
     "benefitFounding": "Hacerte socio fundador, cuando se abra.",
-    "orderAgain": "Hacer un pedido"
+    "orderAgain": "Hacer un pedido",
+    "bothClosed": "La membresía fundadora y la suscripción mensual aún no están abiertas.",
+    "membershipTitle": "Socio y suscripción"
   },
   "rsvp": {
     "seats": "Plazas",

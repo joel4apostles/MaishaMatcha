@@ -29,7 +29,7 @@ const milkApplies = (keys: string[]) => keys.some((k) => LATTE_KEYS.has(k));
 const visibleGroups = (l: Line) => l.item.groups.filter((g) => g.slug !== "leche" || milkApplies(l.modifierKeys));
 
 const field =
-  "mt-2 block min-h-[48px] w-full border-b border-wood/40 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
+  "mt-2 block min-h-[48px] w-full border-b border-sumi/50 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
 
 /**
  * The web order, mobile first: carta as hairline rows, options in a sheet,

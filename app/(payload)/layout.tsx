@@ -6,6 +6,7 @@ import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import type { ReactNode } from "react";
 import { importMap } from "./admin/importMap.js";
 import "./custom.scss";
+import { sans, serif } from "@/lib/fonts";
 
 const serverFunction: ServerFunctionClient = async function (args) {
   "use server";
@@ -18,6 +19,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       config={config}
       importMap={importMap}
       serverFunction={serverFunction}
+      // Brand fonts self-hosted by next/font, like the site: no runtime call to Google.
+      htmlProps={{ className: `${serif.variable} ${sans.variable}` }}
     >
       {children}
     </RootLayout>

@@ -6,10 +6,10 @@
  * Fraunces for the login lockup context.
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap");
 
 :root {
-  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  --font-body: var(--font-hanken), "Hanken Grotesk", system-ui, sans-serif;
+  --md-serif: var(--font-serif-brand), Georgia, serif;
 
   /* Base ramps some components reference directly — matcha, not blue. */
   --color-success-500: #9bab37;
@@ -150,7 +150,7 @@ body {
   ul, ol { margin: 0; padding: 0; list-style: none; }
 
   .md-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-bottom: 24px; }
-  .md-head h1 { font-family: "Fraunces", Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.15; }
+  .md-head h1 { font-family: var(--md-serif); font-weight: 400; font-size: 30px; line-height: 1.15; }
   .md-actions { display: flex; flex-wrap: wrap; gap: 8px; }
   .md-actions a {
     display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
@@ -161,7 +161,7 @@ body {
 
   .md-box { border: 1px solid var(--md-line); border-radius: 2px; padding: 18px 20px; }
   .md-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(28, 27, 24, 0.72); }
-  .md-big { font-family: "Fraunces", Georgia, serif; font-size: 30px; font-weight: 400; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .md-big { font-family: var(--md-serif); font-size: 30px; font-weight: 400; margin-top: 6px; font-variant-numeric: tabular-nums; }
   .md-mid { margin-top: 10px; font-size: 16px; line-height: 1.5; }
   .md-sub { margin-top: 4px; font-size: 13px; color: rgba(28, 27, 24, 0.72); }
   .md-empty { margin-top: 10px; color: rgba(28, 27, 24, 0.72); }
@@ -183,7 +183,7 @@ body {
   .md-progress span { display: block; height: 100%; background: #9bab37; }
   .md-steps { margin-top: 14px; }
   .md-steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; padding: 6px 0; }
-  .md-steps li[data-done="true"] { color: rgba(28, 27, 24, 0.6); }
+  .md-steps li[data-done="true"] { color: rgba(28, 27, 24, 0.78); }
   .md-tick {
     width: 20px; height: 20px; margin-top: 2px; display: grid; place-items: center; font-size: 12px;
     border: 1px solid rgba(28, 27, 24, 0.45); border-radius: 2px;
@@ -194,7 +194,7 @@ body {
     margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--md-line);
     display: grid; gap: 28px 32px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
-  .md-group h2 { font-family: "Fraunces", Georgia, serif; font-weight: 400; font-size: 22px; margin-bottom: 8px; }
+  .md-group h2 { font-family: var(--md-serif); font-weight: 400; font-size: 22px; margin-bottom: 8px; }
   .md-group li a { display: block; padding: 8px 0; min-height: 44px; text-decoration: none; border-bottom: 1px solid rgba(176, 141, 87, 0.2); }
   .md-group li a:hover .md-row > span:first-child { text-decoration: underline; text-underline-offset: 3px; }
   .md-row { display: flex; justify-content: space-between; gap: 12px; font-weight: 500; }
