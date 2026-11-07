@@ -3,7 +3,7 @@ import { editorialAccess } from "../access";
 
 export const StoryChapters: CollectionConfig = {
   slug: "story-chapters",
-  labels: { singular: "Capítulo", plural: "Historia" },
+  labels: { singular: { es: "Capítulo", en: "Chapter" }, plural: { es: "Historia", en: "Story" } },
   admin: { useAsTitle: "title", defaultColumns: ["title", "era", "order"] },
   access: editorialAccess,
   defaultSort: "order",

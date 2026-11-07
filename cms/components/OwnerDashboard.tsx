@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Gutter } from "@payloadcms/ui";
 import { inventoryAlerts } from "@/lib/inventory";
 import { madridDay, today } from "@/lib/reports";
-import { COLLECTION_NOTES, SECONDARY, setupSteps } from "@/lib/dashboard";
+import { COLLECTION_NOTES, COLLECTION_NOTES_EN, DASH, SECONDARY, setupSteps } from "@/lib/dashboard";
 
 /**
  * The admin home (replaces Payload's tile grid): today at a glance, the
@@ -11,27 +11,21 @@ import { COLLECTION_NOTES, SECONDARY, setupSteps } from "@/lib/dashboard";
  * quick actions, and every collection as a compact list with counts.
  * Server component; the admin is owner/manager only.
  */
-const euro = (cents: number) =>
-  new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(cents / 100);
-
-const METHOD: Record<string, string> = {
-  cash: "Efectivo",
-  card_terminal: "Tarjeta (datáfono)",
-  card_stripe: "Tarjeta (Stripe)",
-  online: "Online",
-};
-const CHANNEL: Record<string, string> = { counter: "Barra", online: "Web", table: "Mesa" };
 
 type Label = string | Record<string, string>;
 type NavGroup = { label: string; entities: { label: Label; slug: string; type: string }[] };
-const text = (l: Label) => (typeof l === "string" ? l : (l.es ?? Object.values(l)[0] ?? ""));
+const text = (l: Label, lang: "es" | "en") => (typeof l === "string" ? l : (l[lang] ?? l.es ?? Object.values(l)[0] ?? ""));
 
 /** The same moment a week ago, and now (server render, per request). */
 const clock = () => ({ now: new Date(), weekAgo: new Date(Date.now() - 7 * 86400000) });
 
 type Pending = { key: string; text: string; href: string };
 
-export async function OwnerDashboardView({ payload, navGroups = [] }: { payload: Payload; navGroups?: NavGroup[] }) {
+export async function OwnerDashboardView({ payload, navGroups = [], i18n }: { payload: Payload; navGroups?: NavGroup[]; i18n?: { language?: string } }) {
+  const lang: "es" | "en" = i18n?.language === "en" ? "en" : "es";
+  const T = DASH[lang];
+  const notes = lang === "en" ? COLLECTION_NOTES_EN : COLLECTION_NOTES;
+  const euro = (cents: number) => new Intl.NumberFormat(lang === "en" ? "en-GB" : "es-ES", { style: "currency", currency: "EUR" }).format(cents / 100);
   const business = await payload.findGlobal({ slug: "business", overrideAccess: true });
   const { now: nowDate, weekAgo: lastWeek } = clock();
   const now = nowDate.toISOString();
@@ -71,18 +65,17 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
     foundingReady: Boolean(business.foundingOpen && business.foundingPriceCents && business.foundingTaxRate),
     upcomingEvents: upcomingEvents.totalDocs,
     onlineOrdering: Boolean(business.onlineOrdering),
-  });
+  }, lang);
   const done = steps.filter((s) => s.done).length;
 
-  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
   const pending: Pending[] = [
-    ...(webOrders.totalDocs ? [{ key: "web", text: `${plural(webOrders.totalDocs, "pedido web o de mesa", "pedidos web o de mesa")} por preparar`, href: "/admin/collections/orders" }] : []),
-    ...(refundFlags.totalDocs ? [{ key: "refund", text: `${plural(refundFlags.totalDocs, "pago", "pagos")} marcado DEVOLVER: devuélvelo en Stripe y marca el pedido como devuelto`, href: "/admin/collections/orders" }] : []),
-    ...alerts.draftOrders.map((d) => ({ key: `po-${d.id}`, text: `Pedido ${d.label} a ${d.supplier} por aprobar · ${euro(d.totalCents)}`, href: `/admin/collections/purchase-orders/${d.id}` })),
-    ...(draftLetters.totalDocs ? [{ key: "letters", text: `${plural(draftLetters.totalDocs, "carta", "cartas")} por email en borrador`, href: "/admin/collections/campaigns" }] : []),
-    ...alerts.lowStock.map((a) => ({ key: `low-${a.id}`, text: `Stock bajo: ${a.name} · ${a.stock} ${a.unit}`, href: `/admin/collections/inventory-items/${a.id}` })),
-    ...alerts.expiring.map((b) => ({ key: `exp-${b.id}`, text: `Caduca pronto: ${b.name}${b.expiresOn ? ` · ${new Date(b.expiresOn).toLocaleDateString("es-ES")}` : ""}`, href: "/admin/collections/batches" })),
-    ...alerts.lowMargin.map((m) => ({ key: `mar-${m.id}`, text: `Margen bajo: ${m.name} · ${m.marginPercent} %`, href: "/admin/collections/recipe-lines" })),
+    ...(webOrders.totalDocs ? [{ key: "web", text: T.webOrders(webOrders.totalDocs), href: "/admin/collections/orders" }] : []),
+    ...(refundFlags.totalDocs ? [{ key: "refund", text: T.refundFlags(refundFlags.totalDocs), href: "/admin/collections/orders" }] : []),
+    ...alerts.draftOrders.map((d) => ({ key: `po-${d.id}`, text: T.po(String(d.label), d.supplier, euro(d.totalCents)), href: `/admin/collections/purchase-orders/${d.id}` })),
+    ...(draftLetters.totalDocs ? [{ key: "letters", text: T.letters(draftLetters.totalDocs), href: "/admin/collections/campaigns" }] : []),
+    ...alerts.lowStock.map((a) => ({ key: `low-${a.id}`, text: `${T.low}: ${a.name} · ${a.stock} ${a.unit}`, href: `/admin/collections/inventory-items/${a.id}` })),
+    ...alerts.expiring.map((b) => ({ key: `exp-${b.id}`, text: `${T.expiring}: ${b.name}${b.expiresOn ? ` · ${new Date(b.expiresOn).toLocaleDateString(lang === "en" ? "en-GB" : "es-ES")}` : ""}`, href: "/admin/collections/batches" })),
+    ...alerts.lowMargin.map((m) => ({ key: `mar-${m.id}`, text: `${T.margin}: ${m.name} · ${m.marginPercent} %`, href: "/admin/collections/recipe-lines" })),
   ];
 
   // Counts for every collection the user can see.
@@ -103,17 +96,17 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
   const month = madridDay().label.slice(0, 7);
   const [y, m] = month.split("-").map(Number);
   const nextMonth = m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, "0")}`;
-  const dateLine = nowDate.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Madrid" });
+  const dateLine = nowDate.toLocaleDateString(lang === "en" ? "en-GB" : "es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Madrid" });
   const hasSales = t.orders > 0;
 
   const entityLink = (e: NavGroup["entities"][number]) => (
     <li key={e.slug}>
       <Link href={e.type === "globals" ? `/admin/globals/${e.slug}` : `/admin/collections/${e.slug}`}>
         <span className="md-row">
-          <span>{text(e.label)}</span>
+          <span>{text(e.label, lang)}</span>
           {counts.get(e.slug) != null ? <span className="md-count">{counts.get(e.slug)}</span> : null}
         </span>
-        {COLLECTION_NOTES[e.slug] ? <span className="md-note">{COLLECTION_NOTES[e.slug]}</span> : null}
+        {notes[e.slug] ? <span className="md-note">{notes[e.slug]}</span> : null}
       </Link>
     </li>
   );
@@ -121,43 +114,43 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
   return (
     <Gutter className="maisha-dash">
       <header className="md-head">
-        <h1>Hoy · {dateLine}</h1>
-        <nav aria-label="Accesos rápidos" className="md-actions">
-          <Link href="/pos" className="md-primary">Abrir la barra</Link>
-          <Link href="/admin/collections/menu-items/create">Nuevo producto</Link>
-          <Link href="/admin/collections/events/create">Nuevo evento</Link>
-          <Link href="/admin/collections/campaigns/create">Nueva carta</Link>
-          <Link href="/es" target="_blank" rel="noreferrer">Ver la web</Link>
+        <h1>{T.today} · {dateLine}</h1>
+        <nav aria-label={T.quick} className="md-actions">
+          <Link href="/pos" className="md-primary">{T.openBar}</Link>
+          <Link href="/admin/collections/menu-items/create">{T.newProduct}</Link>
+          <Link href="/admin/collections/events/create">{T.newEvent}</Link>
+          <Link href="/admin/collections/campaigns/create">{T.newLetter}</Link>
+          <Link href="/es" target="_blank" rel="noreferrer">{T.seeSite}</Link>
         </nav>
       </header>
 
-      <section aria-label="Ventas de hoy" className="md-kpis">
+      <section aria-label={T.salesToday} className="md-kpis">
         <div className="md-box">
-          <p className="md-eyebrow">Ventas</p>
+          <p className="md-eyebrow">{T.sales}</p>
           <p className="md-big">{euro(t.salesCents)}</p>
-          <p className="md-sub">Hace una semana: {euro(before.salesCents)}</p>
+          <p className="md-sub">{T.weekAgo}: {euro(before.salesCents)}</p>
         </div>
         <div className="md-box">
-          <p className="md-eyebrow">Pedidos</p>
+          <p className="md-eyebrow">{T.orders}</p>
           <p className="md-big">{t.orders}</p>
-          <p className="md-sub">Hace una semana: {before.orders}</p>
+          <p className="md-sub">{T.weekAgo}: {before.orders}</p>
         </div>
         <div className="md-box">
-          <p className="md-eyebrow">Ticket medio</p>
+          <p className="md-eyebrow">{T.avg}</p>
           <p className="md-big">{euro(t.averageTicketCents)}</p>
-          {t.refundsCents ? <p className="md-sub">Devoluciones {euro(t.refundsCents)}</p> : null}
+          {t.refundsCents ? <p className="md-sub">{T.refunds} {euro(t.refundsCents)}</p> : null}
         </div>
         <div className="md-box">
-          <p className="md-eyebrow">En turno</p>
-          <p className="md-mid">{t.onShift.length ? t.onShift.map((s) => s.name).join(", ") : "Nadie"}</p>
+          <p className="md-eyebrow">{T.onShift}</p>
+          <p className="md-mid">{t.onShift.length ? t.onShift.map((s) => s.name).join(", ") : T.nobody}</p>
         </div>
       </section>
 
       <div className="md-two">
         {done < steps.length ? (
           <section aria-labelledby="md-setup" className="md-box">
-            <h2 id="md-setup" className="md-eyebrow">Para abrir · {done} de {steps.length}</h2>
-            <div className="md-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={done} aria-label="Pasos hechos">
+            <h2 id="md-setup" className="md-eyebrow">{T.setup} · {done} {T.of} {steps.length}</h2>
+            <div className="md-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={done} aria-label={T.stepsDone}>
               <span style={{ width: `${(done / steps.length) * 100}%` }} />
             </div>
             <ol className="md-steps">
@@ -166,7 +159,7 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
                   <span aria-hidden="true" className="md-tick">{s.done ? "✓" : ""}</span>
                   <span>
                     {s.href && !s.done ? <Link href={s.href}>{s.label}</Link> : <span>{s.label}</span>}
-                    <span className="sr-only">{s.done ? " (hecho)" : " (pendiente)"}</span>
+                    <span className="sr-only">{s.done ? ` (${T.done})` : ` (${T.todo})`}</span>
                     {!s.done ? <span className="md-note">{s.hint}</span> : null}
                   </span>
                 </li>
@@ -176,7 +169,7 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
         ) : null}
 
         <section aria-labelledby="md-pending" className="md-box">
-          <h2 id="md-pending" className="md-eyebrow">Pendiente · {pending.length}</h2>
+          <h2 id="md-pending" className="md-eyebrow">{T.pending} · {pending.length}</h2>
           {pending.length ? (
             <ul className="md-list">
               {pending.map((p) => (
@@ -186,12 +179,12 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
               ))}
             </ul>
           ) : (
-            <p className="md-empty">Nada pendiente. Todo en orden.</p>
+            <p className="md-empty">{T.nothing}</p>
           )}
         </section>
 
         <section aria-labelledby="md-sales" className="md-box">
-          <h2 id="md-sales" className="md-eyebrow">Ventas de hoy</h2>
+          <h2 id="md-sales" className="md-eyebrow">{T.salesToday}</h2>
           {hasSales ? (
             <div className="md-split">
               <ol className="md-list">
@@ -203,24 +196,24 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
               </ol>
               <ul className="md-list">
                 {Object.entries(t.byChannel).map(([k, v]) => (
-                  <li key={k}>{CHANNEL[k] ?? k} · {euro(v)}</li>
+                  <li key={k}>{T.channel[k] ?? k} · {euro(v)}</li>
                 ))}
                 {Object.entries(t.byMethod).map(([k, v]) => (
-                  <li key={k} className="md-soft">{METHOD[k] ?? k} · {euro(v)}</li>
+                  <li key={k} className="md-soft">{T.method[k] ?? k} · {euro(v)}</li>
                 ))}
               </ul>
             </div>
           ) : (
-            <p className="md-empty">Sin ventas todavía.</p>
+            <p className="md-empty">{T.noSales}</p>
           )}
           <p className="md-sub md-csv">
-            Para la gestoría: <a href={`/api/reports/invoices?from=${month}-01&to=${nextMonth}-01`}>facturas del mes (CSV)</a> ·{" "}
-            <a href={`/api/reports/iva?from=${month}-01&to=${nextMonth}-01`}>IVA del mes (CSV)</a>
+            {T.accountant}: <a href={`/api/reports/invoices?from=${month}-01&to=${nextMonth}-01`}>{T.invoicesCsv}</a> ·{" "}
+            <a href={`/api/reports/iva?from=${month}-01&to=${nextMonth}-01`}>{T.vatCsv}</a>
           </p>
         </section>
       </div>
 
-      <section aria-label="Todo" className="md-groups">
+      <section aria-label={T.all} className="md-groups">
         {navGroups.map((g) => {
           const main = g.entities.filter((e) => !SECONDARY.has(e.slug));
           const more = g.entities.filter((e) => SECONDARY.has(e.slug));
@@ -230,7 +223,7 @@ export async function OwnerDashboardView({ payload, navGroups = [] }: { payload:
               <ul>{main.map(entityLink)}</ul>
               {more.length ? (
                 <details>
-                  <summary>Más</summary>
+                  <summary>{T.more}</summary>
                   <ul>{more.map(entityLink)}</ul>
                 </details>
               ) : null}

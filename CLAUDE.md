@@ -231,6 +231,10 @@ customer records (say so in the privacy notice, remove by hand on
 request). A founding fee paid with no place left (or paid twice) is flagged
 "DEVOLVER" on the order and in the audit log: refund it in Stripe.
 
+Live Supabase check 2026-11-07: anon and authenticated have NO usage on
+the `payload` schema (has_schema_privilege false/false); "Automatically
+expose new tables" turned off in the Data API.
+
 Pre-push audit 2026-11-06 (security-audit skill): SHIP. Same 5 low + 5
 moderate advisories as accepted above, no secrets tracked, lockfile all
 registry.npmjs.org, every collection spells out access, headers present

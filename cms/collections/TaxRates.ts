@@ -9,25 +9,25 @@ import { integer } from "../validators";
  */
 export const TaxRates: CollectionConfig = {
   slug: "tax-rates",
-  labels: { singular: "Tipo de IVA", plural: "Tipos de IVA" },
+  labels: { singular: { es: "Tipo de IVA", en: "VAT rate" }, plural: { es: "Tipos de IVA", en: "VAT rates" } },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "rateBasisPoints", "active"],
-    description: "Confirma los tipos con tu gestor antes de vender.",
+    description: { es: "Confirma los tipos con tu gestor antes de vender.", en: "Check the rates with your accountant before selling." },
   },
   access: { read: anyone, create: owner, update: owner, delete: nobody },
   fields: [
-    { name: "name", type: "text", required: true, label: "Nombre" },
+    { name: "name", type: "text", required: true, label: { es: "Nombre", en: "Name" } },
     {
       name: "rateBasisPoints",
       type: "number",
       required: true,
       min: 0,
       max: 10000,
-      label: "Tipo (puntos básicos)",
+      label: { es: "Tipo (puntos básicos)", en: "Rate (basis points)" },
       admin: { description: "1000 = 10 %, 2100 = 21 %." },
       validate: integer,
     },
-    { name: "active", type: "checkbox", defaultValue: true, label: "Activo" },
+    { name: "active", type: "checkbox", defaultValue: true, label: { es: "Activo", en: "Active" } },
   ],
 };

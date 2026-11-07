@@ -12,7 +12,7 @@ import { integerCents } from "../validators";
  */
 export const Users: CollectionConfig = {
   slug: "users",
-  labels: { singular: "Persona del equipo", plural: "Equipo" },
+  labels: { singular: { es: "Persona del equipo", en: "Team member" }, plural: { es: "Equipo", en: "Team" } },
   auth: {
     tokenExpiration: 60 * 60 * 12,
     maxLoginAttempts: 5,
@@ -38,17 +38,17 @@ export const Users: CollectionConfig = {
     delete: nobody,
   },
   fields: [
-    { name: "name", type: "text", required: true, label: "Nombre" },
+    { name: "name", type: "text", required: true, label: { es: "Nombre", en: "Name" } },
     {
       name: "role",
       type: "select",
       required: true,
       defaultValue: "barista",
-      label: "Rol",
+      label: { es: "Rol", en: "Role" },
       access: { create: ownerField, update: ownerField },
       options: [
-        { label: "Propietario", value: "owner" },
-        { label: "Encargado", value: "manager" },
+        { label: { es: "Propietario", en: "Owner" }, value: "owner" },
+        { label: { es: "Encargado", en: "Manager" }, value: "manager" },
         { label: "Barista", value: "barista" },
       ],
     },
@@ -56,9 +56,9 @@ export const Users: CollectionConfig = {
       name: "active",
       type: "checkbox",
       defaultValue: true,
-      label: "Activo",
+      label: { es: "Activo", en: "Active" },
       access: { create: ownerField, update: ownerField },
-      admin: { description: "Desactiva en lugar de borrar: el historial conserva su nombre." },
+      admin: { description: { es: "Desactiva en lugar de borrar: el historial conserva su nombre.", en: "Deactivate instead of deleting: the history keeps their name." } },
     },
     {
       name: "refundLimitCents",
@@ -66,20 +66,20 @@ export const Users: CollectionConfig = {
       defaultValue: 0,
       min: 0,
       validate: integerCents,
-      label: "Límite de devolución (céntimos)",
+      label: { es: "Límite de devolución (céntimos)", en: "Refund limit (cents)" },
       access: { create: ownerField, update: ownerField },
       admin: {
-        description: "Devoluciones por encima de esta cantidad necesitan a un encargado. 500 = 5,00 €.",
+        description: { es: "Devoluciones por encima de esta cantidad necesitan a un encargado. 500 = 5,00 €.", en: "Refunds above this amount need a manager. 500 = 5.00 €." },
       },
     },
     {
       name: "pin",
       type: "text",
       virtual: true,
-      label: "Nuevo PIN de barra",
+      label: { es: "Nuevo PIN de barra", en: "New bar PIN" },
       access: { read: hiddenField },
       admin: {
-        description: "De 4 a 6 cifras. Se guarda cifrado; nadie puede leerlo después.",
+        description: { es: "De 4 a 6 cifras. Se guarda cifrado; nadie puede leerlo después.", en: "4 to 6 digits. Stored encrypted; nobody can read it afterwards." },
       },
       validate: (value: string | null | undefined) =>
         !value ? true : (pinProblem(value) ?? true),

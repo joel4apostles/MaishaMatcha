@@ -9,7 +9,7 @@ import { hiddenField, owner, ownerField, ownerOrManager } from "../access";
  */
 export const Members: CollectionConfig = {
   slug: "members",
-  labels: { singular: "Socio", plural: "Socios" },
+  labels: { singular: { es: "Socio", en: "Member" }, plural: { es: "Socios", en: "Members" } },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "email", "tier", "foundingNumber", "emailOptIn"],
@@ -24,20 +24,20 @@ export const Members: CollectionConfig = {
     ],
   },
   fields: [
-    { name: "name", type: "text", required: true, label: "Nombre" },
+    { name: "name", type: "text", required: true, label: { es: "Nombre", en: "Name" } },
     { name: "email", type: "email", required: true, unique: true, label: "Email" },
     {
       name: "tier",
       type: "select",
       required: true,
       defaultValue: "customer",
-      label: "Tipo",
+      label: { es: "Tipo", en: "Type" },
       access: { update: ownerField },
       options: [
-        { label: "Cliente", value: "customer" },
-        { label: "Socio fundador", value: "founding" },
-        { label: "Premium", value: "premium" },
-        { label: "Lista de espera", value: "waitlist" },
+        { label: { es: "Cliente", en: "Customer" }, value: "customer" },
+        { label: { es: "Socio fundador", en: "Founding member" }, value: "founding" },
+        { label: { es: "Premium", en: "Monthly subscription" }, value: "premium" },
+        { label: { es: "Lista de espera", en: "Waiting list" }, value: "waitlist" },
       ],
     },
     {
@@ -45,23 +45,23 @@ export const Members: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: "active",
-      label: "Estado",
+      label: { es: "Estado", en: "Status" },
       options: [
-        { label: "Activo", value: "active" },
-        { label: "Pausado", value: "paused" },
-        { label: "Baja", value: "cancelled" },
+        { label: { es: "Activo", en: "Active" }, value: "active" },
+        { label: { es: "Pausado", en: "Paused" }, value: "paused" },
+        { label: { es: "Baja", en: "Inactive" }, value: "cancelled" },
       ],
     },
     {
       type: "row",
       fields: [
-        { name: "foundingNumber", type: "number", label: "Nº de socio fundador", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
-        { name: "foundingSince", type: "date", label: "Fundador desde", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+        { name: "foundingNumber", type: "number", label: { es: "Nº de socio fundador", en: "Founding member no." }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+        { name: "foundingSince", type: "date", label: { es: "Fundador desde", en: "Founder since" }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
       ],
     },
     {
       type: "collapsible",
-      label: "Suscripción premium",
+      label: { es: "Suscripción premium", en: "Monthly subscription" },
       fields: [
         {
           type: "row",
@@ -70,18 +70,18 @@ export const Members: CollectionConfig = {
               name: "subscriptionStatus",
               type: "select",
               defaultValue: "none",
-              label: "Estado",
+              label: { es: "Estado", en: "Status" },
               access: { create: hiddenField, update: hiddenField },
               admin: { readOnly: true },
               options: [
-                { label: "Sin suscripción", value: "none" },
-                { label: "Activa", value: "active" },
-                { label: "Pago pendiente", value: "past_due" },
-                { label: "Cancelada", value: "cancelled" },
+                { label: { es: "Sin suscripción", en: "No subscription" }, value: "none" },
+                { label: { es: "Activa", en: "Active" }, value: "active" },
+                { label: { es: "Pago pendiente", en: "Payment pending" }, value: "past_due" },
+                { label: { es: "Cancelada", en: "Cancelled" }, value: "cancelled" },
               ],
             },
-            { name: "subscriptionPeriodEnd", type: "date", label: "Pagada hasta", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
-            { name: "cancelAtPeriodEnd", type: "checkbox", label: "Termina al final del periodo", access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+            { name: "subscriptionPeriodEnd", type: "date", label: { es: "Pagada hasta", en: "Paid until" }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+            { name: "cancelAtPeriodEnd", type: "checkbox", label: { es: "Termina al final del periodo", en: "Ends at the end of the period" }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
           ],
         },
         // Stripe references: server only, never shown or editable.
@@ -95,25 +95,25 @@ export const Members: CollectionConfig = {
       name: "emailOptIn",
       type: "checkbox",
       defaultValue: false,
-      label: "Acepta cartas por email",
+      label: { es: "Acepta cartas por email", en: "Accepts email letters" },
       // Consent belongs to the member: only their own account page sets it.
       access: { create: hiddenField, update: hiddenField },
-      admin: { description: "Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó." },
+      admin: { description: { es: "Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó.", en: "Only the member changes it. Campaigns go only to those who accepted." } },
     },
     {
       name: "locale",
       type: "select",
       defaultValue: "es",
-      label: "Idioma",
+      label: { es: "Idioma", en: "Language" },
       options: [
         { label: "Español", value: "es" },
         { label: "English", value: "en" },
       ],
     },
-    { name: "favoriteRecipeCode", type: "text", label: "Receta favorita" },
-    { name: "notes", type: "textarea", label: "Notas internas" },
+    { name: "favoriteRecipeCode", type: "text", label: { es: "Receta favorita", en: "Favourite recipe" } },
+    { name: "notes", type: "textarea", label: { es: "Notas internas", en: "Internal notes" } },
     // Bumped to sign the member out everywhere.
     { name: "sessionVersion", type: "number", defaultValue: 0, access: { read: hiddenField, update: hiddenField }, admin: { hidden: true } },
-    { name: "lastSignInAt", type: "date", label: "Última entrada", admin: { readOnly: true } },
+    { name: "lastSignInAt", type: "date", label: { es: "Última entrada", en: "Last entry" }, admin: { readOnly: true } },
   ],
 };

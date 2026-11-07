@@ -8,16 +8,16 @@ import { hiddenField, nobody, owner } from "../access";
  */
 export const PosDevices: CollectionConfig = {
   slug: "pos-devices",
-  labels: { singular: "Dispositivo de barra", plural: "Dispositivos de barra" },
+  labels: { singular: { es: "Dispositivo de barra", en: "Bar device" }, plural: { es: "Dispositivos de barra", en: "Bar devices" } },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "active", "lastSeenAt", "createdAt"],
-    description: "Desactiva un dispositivo perdido para revocarlo al instante.",
+    description: { es: "Desactiva un dispositivo perdido para revocarlo al instante.", en: "Deactivate a lost device to revoke it at once." },
   },
   access: { read: owner, create: nobody, update: owner, delete: nobody },
   fields: [
-    { name: "name", type: "text", required: true, label: "Nombre" },
-    { name: "active", type: "checkbox", defaultValue: true, label: "Activo" },
+    { name: "name", type: "text", required: true, label: { es: "Nombre", en: "Name" } },
+    { name: "active", type: "checkbox", defaultValue: true, label: { es: "Activo", en: "Active" } },
     {
       name: "tokenHash",
       type: "text",
@@ -31,9 +31,9 @@ export const PosDevices: CollectionConfig = {
       name: "registeredBy",
       type: "relationship",
       relationTo: "users",
-      label: "Registrado por",
+      label: { es: "Registrado por", en: "Recorded by" },
       admin: { readOnly: true },
     },
-    { name: "lastSeenAt", type: "date", label: "Último uso", admin: { readOnly: true } },
+    { name: "lastSeenAt", type: "date", label: { es: "Último uso", en: "Last used" }, admin: { readOnly: true } },
   ],
 };

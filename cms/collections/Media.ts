@@ -3,7 +3,7 @@ import { editorialAccess } from "../access";
 
 export const Media: CollectionConfig = {
   slug: "media",
-  labels: { singular: "Imagen", plural: "Imágenes" },
+  labels: { singular: { es: "Imagen", en: "Image" }, plural: { es: "Imágenes", en: "Images" } },
   upload: {
     staticDir: "media",
     imageSizes: [

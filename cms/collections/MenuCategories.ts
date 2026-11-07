@@ -3,7 +3,7 @@ import { editorialAccess } from "../access";
 
 export const MenuCategories: CollectionConfig = {
   slug: "menu-categories",
-  labels: { singular: "Categoría", plural: "Categorías" },
+  labels: { singular: { es: "Categoría", en: "Category" }, plural: { es: "Categorías", en: "Categories" } },
   admin: { useAsTitle: "title", defaultColumns: ["title", "order"] },
   access: editorialAccess,
   defaultSort: "order",
@@ -21,8 +21,8 @@ export const MenuCategories: CollectionConfig = {
       name: "shop",
       type: "checkbox",
       defaultValue: false,
-      label: "Tienda",
-      admin: { description: "Productos para llevar (latas de matcha, utensilios...). Salen en la tienda de la web, no en la carta." },
+      label: { es: "Tienda", en: "Shop" },
+      admin: { description: { es: "Productos para llevar (latas de matcha, utensilios...). Salen en la tienda de la web, no en la carta.", en: "Take-home products (matcha tins, tools...). Shown in the website shop, not on the menu." } },
     },
   ],
 };

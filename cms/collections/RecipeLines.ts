@@ -9,10 +9,10 @@ import { anyStaff, nobody, ownerOrManager } from "../access";
  */
 export const RecipeLines: CollectionConfig = {
   slug: "recipe-lines",
-  labels: { singular: "Línea de receta", plural: "Recetas" },
+  labels: { singular: { es: "Línea de receta", en: "Recipe line" }, plural: { es: "Recetas", en: "Recipes" } },
   admin: {
     defaultColumns: ["target", "ingredient", "quantity", "usesMeasuredGrams"],
-    description: "Qué gasta cada bebida y cada opción. Cada venta lo descuenta del inventario.",
+    description: { es: "Qué gasta cada bebida y cada opción. Cada venta lo descuenta del inventario.", en: "What each drink and option uses. Every sale deducts it from the inventory." },
   },
   access: { read: anyStaff, create: ownerOrManager, update: ownerOrManager, delete: ownerOrManager },
   fields: [
@@ -21,41 +21,41 @@ export const RecipeLines: CollectionConfig = {
       type: "relationship",
       relationTo: ["menu-items", "modifiers"],
       required: true,
-      label: "Bebida u opción",
+      label: { es: "Bebida u opción", en: "Drink or option" },
     },
-    { name: "ingredient", type: "relationship", relationTo: "inventory-items", required: true, label: "Ingrediente" },
+    { name: "ingredient", type: "relationship", relationTo: "inventory-items", required: true, label: { es: "Ingrediente", en: "Ingredient" } },
     {
       name: "quantity",
       type: "number",
       required: true,
       min: 0,
-      label: "Cantidad por unidad",
-      admin: { description: "En la unidad del ingrediente (g, ml, uds)." },
+      label: { es: "Cantidad por unidad", en: "Quantity per unit" },
+      admin: { description: { es: "En la unidad del ingrediente (g, ml, uds).", en: "In the ingredient's unit (g, ml, units)." } },
     },
     {
       name: "usesMeasuredGrams",
       type: "checkbox",
       defaultValue: false,
-      label: "Usa los gramos medidos",
-      admin: { description: "Para el matcha: descuenta lo que el barista pesó en esa venta." },
+      label: { es: "Usa los gramos medidos", en: "Use the measured grams" },
+      admin: { description: { es: "Para el matcha: descuenta lo que el barista pesó en esa venta.", en: "For matcha: deducts what the barista weighed in that sale." } },
     },
   ],
 };
 
 export const StockCounts: CollectionConfig = {
   slug: "stock-counts",
-  labels: { singular: "Recuento", plural: "Recuentos" },
+  labels: { singular: { es: "Recuento", en: "Count" }, plural: { es: "Recuentos", en: "Stock counts" } },
   admin: {
     defaultColumns: ["ingredient", "countedQuantity", "difference", "createdAt"],
-    description: "Escribe lo que hay de verdad: el sistema crea el ajuste por la diferencia.",
+    description: { es: "Escribe lo que hay de verdad: el sistema crea el ajuste por la diferencia.", en: "Enter what is really there: the system creates the adjustment for the difference." },
   },
   defaultSort: "-createdAt",
   access: { read: anyStaff, create: anyStaff, update: nobody, delete: nobody },
   fields: [
-    { name: "ingredient", type: "relationship", relationTo: "inventory-items", required: true, label: "Ingrediente" },
-    { name: "countedQuantity", type: "number", required: true, min: 0, label: "Cantidad contada" },
-    { name: "difference", type: "number", label: "Diferencia", admin: { readOnly: true } },
-    { name: "note", type: "text", label: "Nota" },
+    { name: "ingredient", type: "relationship", relationTo: "inventory-items", required: true, label: { es: "Ingrediente", en: "Ingredient" } },
+    { name: "countedQuantity", type: "number", required: true, min: 0, label: { es: "Cantidad contada", en: "Counted quantity" } },
+    { name: "difference", type: "number", label: { es: "Diferencia", en: "Difference" }, admin: { readOnly: true } },
+    { name: "note", type: "text", label: { es: "Nota", en: "Note" } },
   ],
   hooks: {
     beforeChange: [
@@ -86,18 +86,18 @@ export const StockCounts: CollectionConfig = {
 
 export const Batches: CollectionConfig = {
   slug: "batches",
-  labels: { singular: "Lote", plural: "Lotes" },
+  labels: { singular: { es: "Lote", en: "Batch" }, plural: { es: "Lotes", en: "Batches" } },
   admin: {
     defaultColumns: ["ingredient", "lot", "quantity", "expiresOn"],
-    description: "Lotes recibidos de perecederos, con su caducidad.",
+    description: { es: "Lotes recibidos de perecederos, con su caducidad.", en: "Perishable batches received, with their expiry." },
   },
   defaultSort: "expiresOn",
   access: { read: anyStaff, create: ownerOrManager, update: ownerOrManager, delete: nobody },
   fields: [
-    { name: "ingredient", type: "relationship", relationTo: "inventory-items", required: true, label: "Ingrediente" },
-    { name: "lot", type: "text", label: "Lote" },
-    { name: "quantity", type: "number", required: true, min: 0, label: "Cantidad recibida" },
-    { name: "expiresOn", type: "date", label: "Caduca", admin: { date: { pickerAppearance: "dayOnly" } } },
-    { name: "purchaseOrder", type: "relationship", relationTo: "purchase-orders", label: "Pedido a proveedor" },
+    { name: "ingredient", type: "relationship", relationTo: "inventory-items", required: true, label: { es: "Ingrediente", en: "Ingredient" } },
+    { name: "lot", type: "text", label: { es: "Lote", en: "Batch" } },
+    { name: "quantity", type: "number", required: true, min: 0, label: { es: "Cantidad recibida", en: "Quantity received" } },
+    { name: "expiresOn", type: "date", label: { es: "Caduca", en: "Expires" }, admin: { date: { pickerAppearance: "dayOnly" } } },
+    { name: "purchaseOrder", type: "relationship", relationTo: "purchase-orders", label: { es: "Pedido a proveedor", en: "Supplier order" } },
   ],
 };

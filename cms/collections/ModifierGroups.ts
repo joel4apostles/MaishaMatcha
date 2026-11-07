@@ -8,7 +8,7 @@ import { editorialAccess } from "../access";
  */
 export const ModifierGroups: CollectionConfig = {
   slug: "modifier-groups",
-  labels: { singular: "Grupo de opciones", plural: "Grupos de opciones" },
+  labels: { singular: { es: "Grupo de opciones", en: "Option group" }, plural: { es: "Grupos de opciones", en: "Option groups" } },
   admin: {
     useAsTitle: "label",
     defaultColumns: ["label", "slug", "selection", "required", "order"],
@@ -16,26 +16,26 @@ export const ModifierGroups: CollectionConfig = {
   defaultSort: "order",
   access: editorialAccess,
   fields: [
-    { name: "slug", type: "text", required: true, unique: true, label: "Clave" },
-    { name: "label", type: "text", required: true, localized: true, label: "Nombre" },
+    { name: "slug", type: "text", required: true, unique: true, label: { es: "Clave", en: "Key" } },
+    { name: "label", type: "text", required: true, localized: true, label: { es: "Nombre", en: "Name" } },
     {
       name: "selection",
       type: "select",
       required: true,
       defaultValue: "single",
-      label: "Selección",
+      label: { es: "Selección", en: "Choice" },
       options: [
-        { label: "Una opción", value: "single" },
-        { label: "Varias opciones", value: "multiple" },
+        { label: { es: "Una opción", en: "One option" }, value: "single" },
+        { label: { es: "Varias opciones", en: "Several options" }, value: "multiple" },
       ],
     },
     {
       name: "required",
       type: "checkbox",
       defaultValue: false,
-      label: "Obligatorio",
-      admin: { description: "El barista debe elegir antes de cobrar." },
+      label: { es: "Obligatorio", en: "Required" },
+      admin: { description: { es: "El barista debe elegir antes de cobrar.", en: "The barista must choose before charging." } },
     },
-    { name: "order", type: "number", defaultValue: 0, label: "Orden" },
+    { name: "order", type: "number", defaultValue: 0, label: { es: "Orden", en: "Order" } },
   ],
 };

@@ -174,7 +174,7 @@ export interface UserAuthOperations {
   };
 }
 /**
- * Se crean desde la barra o la web. Aquí se consultan; no se editan.
+ * Created from the bar or the website. Viewed here; not edited.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
@@ -182,7 +182,7 @@ export interface UserAuthOperations {
 export interface Order {
   id: number;
   /**
-   * Número visible: 0042
+   * Visible number: 0042
    */
   label?: string | null;
   channel: 'counter' | 'online' | 'table';
@@ -248,24 +248,24 @@ export interface MenuItem {
   name: string;
   category: number | MenuCategory;
   /**
-   * IVA incluido. 450 = 4,50 €.
+   * VAT included. 450 = 4.50 €.
    */
   priceCents: number;
   /**
-   * Vacío = mismo precio que en barra.
+   * Empty = same price as at the bar.
    */
   onlinePriceCents?: number | null;
   taxRate: number | TaxRate;
   /**
-   * La barra lo propone y el barista lo ajusta a lo que pesa de verdad. Vacío = no se pesa.
+   * The bar suggests it and the barista adjusts it to what is really weighed. Empty = not weighed.
    */
   defaultGrams?: number | null;
   /**
-   * Solo para productos de la tienda. Vacío = sin límite. Baja sola con cada venta y vuelve si se anula. A 0 sale como agotado.
+   * Shop products only. Empty = no limit. Goes down with each sale and back if voided. At 0 it shows as sold out.
    */
   stock?: number | null;
   /**
-   * Desmarca para "agotado" en la web y en la barra.
+   * Untick for "sold out" on the website and at the bar.
    */
   available?: boolean | null;
   /**
@@ -291,22 +291,22 @@ export interface MenuItem {
     | null;
   modifierGroups?: (number | ModifierGroup)[] | null;
   /**
-   * El tono de la bebida, hex (#6B7F5E).
+   * The drink's tone, hex (#6B7F5E).
    */
   color: string;
   description: string;
   origin?: string | null;
   /**
-   * Aparece en la portada (máximo 4).
+   * Shown on the home page (up to 4).
    */
   signature?: boolean | null;
   photo?: (number | null) | Media;
   /**
-   * Solo productos de la tienda. Opcional: si está vacío, la página del producto no muestra esta parte.
+   * Shop products only. Optional: if empty, the product page leaves this part out.
    */
   ritual?: string | null;
   /**
-   * Hasta tres productos de la tienda que se sugieren en la página de este.
+   * Up to three shop products suggested on this product's page.
    */
   pairsWith?: (number | MenuItem)[] | null;
   order?: number | null;
@@ -326,14 +326,14 @@ export interface MenuCategory {
   title: string;
   order: number;
   /**
-   * Productos para llevar (latas de matcha, utensilios...). Salen en la tienda de la web, no en la carta.
+   * Take-home products (matcha tins, tools...). Shown in the website shop, not on the menu.
    */
   shop?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Confirma los tipos con tu gestor antes de vender.
+ * Check the rates with your accountant before selling.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tax-rates".
@@ -359,7 +359,7 @@ export interface ModifierGroup {
   label: string;
   selection: 'single' | 'multiple';
   /**
-   * El barista debe elegir antes de cobrar.
+   * The barista must choose before charging.
    */
   required?: boolean | null;
   order?: number | null;
@@ -430,7 +430,7 @@ export interface Member {
   stripeSubscriptionId?: string | null;
   subscriptionEventAt?: number | null;
   /**
-   * Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó.
+   * Only the member changes it. Campaigns go only to those who accepted.
    */
   emailOptIn?: boolean | null;
   locale?: ('es' | 'en') | null;
@@ -450,15 +450,15 @@ export interface User {
   name: string;
   role: 'owner' | 'manager' | 'barista';
   /**
-   * Desactiva en lugar de borrar: el historial conserva su nombre.
+   * Deactivate instead of deleting: the history keeps their name.
    */
   active?: boolean | null;
   /**
-   * Devoluciones por encima de esta cantidad necesitan a un encargado. 500 = 5,00 €.
+   * Refunds above this amount need a manager. 500 = 5.00 €.
    */
   refundLimitCents?: number | null;
   /**
-   * De 4 a 6 cifras. Se guarda cifrado; nadie puede leerlo después.
+   * 4 to 6 digits. Stored encrypted; nobody can read it afterwards.
    */
   pin?: string | null;
   pinHash?: string | null;
@@ -485,7 +485,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Desactiva un dispositivo perdido para revocarlo al instante.
+ * Deactivate a lost device to revoke it at once.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pos-devices".
@@ -530,7 +530,7 @@ export interface Shift {
   createdAt: string;
 }
 /**
- * Solo se añaden. Una devolución es un registro aparte.
+ * Append only. A refund is a separate record.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payments".
@@ -566,7 +566,7 @@ export interface Refund {
   createdAt: string;
 }
 /**
- * Registro inalterable. Las correcciones son facturas rectificativas.
+ * Unalterable record. Corrections are corrective invoices.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "invoices".
@@ -613,11 +613,11 @@ export interface Modifier {
   id: number;
   group: number | ModifierGroup;
   /**
-   * Estable y única, p. ej. base.tonica. La usan las recetas compartidas.
+   * Stable and unique, e.g. base.tonica. Shared recipes use it.
    */
   key: string;
   /**
-   * Tres letras para el código de receta (TON).
+   * Three letters for the recipe code (TON).
    */
   code?: string | null;
   label: string;
@@ -650,7 +650,7 @@ export interface Modifier {
   createdAt: string;
 }
 /**
- * El stock solo cambia con movimientos: el registro es la verdad.
+ * Stock only changes through movements: the ledger is the truth.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "inventory-items".
@@ -660,25 +660,25 @@ export interface InventoryItem {
   name: string;
   unit: 'g' | 'kg' | 'ml' | 'l' | 'uds';
   /**
-   * Lo mantienen los movimientos; no se edita a mano.
+   * Kept by the movements; not edited by hand.
    */
   stock?: number | null;
   /**
-   * Al bajar de aquí se prepara un pedido al proveedor.
+   * Below this level a supplier order is prepared.
    */
   lowStockAt?: number | null;
   /**
-   * Vacío = hasta el nivel ideal.
+   * Empty = up to the ideal level.
    */
   reorderQuantity?: number | null;
   parLevel?: number | null;
   /**
-   * Matcha a 300 €/kg con unidad g: 30000. Leche a 1,20 €/l con unidad ml: 120.
+   * Matcha at 300 €/kg with unit g: 30000. Milk at 1.20 €/l with unit ml: 120.
    */
   costCentsPer1000?: number | null;
   supplier?: (number | null) | Supplier;
   /**
-   * Para perecederos: los lotes avisan antes de caducar.
+   * For perishables: batches warn before they expire.
    */
   shelfLifeDays?: number | null;
   updatedAt: string;
@@ -698,7 +698,7 @@ export interface Supplier {
   leadTimeDays?: number | null;
   minOrderCents?: number | null;
   /**
-   * Apagado: cada pedido espera tu aprobación. Recomendado.
+   * Off: every order waits for your approval. Recommended.
    */
   autoSend?: boolean | null;
   notes?: string | null;
@@ -706,7 +706,7 @@ export interface Supplier {
   createdAt: string;
 }
 /**
- * Qué gasta cada bebida y cada opción. Cada venta lo descuenta del inventario.
+ * What each drink and option uses. Every sale deducts it from the inventory.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "recipe-lines".
@@ -724,18 +724,18 @@ export interface RecipeLine {
       };
   ingredient: number | InventoryItem;
   /**
-   * En la unidad del ingrediente (g, ml, uds).
+   * In the ingredient's unit (g, ml, units).
    */
   quantity: number;
   /**
-   * Para el matcha: descuenta lo que el barista pesó en esa venta.
+   * For matcha: deducts what the barista weighed in that sale.
    */
   usesMeasuredGrams?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Solo se añaden: una corrección es un movimiento nuevo.
+ * Append only: a correction is a new movement.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stock-movements".
@@ -744,7 +744,7 @@ export interface StockMovement {
   id: number;
   item: number | InventoryItem;
   /**
-   * + entra stock, − sale stock (en la unidad del ingrediente).
+   * + adds stock, − removes stock (in the ingredient's unit).
    */
   delta: number;
   reason: 'purchase' | 'sale' | 'usage' | 'waste' | 'count' | 'adjustment';
@@ -756,7 +756,7 @@ export interface StockMovement {
   createdAt: string;
 }
 /**
- * Borradores automáticos: revisa, aprueba y se envían al proveedor.
+ * Automatic drafts: review and approve, then they go to the supplier.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "purchase-orders".
@@ -785,7 +785,7 @@ export interface PurchaseOrder {
   createdAt: string;
 }
 /**
- * Escribe lo que hay de verdad: el sistema crea el ajuste por la diferencia.
+ * Enter what is really there: the system creates the adjustment for the difference.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stock-counts".
@@ -800,7 +800,7 @@ export interface StockCount {
   createdAt: string;
 }
 /**
- * Lotes recibidos de perecederos, con su caducidad.
+ * Perishable batches received, with their expiry.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "batches".
@@ -825,7 +825,7 @@ export interface SupplierProduct {
   ingredient: number | InventoryItem;
   sku?: string | null;
   /**
-   * En la unidad del ingrediente: una lata de 100 g = 100.
+   * In the ingredient's unit: a 100 g tin = 100.
    */
   packSize: number;
   priceCents: number;
@@ -853,7 +853,7 @@ export interface Event {
   id: number;
   title: string;
   /**
-   * Lo que se lee en la web, p. ej. "Sábado 14, 19:00" o "Fecha por anunciar".
+   * What the website shows, e.g. "Saturday 14, 19:00" or "Date to be announced".
    */
   when: string;
   description: string;
@@ -874,16 +874,16 @@ export interface Campaign {
   subject: string;
   title: string;
   /**
-   * Párrafos separados por una línea en blanco. Sin exclamaciones ni rayas, como el resto de la marca.
+   * Paragraphs separated by a blank line. No exclamation marks or dashes, like the rest of the brand.
    */
   body: string;
   audience: 'all' | 'founding';
   /**
-   * Se envía a quienes tienen ese idioma en su cuenta.
+   * Sent to everyone with that language on their account.
    */
   locale: 'es' | 'en';
   /**
-   * Escribe tu email y guarda: llega una prueba. No cuenta como envío.
+   * Enter your email and save: a test arrives. It does not count as a send.
    */
   sendTestTo?: string | null;
   status: 'draft' | 'approved' | 'sent';
@@ -916,7 +916,7 @@ export interface StoryChapter {
   createdAt: string;
 }
 /**
- * Solo lectura. Cada acción sensible deja aquí su rastro.
+ * Read only. Every sensitive action leaves its trace here.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log".
@@ -1735,16 +1735,16 @@ export interface Business {
   nif?: string | null;
   address?: string | null;
   /**
-   * Prefijo de las facturas simplificadas. Cámbialo solo con tu gestor.
+   * Prefix for simplified invoices. Change it only with your accountant.
    */
   invoiceSeries?: string | null;
   /**
-   * Prefijo de las facturas completas (con NIF del cliente). Cámbialo solo con tu gestor.
+   * Prefix for full invoices (with the customer's tax ID). Change it only with your accountant.
    */
   fullInvoiceSeries?: string | null;
   receiptFooter?: string | null;
   /**
-   * Apagado: la web dice que los pedidos online llegan pronto.
+   * Off: the website says online ordering is coming soon.
    */
   onlineOrdering?: boolean | null;
   /**
@@ -1756,7 +1756,7 @@ export interface Business {
    */
   closingTime?: string | null;
   /**
-   * Cada mesa tiene su QR (imprímelos en la barra: Mesas). Funciona en horario de apertura.
+   * Each table has its own QR (print them at the bar: Mesas). Works during opening hours.
    */
   tableOrdering?: boolean | null;
   tableCount?: number | null;
@@ -1765,7 +1765,7 @@ export interface Business {
   slotCapacity?: number | null;
   leadMinutes?: number | null;
   /**
-   * Necesita precio, IVA y Stripe configurado. Se cierra sola al llegar al límite.
+   * Needs a price, VAT and Stripe set up. Closes itself when the limit is reached.
    */
   foundingOpen?: boolean | null;
   foundingPriceCents?: number | null;
@@ -1773,18 +1773,18 @@ export interface Business {
   foundingTaxRate?: (number | null) | TaxRate;
   foundingPerks?: string | null;
   /**
-   * Mensual, con Stripe. Necesita precio, IVA y Stripe configurado.
+   * Monthly, with Stripe. Needs a price, VAT and Stripe set up.
    */
   premiumOpen?: boolean | null;
   premiumMonthlyCents?: number | null;
   /**
-   * El precio que se prometió a los socios fundadores. Vacío = el mismo.
+   * The price promised to founding members. Empty = the same.
    */
   premiumFoundingMonthlyCents?: number | null;
   premiumTaxRate?: (number | null) | TaxRate;
   premiumPerks?: string | null;
   /**
-   * Avisa de las bebidas cuyo margen baje de aquí.
+   * Flags drinks whose margin drops below this.
    */
   targetMarginPercent?: number | null;
   updatedAt?: string | null;

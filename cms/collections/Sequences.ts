@@ -9,7 +9,7 @@ import { nobody, owner } from "../access";
  */
 export const Sequences: CollectionConfig = {
   slug: "sequences",
-  labels: { singular: "Secuencia", plural: "Secuencias" },
+  labels: { singular: { es: "Secuencia", en: "Sequence" }, plural: { es: "Secuencias", en: "Sequences" } },
   admin: { useAsTitle: "key", hidden: true },
   access: { read: owner, create: nobody, update: nobody, delete: nobody },
   fields: [

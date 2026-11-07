@@ -11,7 +11,7 @@ import { owner, ownerOrManager } from "../access";
  */
 export const Campaigns: CollectionConfig = {
   slug: "campaigns",
-  labels: { singular: "Carta por email", plural: "Cartas por email" },
+  labels: { singular: { es: "Carta por email", en: "Email letter" }, plural: { es: "Cartas por email", en: "Email letters" } },
   admin: { useAsTitle: "subject", defaultColumns: ["subject", "audience", "status", "sentCount", "sentAt"] },
   access: { read: ownerOrManager, create: ownerOrManager, update: ownerOrManager, delete: owner },
   hooks: {
@@ -50,24 +50,24 @@ export const Campaigns: CollectionConfig = {
     ],
   },
   fields: [
-    { name: "subject", type: "text", required: true, maxLength: 120, label: "Asunto" },
-    { name: "title", type: "text", required: true, maxLength: 120, label: "Titular" },
+    { name: "subject", type: "text", required: true, maxLength: 120, label: { es: "Asunto", en: "Subject" } },
+    { name: "title", type: "text", required: true, maxLength: 120, label: { es: "Titular", en: "Holder" } },
     {
       name: "body",
       type: "textarea",
       required: true,
-      label: "Texto",
-      admin: { description: "Párrafos separados por una línea en blanco. Sin exclamaciones ni rayas, como el resto de la marca." },
+      label: { es: "Texto", en: "Text" },
+      admin: { description: { es: "Párrafos separados por una línea en blanco. Sin exclamaciones ni rayas, como el resto de la marca.", en: "Paragraphs separated by a blank line. No exclamation marks or dashes, like the rest of the brand." } },
     },
     {
       name: "audience",
       type: "select",
       required: true,
       defaultValue: "all",
-      label: "Para",
+      label: { es: "Para", en: "For" },
       options: [
-        { label: "Todos los que aceptaron cartas", value: "all" },
-        { label: "Solo socios fundadores", value: "founding" },
+        { label: { es: "Todos los que aceptaron cartas", en: "Everyone who accepted letters" }, value: "all" },
+        { label: { es: "Solo socios fundadores", en: "Founding members only" }, value: "founding" },
       ],
     },
     {
@@ -75,8 +75,8 @@ export const Campaigns: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: "es",
-      label: "Idioma de la carta",
-      admin: { description: "Se envía a quienes tienen ese idioma en su cuenta." },
+      label: { es: "Idioma de la carta", en: "Menu language" },
+      admin: { description: { es: "Se envía a quienes tienen ese idioma en su cuenta.", en: "Sent to everyone with that language on their account." } },
       options: [
         { label: "Español", value: "es" },
         { label: "English", value: "en" },
@@ -85,23 +85,23 @@ export const Campaigns: CollectionConfig = {
     {
       name: "sendTestTo",
       type: "email",
-      label: "Enviar prueba a",
-      admin: { description: "Escribe tu email y guarda: llega una prueba. No cuenta como envío." },
+      label: { es: "Enviar prueba a", en: "Send a test to" },
+      admin: { description: { es: "Escribe tu email y guarda: llega una prueba. No cuenta como envío.", en: "Enter your email and save: a test arrives. It does not count as a send." } },
     },
     {
       name: "status",
       type: "select",
       required: true,
       defaultValue: "draft",
-      label: "Estado",
+      label: { es: "Estado", en: "Status" },
       options: [
-        { label: "Borrador", value: "draft" },
-        { label: "Aprobada (se envía al guardar)", value: "approved" },
-        { label: "Enviada", value: "sent" },
+        { label: { es: "Borrador", en: "Draft" }, value: "draft" },
+        { label: { es: "Aprobada (se envía al guardar)", en: "Approved (sent on save)" }, value: "approved" },
+        { label: { es: "Enviada", en: "Sent" }, value: "sent" },
       ],
     },
-    { name: "sentCount", type: "number", label: "Enviadas", admin: { readOnly: true } },
-    { name: "sentAt", type: "date", label: "Enviada el", admin: { readOnly: true } },
-    { name: "approvedBy", type: "relationship", relationTo: "users", label: "Aprobada por", admin: { readOnly: true } },
+    { name: "sentCount", type: "number", label: { es: "Enviadas", en: "Sent" }, admin: { readOnly: true } },
+    { name: "sentAt", type: "date", label: { es: "Enviada el", en: "Sent on" }, admin: { readOnly: true } },
+    { name: "approvedBy", type: "relationship", relationTo: "users", label: { es: "Aprobada por", en: "Approved by" }, admin: { readOnly: true } },
   ],
 };

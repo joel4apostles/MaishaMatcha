@@ -7,22 +7,22 @@ import { nobody, ownerOrManager } from "../access";
  */
 export const AuditLog: CollectionConfig = {
   slug: "audit-log",
-  labels: { singular: "Registro", plural: "Registro de actividad" },
+  labels: { singular: { es: "Registro", en: "Record" }, plural: { es: "Registro de actividad", en: "Activity log" } },
   admin: {
     useAsTitle: "action",
     defaultColumns: ["createdAt", "action", "actor", "entity", "reason"],
-    description: "Solo lectura. Cada acción sensible deja aquí su rastro.",
+    description: { es: "Solo lectura. Cada acción sensible deja aquí su rastro.", en: "Read only. Every sensitive action leaves its trace here." },
   },
   defaultSort: "-createdAt",
   access: { read: ownerOrManager, create: nobody, update: nobody, delete: nobody },
   fields: [
-    { name: "action", type: "text", required: true, index: true, label: "Acción" },
-    { name: "actor", type: "relationship", relationTo: "users", label: "Quién" },
-    { name: "device", type: "relationship", relationTo: "pos-devices", label: "Dispositivo" },
-    { name: "entity", type: "text", required: true, label: "Colección" },
-    { name: "entityId", type: "text", label: "Documento" },
-    { name: "reason", type: "textarea", label: "Motivo" },
-    { name: "before", type: "json", label: "Antes" },
-    { name: "after", type: "json", label: "Después" },
+    { name: "action", type: "text", required: true, index: true, label: { es: "Acción", en: "Action" } },
+    { name: "actor", type: "relationship", relationTo: "users", label: { es: "Quién", en: "Who" } },
+    { name: "device", type: "relationship", relationTo: "pos-devices", label: { es: "Dispositivo", en: "Device" } },
+    { name: "entity", type: "text", required: true, label: { es: "Colección", en: "Collection" } },
+    { name: "entityId", type: "text", label: { es: "Documento", en: "Document" } },
+    { name: "reason", type: "textarea", label: { es: "Motivo", en: "Reason" } },
+    { name: "before", type: "json", label: { es: "Antes", en: "Before" } },
+    { name: "after", type: "json", label: { es: "Después", en: "After" } },
   ],
 };
