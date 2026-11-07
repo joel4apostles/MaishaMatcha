@@ -78,7 +78,11 @@ export default buildConfig({
   db,
   sharp,
   localization: {
-    locales: ["es", "en"],
+    // Named, so the selector reads "Español / English", not "es / en".
+    locales: [
+      { code: "es", label: "Español" },
+      { code: "en", label: "English" },
+    ],
     defaultLocale: "es",
     fallback: true,
   },
@@ -89,6 +93,11 @@ export default buildConfig({
     theme: "light",
     meta: {
       titleSuffix: " · maisha matcha",
+      // The brand mark in the browser tab, not Payload's default icon.
+      icons: [
+        { rel: "icon", type: "image/svg+xml", url: "/icon.svg" },
+        { rel: "apple-touch-icon", url: "/apple-icon.png" },
+      ],
     },
     components: {
       // Our own admin home: today, the launch checklist, what is pending, and
@@ -101,7 +110,16 @@ export default buildConfig({
     },
   },
   // The admin speaks Spanish first, like the salon (English stays available).
-  i18n: { supportedLanguages: { es, en }, fallbackLanguage: "es" },
+  i18n: {
+    supportedLanguages: { es, en },
+    fallbackLanguage: "es",
+    // The top-right selector switches which language of the CONTENT you
+    // edit (event titles, descriptions), not the admin's own language.
+    translations: {
+      es: { general: { locale: "Contenido en" } },
+      en: { general: { locale: "Content in" } },
+    },
+  },
   // Dashboard order and groups follow how the salon works, not the schema.
   collections: inSalonOrder([
     [Orders, "Barra"],
