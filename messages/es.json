@@ -90,8 +90,7 @@
     "prepare": "Crea tu bebida con {name}",
     "yoursEyebrow": "A tu manera",
     "yoursTitle": "Leche, extras, tu receta",
-    "yoursBody": "Cualquier matcha o té como latte (+{delta}), con leche o avena. Y si quieres, una capa más.",
-    "photoAlt": "Dos matcha latte en vasos maisha, con leche y puré de mango, sobre la barra de azulejo verde."
+    "yoursBody": "Cualquier matcha o té como latte (+{delta}), con leche o avena. Y si quieres, una capa más."
   },
   "story": {
     "eyebrow": "Historia",
@@ -257,10 +256,7 @@
     "save": "Guardar",
     "savedAs": "Guardada como {name}.",
     "savedRemove": "Borrar {name}",
-    "savedEmpty": "Se guardan solo en este dispositivo.",
-    "illustration": "Ilustración. Cada bebida se prepara a mano.",
-    "photoAlt": "Un barista vierte matcha desde un cuenco negro sobre hielo, leche y ube en un vaso maisha.",
-    "photoCaption": "En la barra"
+    "savedEmpty": "Se guardan solo en este dispositivo."
   },
   "pos": {
     "title": "Barra",

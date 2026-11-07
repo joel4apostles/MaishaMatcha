@@ -90,8 +90,7 @@
     "prepare": "Create your drink with {name}",
     "yoursEyebrow": "Your way",
     "yoursTitle": "Milk, extras, your recipe",
-    "yoursBody": "Any matcha or tea as a latte (+{delta}), with milk or oat. And if you like, one more layer.",
-    "photoAlt": "Two matcha lattes in maisha cups, with milk and mango purée, on the green-tiled bar."
+    "yoursBody": "Any matcha or tea as a latte (+{delta}), with milk or oat. And if you like, one more layer."
   },
   "story": {
     "eyebrow": "Story",
@@ -257,10 +256,7 @@
     "save": "Save",
     "savedAs": "Saved as {name}.",
     "savedRemove": "Delete {name}",
-    "savedEmpty": "Kept on this device only.",
-    "illustration": "Illustration. Every drink is made by hand.",
-    "photoAlt": "A barista pours matcha from a black bowl over ice, milk and ube in a maisha cup.",
-    "photoCaption": "At the bar"
+    "savedEmpty": "Kept on this device only."
   },
   "pos": {
     "title": "Counter",

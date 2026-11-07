@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import { Eyebrow } from "@/components/Eyebrow";
@@ -11,7 +10,6 @@ import { cartaExtras, cartaGroup, itemSlug, priceLines } from "@/lib/carta";
 import { TastingCard } from "@/components/TastingCard";
 import { formatEuro } from "@/lib/money";
 import { pageMetadata } from "@/lib/seo";
-import drinkPhoto from "@/public/images/drinks-layered.jpg";
 import type { Locale } from "@/i18n/routing";
 import { Numeral } from "@/components/Numeral";
 
@@ -122,27 +120,22 @@ function MenuContent() {
           </section>
         ) : null}
 
-        {/* Your way: the latte photograph beside the milks and extras. */}
-        <section id="extras" aria-labelledby="extras-title" className="grid scroll-mt-24 grid-cols-1 items-center gap-10 pt-20 sm:pt-28 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-16">
-          <Reveal>
-            <div className="relative mx-auto aspect-[3/4] w-full max-w-[26rem] overflow-hidden rounded-[2px] md:mx-0 md:aspect-[4/5]">
-              <Image
-                src={drinkPhoto}
-                alt={t("photoAlt")}
-                placeholder="blur"
-                fill
-                sizes="(min-width: 768px) 416px, 90vw"
-                className="object-cover object-center"
-              />
-            </div>
-          </Reveal>
+        {/* Your way: the words on the left, the milks and extras beside them. */}
+        <section id="extras" aria-labelledby="extras-title" className={`mt-20 grid scroll-mt-24 grid-cols-1 gap-10 border-t ${hairline} pt-12 sm:mt-28 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-16`}>
           <Reveal>
             <Eyebrow>{t("yoursEyebrow")}</Eyebrow>
-            <h2 id="extras-title" className="mt-5 font-serif text-display font-light text-sumi">
+            <h2 id="extras-title" className="mt-5 text-balance font-serif text-title font-light text-sumi">
               {t("yoursTitle")}
             </h2>
             <p className="measure mt-5 text-sumi/80">{t("yoursBody", { delta: formatEuro(latteDelta, locale) })}</p>
-            <ul className={`mt-7 border-t ${hairline}`}>
+            <div className="mt-6">
+              <Link href="/crea" className={quietLinkClass}>
+                {cta("create")}
+              </Link>
+            </div>
+          </Reveal>
+          <Reveal>
+            <ul className={`border-t ${hairline}`}>
               {extras.map((extra) => (
                 <li key={extra.key} className="flex items-baseline justify-between gap-6 border-b border-wood/25 py-3.5">
                   <div className="min-w-0">
@@ -153,11 +146,6 @@ function MenuContent() {
                 </li>
               ))}
             </ul>
-            <div className="mt-5">
-              <Link href="/crea" className={quietLinkClass}>
-                {cta("create")}
-              </Link>
-            </div>
           </Reveal>
         </section>
 

@@ -6,8 +6,6 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { Headline } from "@/components/Headline";
 import { Reveal } from "@/components/Reveal";
 import { RecipeBuilder } from "@/components/RecipeBuilder";
-import Image from "next/image";
-import pourPhoto from "@/public/images/pour-ube.jpg";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
 
@@ -40,24 +38,13 @@ function CreateContent() {
   const t = useTranslations("create");
   return (
     <Section>
-      <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-16">
-        <Reveal>
-          <Eyebrow>{t("eyebrow")}</Eyebrow>
-          <Headline as="h1" className="mt-5 text-display">
-            {t("title")}
-          </Headline>
-          <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
-        </Reveal>
-        {/* The real thing, at the bar: matcha poured over milk and ube. */}
-        <Reveal className="hidden md:block">
-          <figure>
-            <div className="overflow-hidden rounded-[2px]">
-              <Image src={pourPhoto} alt={t("photoAlt")} sizes="240px" placeholder="blur" className="aspect-[3/4] h-auto w-full object-cover" />
-            </div>
-            <figcaption className="mt-3 text-eyebrow uppercase text-sumi/70">{t("photoCaption")}</figcaption>
-          </figure>
-        </Reveal>
-      </div>
+      <Reveal>
+        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <Headline as="h1" className="mt-5 text-display">
+          {t("title")}
+        </Headline>
+        <p className="measure mt-6 text-lg text-sumi/80">{t("intro")}</p>
+      </Reveal>
 
       <div className="mt-14">
         <RecipeBuilder />
