@@ -56,6 +56,20 @@ export async function OwnerDashboardView({ payload, navGroups = [], i18n }: { pa
     payload.count({ collection: "events", overrideAccess: true, where: { startsAt: { greater_than: now } } }),
   ]);
 
+  // Upcoming events with seats: warn when 80% or more are booked.
+  const soon = await payload.find({ collection: "events", overrideAccess: true, depth: 0, limit: 20, locale: lang, where: { and: [{ startsAt: { greater_than: now } }, { capacity: { exists: true } }] } });
+  const booked = soon.docs.length
+    ? await payload.find({ collection: "rsvps", overrideAccess: true, depth: 0, limit: 5000, where: { and: [{ event: { in: soon.docs.map((e) => e.id) } }, { status: { equals: "going" } }] } })
+    : { docs: [] as { event: unknown; seats: number }[] };
+  const taken = new Map<number, number>();
+  for (const r of booked.docs) {
+    const id = typeof r.event === "object" && r.event ? (r.event as { id: number }).id : (r.event as number);
+    taken.set(id, (taken.get(id) ?? 0) + r.seats);
+  }
+  const filling = soon.docs
+    .filter((e) => e.capacity && (taken.get(e.id) ?? 0) / e.capacity >= 0.8)
+    .map((e) => ({ id: e.id, title: e.title, taken: taken.get(e.id) ?? 0, capacity: e.capacity as number }));
+
   const steps = setupSteps({
     legalName: business.legalName,
     nif: business.nif,
@@ -72,6 +86,7 @@ export async function OwnerDashboardView({ payload, navGroups = [], i18n }: { pa
     ...(webOrders.totalDocs ? [{ key: "web", text: T.webOrders(webOrders.totalDocs), href: "/admin/collections/orders" }] : []),
     ...(refundFlags.totalDocs ? [{ key: "refund", text: T.refundFlags(refundFlags.totalDocs), href: "/admin/collections/orders" }] : []),
     ...alerts.draftOrders.map((d) => ({ key: `po-${d.id}`, text: T.po(String(d.label), d.supplier, euro(d.totalCents)), href: `/admin/collections/purchase-orders/${d.id}` })),
+    ...filling.map((e) => ({ key: `ev-${e.id}`, text: T.filling(e.title, e.taken, e.capacity), href: `/admin/collections/events/${e.id}` })),
     ...(draftLetters.totalDocs ? [{ key: "letters", text: T.letters(draftLetters.totalDocs), href: "/admin/collections/campaigns" }] : []),
     ...alerts.lowStock.map((a) => ({ key: `low-${a.id}`, text: `${T.low}: ${a.name} · ${a.stock} ${a.unit}`, href: `/admin/collections/inventory-items/${a.id}` })),
     ...alerts.expiring.map((b) => ({ key: `exp-${b.id}`, text: `${T.expiring}: ${b.name}${b.expiresOn ? ` · ${new Date(b.expiresOn).toLocaleDateString(lang === "en" ? "en-GB" : "es-ES")}` : ""}`, href: "/admin/collections/batches" })),
