@@ -54,6 +54,9 @@ Reduced palette, 2–3 colors maximum, much negative space.
 - NO gradients anywhere in the DESIGN. Flat color fields only (backgrounds,
   buttons, placeholders, OG image). Depth comes from whitespace and
   hairlines, not from blends.
+- FOUNDER EXEMPTION (2026-11-07): the home pour video (PourVideo) has its
+  edges feathered into washi with a CSS mask, so it reads printed on the
+  page. Only that video; photographs keep their clean edge.
 - FOUNDER EXEMPTION (2026-09-07): the drink visualization in the recipe
   builder (today PhotoDrink; the Phase 6 live drink later) is treated like a photograph — it may use gradients
   (liquid depth, glass shine) and quiet ambient loops (rising bubbles,

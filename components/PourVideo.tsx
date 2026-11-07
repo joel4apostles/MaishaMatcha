@@ -11,6 +11,15 @@ import { useTranslations } from "next-intl";
  * (WCAG 2.2.2), which turns into "watch again" at the end.
  * Reduced motion: the still of the finished drink, no playback.
  */
+const FEATHER: React.CSSProperties = {
+  WebkitMaskImage:
+    "linear-gradient(to right, transparent, #000 18%, #000 82%, transparent), linear-gradient(to bottom, transparent, #000 16%, #000 94%, transparent)",
+  WebkitMaskComposite: "source-in",
+  maskImage:
+    "linear-gradient(to right, transparent, #000 18%, #000 82%, transparent), linear-gradient(to bottom, transparent, #000 16%, #000 94%, transparent)",
+  maskComposite: "intersect",
+};
+
 export function PourVideo({ className = "" }: { className?: string }) {
   const t = useTranslations("home.menuPreview");
   const ref = useRef<HTMLVideoElement>(null);
@@ -50,7 +59,9 @@ export function PourVideo({ className = "" }: { className?: string }) {
 
   return (
     <figure className={className}>
-      <div className="relative overflow-hidden rounded-[2px]">
+      {/* The edges dissolve into the washi paper, like a print on the page
+          (founder choice, 2026-11-07): a mask on the frame, not a colour gradient. */}
+      <div className="relative" style={FEATHER}>
         {still ? (
           // eslint-disable-next-line @next/next/no-img-element -- a plain still; next/image would add a second request path for one frame
           <img src="/images/pour-last.jpg" alt={t("videoAlt")} width={720} height={720} className="aspect-square h-auto w-full object-cover" />
