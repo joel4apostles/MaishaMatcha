@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-07, evening (Opus 5.5 session). main = origin/main (d1163c4), all pushed and live.
+Last updated: 2026-11-07, night (Opus 5.5 session). Everything pushed except the latest handoff/video commit if not yet pushed: check `git rev-list --count origin/main..main`.
 
 ## Where things stand
 
@@ -28,16 +28,24 @@ Last updated: 2026-11-07, evening (Opus 5.5 session). main = origin/main (d1163c
   Kanji numerals are unframed brush glyphs (`components/Numeral.tsx`; the
   outline square is the seal's alone, per design review). Real photos:
   `public/images/salon-*.jpg`, `shop-tins.jpg`, `drinks-layered.jpg`
-  (carta), `pour-ube.jpg` (crea, hands only, no faces), all EXIF stripped.
+  (EXIF stripped). The carta and /crea photos were removed at the founder's
+  request ("poorly placed"): keep new imagery to places agreed first.
   Faces in founder photos need the person's OK before publishing.
 - **Phones**: header = leaf + Pedir + the word "Menú", which opens a
   full-screen washi sheet (`components/MobileMenu.tsx`, native modal
   dialog, 21 CDP checks passed). Desktop nav unchanged. The header keeps its
   sumi/50 band over the hero: without it the nav measured ~2:1 on the wall.
-- **Crea tu bebida**: `components/CupDrink.tsx` draws the real clear cup
-  from the recipe (purée, milk, tea over ice with marbling, Coconut Cloud
-  cap; usucha alone = black chawan), layers pour in once. PhotoDrink,
-  drink-real.jpg and blendColor removed.
+- **Crea tu bebida**: `components/LayerColumn.tsx`: the recipe as a quiet
+  column of its layers (cloud, tea, milk, purées), each named beside it.
+  Founder rejected a flat SVG cup illustration as cheap; next step is REAL
+  per-drink clips from a shoot (shot list below), not illustration or AI.
+- **Video**: home carta section (`components/home/MenuPreview.tsx`) shows
+  `public/video/pour.mp4` (`components/PourVideo.tsx`): founder clip
+  IMG_8264, cropped square to hands, bowl and cup (no face, no audio, ~1.9
+  MB), plays once in view, Pausa / Ver de nuevo (WCAG 2.2.2), still for
+  reduced motion. No ffmpeg on this Mac (install was blocked): clips are
+  cropped and re-encoded by recording a canvas in headless Chrome
+  (MediaRecorder, video/mp4 avc1), see the scratchpad recipe in git log.
 - **Admin**: own home dashboard (`cms/components/OwnerDashboard.tsx`, logic
   in `lib/dashboard.ts`): today vs a week ago, launch checklist, pending
   list (web orders, DEVOLVER payments, supplier orders, draft letters,
@@ -68,6 +76,16 @@ Last updated: 2026-11-07, evening (Opus 5.5 session). main = origin/main (d1163c
   "Reservado a socios fundadores", historia sticky glyph sits ~90px low.
 - Blocked on founder: Stripe Terminal, AEAT submission, R1 to R4
   corrective invoices, CafeRadar stamps.
+
+## Video shot list (for the founder)
+
+Same spot on the green tile counter, white wall behind, daylight, LED strip
+off, hands only (no faces), iPhone on a tripod, 4K 30fps, exposure locked,
+side-on at cup height. Clips of 6 to 8 s: usucha whisked in the black bowl
+(Uji, Nishio, Kagoshima) from above; each as a latte poured over ice and
+milk in the Maisha cup; hojicha and black tea solo and latte; purée going in
+(mango, ube); Coconut Cloud on top; one wide clip of the bar. AirDrop the
+originals (not WhatsApp). Then /crea can switch clip by tea and preparation.
 
 ## Environment gotchas
 

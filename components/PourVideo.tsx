@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 /**
- * A real moment at the bar: matcha poured over ice, milk and ube (hands
- * only, silent, 6.8 s). It plays once when half of it is in view, then rests
- * on its last frame. Nothing loops. Because it runs past five seconds there
- * is a pause control (WCAG 2.2.2), which turns into "watch again" at the end.
+ * A real moment at the bar: matcha poured over ice, milk and ube, framed
+ * square on the pour itself (hands, bowl, cup; silent, 6.8 s). It plays
+ * once when half of it is in view, then rests on its last frame. Nothing
+ * loops. Because it runs past five seconds there is a pause control
+ * (WCAG 2.2.2), which turns into "watch again" at the end.
  * Reduced motion: the still of the finished drink, no playback.
  */
 export function PourVideo({ className = "" }: { className?: string }) {
@@ -52,7 +53,7 @@ export function PourVideo({ className = "" }: { className?: string }) {
       <div className="relative overflow-hidden rounded-[2px]">
         {still ? (
           // eslint-disable-next-line @next/next/no-img-element -- a plain still; next/image would add a second request path for one frame
-          <img src="/images/pour-last.jpg" alt={t("videoAlt")} width={720} height={900} className="aspect-[4/5] h-auto w-full object-cover" />
+          <img src="/images/pour-last.jpg" alt={t("videoAlt")} width={720} height={720} className="aspect-square h-auto w-full object-cover" />
         ) : (
           <video
             ref={ref}
@@ -66,8 +67,8 @@ export function PourVideo({ className = "" }: { className?: string }) {
             onPause={() => setState((s) => (s === "ended" ? s : "paused"))}
             onEnded={() => setState("ended")}
             width={720}
-            height={900}
-            className="aspect-[4/5] h-auto w-full object-cover"
+            height={720}
+            className="aspect-square h-auto w-full object-cover"
           />
         )}
       </div>
