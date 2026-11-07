@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-07, night (Opus 5.5 session). Everything pushed except the latest handoff/video commit if not yet pushed: check `git rev-list --count origin/main..main`.
+Last updated: 2026-11-07, night (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
@@ -16,7 +16,7 @@ Last updated: 2026-11-07, night (Opus 5.5 session). Everything pushed except the
   account created at www.maishamatcha.es/admin. Live check: anon and
   authenticated have NO usage on the `payload` schema; "auto expose new
   tables" is off in Supabase's Data API.
-- **Use the www address.** `maishamatcha.es` (apex) STILL (checked 2026-11-07 evening) has two GoDaddy
+- **Use the www address.** `maishamatcha.es` (apex) STILL (checked 2026-11-07 night) has two GoDaddy
   parking A records (76.223.105.230, 13.248.243.5) beside Vercel's
   216.198.79.1: no valid cert there, and the admin fails from it (its API
   calls go to www). Joel is removing them in GoDaddy DNS + Forwarding, then
@@ -43,7 +43,8 @@ Last updated: 2026-11-07, night (Opus 5.5 session). Everything pushed except the
   `public/video/pour.mp4` (`components/PourVideo.tsx`): founder clip
   IMG_8264, cropped square to hands, bowl and cup (no face, no audio, ~1.9
   MB), plays once in view, Pausa / Ver de nuevo (WCAG 2.2.2), still for
-  reduced motion. No ffmpeg on this Mac (install was blocked): clips are
+  reduced motion. Edges feathered into washi with a CSS mask (founder
+  liked it: "better"); recorded as an exemption in the brand skill. No ffmpeg on this Mac (install was blocked): clips are
   cropped and re-encoded by recording a canvas in headless Chrome
   (MediaRecorder, video/mp4 avc1), see the scratchpad recipe in git log.
 - **Admin**: own home dashboard (`cms/components/OwnerDashboard.tsx`, logic
