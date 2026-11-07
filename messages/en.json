@@ -8,7 +8,10 @@
     "skip": "Skip to content",
     "order": "Order",
     "account": "Account",
-    "shop": "Shop"
+    "shop": "Shop",
+    "menuOpen": "Menu",
+    "menuClose": "Close",
+    "menuAria": "Site menu"
   },
   "cta": {
     "joinWaitlist": "Join the list",

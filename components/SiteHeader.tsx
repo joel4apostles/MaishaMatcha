@@ -7,6 +7,7 @@ import type { AppPathname } from "@/i18n/routing";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { BrandMark } from "./BrandMark";
 import { BrandWordmark } from "./BrandWordmark";
+import { MobileMenu } from "./MobileMenu";
 
 const NAV: { href: AppPathname; key: "menu" | "story" | "events" | "order" }[] = [
   { href: "/menu", key: "menu" },
@@ -66,8 +67,19 @@ export function SiteHeader() {
           <BrandMark className="h-6 w-auto shrink-0" />
           <BrandWordmark className="hidden h-8 w-auto shrink-0 sm:block" />
         </Link>
-        <div className="flex items-center gap-4 sm:gap-7">
-          <ul className="flex items-center gap-3 sm:gap-6">
+        {/* Phones: the one action people come for, and the word "Menú". */}
+        <div className="flex items-center gap-5 sm:hidden">
+          <Link
+            href="/pedir"
+            aria-current={pathname === "/pedir" ? "page" : undefined}
+            className={`${linkBase} ${linkTone}`}
+          >
+            {t("order")}
+          </Link>
+          <MobileMenu tone={overlay ? "light" : "dark"} />
+        </div>
+        <div className="hidden items-center gap-7 sm:flex">
+          <ul className="flex items-center gap-6">
             {NAV.map((item) => (
               <li key={item.key}>
                 <Link
