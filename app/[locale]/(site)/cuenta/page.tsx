@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { getPayload } from "payload";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import config from "@payload-config";
-import { Section } from "@/components/Section";
 import { Eyebrow } from "@/components/Eyebrow";
-import { Headline } from "@/components/Headline";
+import { Numeral } from "@/components/Numeral";
 import { AccountPanel, SignInForm } from "@/components/Account";
 import { foundingSettings } from "@/lib/founding";
 import { monthlyPriceFor, premiumSettings } from "@/lib/premium";
@@ -22,6 +21,36 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { ...base, robots: { index: false, follow: true } };
 }
 
+const BENEFITS = ["benefitOrders", "benefitUsual", "benefitEvents", "benefitFounding"] as const;
+const NUMERALS = ["一", "二", "三", "四"];
+
+/** The carta-style opening shared by both states: title, line, and 茶友 brushed beside it. */
+function Header({ eyebrow, title, phrase, children }: { eyebrow: string; title: string; phrase: string; children?: React.ReactNode }) {
+  return (
+    <header className="grid grid-cols-[minmax(0,1fr)_auto] gap-6 pt-16 pb-12 sm:gap-12 sm:pt-28 sm:pb-16">
+      <div>
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h1 className="mt-6 max-w-[14ch] text-balance font-serif text-hero font-light text-sumi">{title}</h1>
+        {children}
+      </div>
+      <div>
+        <span
+          lang="ja"
+          aria-hidden="true"
+          className="ink-write block select-none font-brush text-[clamp(1.9rem,2vw+1.2rem,3.25rem)] leading-[1.12] text-sumi [writing-mode:vertical-rl]"
+          style={{ animationDelay: "300ms" }}
+        >
+          茶友
+        </span>
+        <span className="sr-only">{phrase}</span>
+      </div>
+    </header>
+  );
+}
+
+const shell = "px-6 sm:px-8";
+const inner = "mx-auto max-w-[1100px] pb-24 sm:pb-32";
+
 export default async function AccountPage({
   params,
   searchParams,
@@ -37,21 +66,35 @@ export default async function AccountPage({
 
   if (!member) {
     return (
-      <Section>
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <Headline as="h1" className="mt-5 text-display">
-          {t("title")}
-        </Headline>
-        <p className="measure mt-6 text-lg text-sumi/80">{t("signInIntro")}</p>
-        {sp.enlace === "caducado" ? (
-          <p role="status" className="mt-6 text-sumi">
-            {t("expired")}
-          </p>
-        ) : null}
-        <div className="mt-10 max-w-md">
-          <SignInForm next={typeof sp.next === "string" ? sp.next : undefined} />
+      <div className={shell}>
+        <div className={inner}>
+          <Header eyebrow={t("eyebrow")} title={t("title")} phrase={t("phrase")}>
+            <p className="measure mt-7 text-lg text-sumi/80">{t("signInIntro")}</p>
+          </Header>
+          <div className="grid grid-cols-1 gap-14 border-t border-wood/35 pt-12 md:grid-cols-2 md:gap-16">
+            <div className="max-w-md">
+              {sp.enlace === "caducado" ? (
+                <p role="status" className="mb-6 text-sumi">
+                  {t("expired")}
+                </p>
+              ) : null}
+              <SignInForm next={typeof sp.next === "string" ? sp.next : undefined} />
+            </div>
+            {/* What an account keeps for you, in the order people use it. */}
+            <section aria-labelledby="a-benefits" className="md:border-l md:border-wood/35 md:pl-16">
+              <h2 id="a-benefits" className="text-eyebrow uppercase text-sumi/70">{t("benefitsTitle")}</h2>
+              <ul className="mt-6 space-y-5">
+                {BENEFITS.map((k, i) => (
+                  <li key={k} className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-4">
+                    <Numeral>{NUMERALS[i]}</Numeral>
+                    <p className="pt-1 text-sumi/85">{t(k)}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
         </div>
-      </Section>
+      </div>
     );
   }
 
@@ -63,13 +106,12 @@ export default async function AccountPage({
   ]);
 
   return (
-    <Section>
-      <Eyebrow>{t("eyebrow")}</Eyebrow>
-      <Headline as="h1" className="mt-5 text-display">
-        {t("hello", { name: member.name.split(" ")[0] })}
-      </Headline>
-      {member.tier === "founding" ? <p className="mt-4 text-sumi/80">{t("tierFounding", { number: member.foundingNumber ?? "" })}</p> : null}
-      <div className="mt-14">
+    <div className={shell}>
+      <div className={inner}>
+      <Header eyebrow={t("eyebrow")} title={t("hello", { name: member.name.split(" ")[0] })} phrase={t("phrase")}>
+        {member.tier === "founding" ? <p className="mt-7 text-eyebrow uppercase text-leaf">{t("tierFounding", { number: member.foundingNumber ?? "" })}</p> : null}
+      </Header>
+      <div className="border-t border-wood/35 pt-12">
         <AccountPanel
           member={{
             name: member.name,
@@ -93,6 +135,7 @@ export default async function AccountPage({
           }}
         />
       </div>
-    </Section>
+      </div>
+    </div>
   );
 }

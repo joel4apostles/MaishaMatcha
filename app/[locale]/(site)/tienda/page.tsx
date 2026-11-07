@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import stillLife from "@/public/images/shop-still-life.jpg";
+import stillLife from "@/public/images/shop-tins.jpg";
 import { getPayload } from "payload";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import config from "@payload-config";

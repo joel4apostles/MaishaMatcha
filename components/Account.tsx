@@ -12,7 +12,8 @@ import {
   premiumPortalAction,
   updatePrefsAction,
 } from "@/app/[locale]/(site)/cuenta/actions";
-import { inkButtonClass } from "@/components/Button";
+import { inkButtonClass, quietLinkClass } from "@/components/Button";
+import { Numeral } from "@/components/Numeral";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatEuro } from "@/lib/money";
 
@@ -74,7 +75,6 @@ export function SignInForm({ next }: { next?: string }) {
       <button type="submit" disabled={pending} className={`${inkButtonClass} w-full sm:w-auto`}>
         {pending ? t("sending") : t("send")}
       </button>
-      <p className="text-sm text-sumi/70">{t("noPassword")}</p>
     </form>
   );
 }
@@ -130,12 +130,37 @@ export function AccountPanel({
     o.kind === "subscription" ? t("subscription") : o.membership ? t("membership") : (["received", "preparing", "ready", "collected", "cancelled"].includes(o.status) ? st(o.status as "received") : o.status);
 
   return (
-    <div className="grid grid-cols-1 gap-16 md:grid-cols-2">
-      <div className="space-y-16">
-        <section aria-labelledby="a-founding">
-          <h2 id="a-founding" className="font-serif text-3xl font-light">
-            {t("foundingTitle")}
-          </h2>
+    <div className="grid grid-cols-1 gap-14 md:grid-cols-2 md:gap-16">
+      <div className="space-y-14">
+        <section aria-labelledby="a-orders">
+          <SectionTitle id="a-orders" numeral="一">{t("ordersTitle")}</SectionTitle>
+          {orders.length === 0 ? <p className="mt-5 text-sumi/80">{t("noOrders")}</p> : null}
+          {orders.length ? (
+            <ul className="mt-5 border-t border-wood/25">
+              {orders.map((o) => (
+                <li key={o.label + o.createdAt} className="border-b border-wood/25">
+                  {o.token && !o.membership ? (
+                    <Link
+                      href={{ pathname: "/pedido/[token]", params: { token: o.token } }}
+                      className="flex min-h-[56px] items-center justify-between gap-4 py-3"
+                    >
+                      <OrderRow o={o} text={statusText(o)} locale={locale} />
+                    </Link>
+                  ) : (
+                    <div className="flex min-h-[56px] items-center justify-between gap-4 py-3">
+                      <OrderRow o={o} text={statusText(o)} locale={locale} />
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+            ) : null}
+          <Link href="/pedir" className={`${quietLinkClass} mt-3`}>
+            {t("orderAgain")}
+          </Link>
+        </section>
+        <section aria-labelledby="a-founding" className="border-t border-wood/35 pt-10">
+          <SectionTitle id="a-founding" numeral="二">{t("foundingTitle")}</SectionTitle>
           {isFounding ? (
             <p className="mt-4 text-sumi/80">{t("foundingYours")}</p>
           ) : justPaid ? (
@@ -177,10 +202,8 @@ export function AccountPanel({
           )}
         </section>
 
-        <section aria-labelledby="a-premium">
-          <h2 id="a-premium" className="font-serif text-3xl font-light">
-            {t("premiumTitle")}
-          </h2>
+        <section aria-labelledby="a-premium" className="border-t border-wood/35 pt-10">
+          <SectionTitle id="a-premium" numeral="三">{t("premiumTitle")}</SectionTitle>
           {premium.status === "active" || premium.status === "past_due" ? (
             <>
               <p className="mt-4 text-sumi/80">
@@ -222,37 +245,11 @@ export function AccountPanel({
           </p>
         </section>
 
-        <section aria-labelledby="a-orders">
-          <h2 id="a-orders" className="font-serif text-3xl font-light">
-            {t("ordersTitle")}
-          </h2>
-          {orders.length === 0 ? <p className="mt-4 text-sumi/80">{t("noOrders")}</p> : null}
-          <ul className="mt-4 border-t border-wood/25">
-            {orders.map((o) => (
-              <li key={o.label + o.createdAt} className="border-b border-wood/25">
-                {o.token && !o.membership ? (
-                  <Link
-                    href={{ pathname: "/pedido/[token]", params: { token: o.token } }}
-                    className="flex min-h-[56px] items-center justify-between gap-4 py-3"
-                  >
-                    <OrderRow o={o} text={statusText(o)} locale={locale} />
-                  </Link>
-                ) : (
-                  <div className="flex min-h-[56px] items-center justify-between gap-4 py-3">
-                    <OrderRow o={o} text={statusText(o)} locale={locale} />
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
       </div>
 
-      <div className="space-y-16">
+      <div className="space-y-14 md:border-l md:border-wood/35 md:pl-16">
         <section aria-labelledby="a-prefs">
-          <h2 id="a-prefs" className="font-serif text-3xl font-light">
-            {t("prefsTitle")}
-          </h2>
+          <SectionTitle id="a-prefs" numeral="四">{t("prefsTitle")}</SectionTitle>
           <form
             action={(form) =>
               start(async () => {
@@ -350,5 +347,15 @@ function OrderRow({ o, text, locale }: { o: Order; text: string; locale: "es" | 
       </span>
       <span className="shrink-0 tabular-nums">{formatEuro(o.totalCents, locale)}</span>
     </>
+  );
+}
+
+/** Section heading in the carta style: a framed kanji numeral, then the title in small caps. */
+function SectionTitle({ id, numeral, children }: { id: string; numeral: string; children: React.ReactNode }) {
+  return (
+    <h2 id={id} className="flex items-center gap-3 text-eyebrow uppercase text-sumi/70">
+      <Numeral>{numeral}</Numeral>
+      {children}
+    </h2>
   );
 }
