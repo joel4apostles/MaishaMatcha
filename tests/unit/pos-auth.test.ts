@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hashPin, isTrivialPin, pinProblem, verifyPin } from "@/lib/pos/pin";
 import { deriveKey, signToken, verifyToken } from "@/lib/pos/token";
-import { canUseBackOffice, hasRole, isActiveStaff } from "@/lib/auth/roles";
+import { canUseBackOffice, hasRole, isActiveStaff, verifiedBackOffice } from "@/lib/auth/roles";
 
 describe("PINs", () => {
   it("hashes and verifies a valid PIN", async () => {
@@ -77,5 +77,16 @@ describe("roles", () => {
     expect(isActiveStaff({ ...owner, active: false })).toBe(false);
     expect(hasRole({ role: "admin", active: true }, "owner")).toBe(false);
     expect(hasRole({ ...owner, collection: "customers" }, "owner")).toBe(false);
+  });
+});
+
+describe("verifiedBackOffice", () => {
+  const owner = { role: "owner", collection: "users" };
+  it("needs the role AND the authenticator code", () => {
+    expect(verifiedBackOffice({ ...owner, _strategy: "totp" } as never)).toBe(true);
+    expect(verifiedBackOffice({ ...owner, _strategy: "local-jwt" } as never)).toBe(false);
+    expect(verifiedBackOffice(owner)).toBe(false);
+    expect(verifiedBackOffice({ role: "barista", collection: "users", _strategy: "totp" } as never)).toBe(false);
+    expect(verifiedBackOffice({ role: "manager", collection: "users", _strategy: "totp" } as never, "owner")).toBe(false);
   });
 });

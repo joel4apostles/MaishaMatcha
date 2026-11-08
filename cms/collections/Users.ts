@@ -25,6 +25,8 @@ export const Users: CollectionConfig = {
   access: {
     admin: ({ req }) => canUseBackOffice(req.user),
     create: owner,
+    // Lifting a password or code lockout is the owner's call.
+    unlock: owner,
     read: ({ req }) => {
       if (hasRole(req.user, "owner", "manager")) return true;
       if (req.user?.collection === "users") return { id: { equals: req.user.id } };

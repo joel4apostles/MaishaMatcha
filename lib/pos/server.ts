@@ -3,7 +3,7 @@ import { cookies, headers } from "next/headers";
 import { getPayload, type Payload } from "payload";
 import config from "@payload-config";
 import { writeAudit } from "@/cms/audit";
-import { hasRole } from "@/lib/auth/roles";
+import { verifiedBackOffice } from "@/lib/auth/roles";
 import { appSecret } from "@/lib/secret";
 import {
   SESSION_SECONDS,
@@ -44,7 +44,7 @@ export const payloadClient = (): Promise<Payload> => getPayload({ config });
 export async function backOfficeOwner() {
   const payload = await payloadClient();
   const { user } = await payload.auth({ headers: await headers() });
-  return user && user.collection === "users" && hasRole(user, "owner") ? user : null;
+  return user && user.collection === "users" && verifiedBackOffice(user, "owner") ? user : null;
 }
 
 /** Cached per request: pages call it directly and through the session. */

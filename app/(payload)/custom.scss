@@ -119,10 +119,91 @@ body {
     height: auto;
   }
   svg:first-child {
-    width: 5.5rem;
+    width: 3.5rem;
   }
-  svg:last-child {
-    width: 13rem;
+  svg:nth-child(2) {
+    width: 9rem;
+    margin-top: -0.5rem;
+  }
+}
+
+.maisha-admin-sub {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(28, 27, 24, 0.72);
+}
+
+/* ---------- Sign-in screens: login, forgotten password, the code ----------
+ * One narrow column under a small lockup; fields are a single ink line, as
+ * on the public site; the button is sumi with washi text. */
+.template-minimal {
+  .template-minimal__wrap {
+    max-width: 380px;
+  }
+  .login__brand {
+    margin-bottom: 48px;
+  }
+  .field-type input {
+    font-size: 16px; // no zoom on iPhone
+    min-height: 44px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(28, 27, 24, 0.5);
+    border-radius: 0;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+    &:hover {
+      border-bottom-color: rgba(28, 27, 24, 0.8);
+    }
+    &:focus,
+    &:focus-visible {
+      border-bottom-color: #1c1b18;
+      box-shadow: 0 1px 0 0 #1c1b18;
+      outline: none;
+    }
+  }
+  .field-label {
+    font-size: 13px;
+    color: rgba(28, 27, 24, 0.8);
+    .required {
+      color: rgba(28, 27, 24, 0.55);
+    }
+  }
+  .login__form__inputWrap {
+    gap: 28px;
+  }
+  // "Forgot password?" gets its own room and a full tap target.
+  .login__form > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 12px;
+    font-size: 14px;
+    color: rgba(28, 27, 24, 0.8);
+    text-decoration-color: rgba(176, 141, 87, 0.6);
+    text-underline-offset: 4px;
+    &:hover {
+      color: #1c1b18;
+      text-decoration-color: currentColor;
+    }
+  }
+  .btn--style-primary {
+    min-height: 48px;
+    background: #1c1b18;
+    color: #f5f1e8;
+    border-radius: 2px;
+    box-shadow: none;
+    &:hover,
+    &:focus-visible {
+      background: #33312c;
+    }
+    &:focus-visible {
+      outline: 2px solid #1c1b18;
+      outline-offset: 3px;
+    }
   }
 }
 
@@ -203,4 +284,57 @@ body {
   .md-group summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 14px; color: rgba(28, 27, 24, 0.75); }
 
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+
+/* ---------- The authenticator screens (payload-totp: setup, code) ----------
+ * The plugin styles them with hashed CSS modules, so they are found by what
+ * they hold: the one-time-code field. Same paper, serif title, ink lines. */
+.template-minimal:has(input[autocomplete="one-time-code"]) {
+  background: var(--theme-bg) !important;
+
+  .template-minimal__wrap {
+    max-width: 420px !important;
+    gap: 28px !important;
+  }
+  h1 {
+    font-family: var(--md-serif);
+    font-weight: 300;
+    font-size: 32px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  p {
+    font-size: 15px !important;
+    color: rgba(28, 27, 24, 0.8);
+  }
+  // "Type the key instead": a quiet ink link with a full tap target.
+  button:not([type="submit"]) {
+    min-height: 44px;
+    color: rgba(28, 27, 24, 0.8) !important;
+    text-decoration: underline;
+    text-decoration-color: rgba(176, 141, 87, 0.6);
+    text-underline-offset: 4px;
+  }
+  // The six boxes become six ink lines.
+  input[maxlength="1"] {
+    width: 36px !important;
+    height: 52px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid rgba(28, 27, 24, 0.5) !important;
+    font-family: var(--md-serif);
+    font-size: 26px !important;
+    font-weight: 400 !important;
+    color: #1c1b18;
+    &:focus {
+      border-bottom: 2px solid #1c1b18 !important;
+      background: transparent !important;
+    }
+  }
+  // The plugin's sliding green focus box and glow are sized for its own
+  // boxes; the thicker ink line above is the focus mark instead.
+  input[maxlength="1"] ~ div {
+    display: none !important;
+  }
 }

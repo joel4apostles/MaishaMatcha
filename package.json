@@ -29,6 +29,7 @@
     "next": "16.4.5",
     "next-intl": "^4.14.9",
     "payload": "3.93.0",
+    "payload-totp": "3.0.7",
     "pdf-lib": "1.17.1",
     "qrcode-generator": "^2.0.4",
     "react": "^19.0.0",

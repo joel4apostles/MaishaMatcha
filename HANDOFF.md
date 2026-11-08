@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-07, night (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-08 (Opus 5.5 session). Two-step admin sign-in committed locally, NOT pushed yet.
 
 ## Where things stand
 
@@ -54,7 +54,20 @@ Last updated: 2026-11-07, night (Opus 5.5 session). main = origin/main, everythi
   whole admin is Spanish or English (each user picks in Account →
   Language); the top-right selector is "Contenido en" (content language).
   Brand favicon in the admin.
-- 146 tests pass (one removed with blendColor). Forms use sumi/50
+- **Admin sign-in is two-step** (2026-11-08, `payload-totp` 3.0.7): password,
+  then a 6-digit code from an authenticator app. Owner and manager MUST set
+  it up on their first sign-in after the deploy (QR screen). Until the code
+  is entered the session gets nothing (API 403; our report/PDF/tablet routes
+  use `verifiedBackOffice`). Public reads (carta, events, story, media, IVA)
+  stay open via `PUBLIC_READ` in payload.config.ts. Login and code screens
+  restyled (narrow column, ink lines, "Entrar"); the admin opens in Spanish
+  until someone picks English (payload-lng cookie, set in proxy.ts).
+  **Lost phone**: Joel runs in Supabase SQL editor
+  `update payload.users set totp_secret = null where email = '<email>';`
+  then signs in and scans a new QR. The plugin's own "has a code" check ran
+  outside transactions and locked the pool under parallel sales: replaced
+  by `hasTotpInTransaction` (keep it when upgrading the plugin).
+- 151 tests pass (one removed with blendColor). Forms use sumi/50
   underlines (AA). Admin fonts self-hosted via next/font.
 
 ## Next

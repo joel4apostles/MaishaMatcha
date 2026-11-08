@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import type { Payload } from "payload";
-import { asUser, boot, staff, type Staff } from "./harness";
+import { asUser, boot, passwordOnly, staff, type Staff } from "./harness";
 
 /**
  * Phase 1 guarantees, proven against Payload on a real (throwaway)
@@ -281,5 +281,38 @@ describe("transactions", () => {
     expect(after.stock ?? 0).toBe(0);
     const moves = await payload.find({ collection: "stock-movements", where: { item: { equals: item.id } } });
     expect(moves.totalDocs).toBe(0);
+  });
+});
+
+describe("authenticator code (two-step sign-in)", () => {
+  it("gives a password-only session nothing until the code is entered", async () => {
+    const half = passwordOnly(owner);
+    await expect(payload.find({ collection: "orders", ...asUser(half) })).rejects.toThrow();
+    await expect(payload.find({ collection: "members", ...asUser(half) })).rejects.toThrow();
+    await expect(
+      payload.create({ collection: "menu-items", data: { name: "X" } as never, ...asUser(half) }),
+    ).rejects.toThrow();
+  });
+
+  it("holds an account that never set the code up to its own record", async () => {
+    const fresh = passwordOnly(manager, false);
+    const own = await payload.find({ collection: "users", ...asUser(fresh) });
+    expect(own.docs.map((d) => d.id)).toEqual([manager.id]);
+    await expect(payload.find({ collection: "orders", ...asUser(fresh) })).rejects.toThrow();
+  });
+
+  it("keeps the carta, events and photos public, and their editing behind the code", async () => {
+    const anon = { overrideAccess: false } as const;
+    expect((await payload.find({ collection: "menu-items", ...anon })).totalDocs).toBeGreaterThan(0);
+    await expect(payload.find({ collection: "events", ...anon })).resolves.toBeTruthy();
+    await expect(payload.find({ collection: "media", ...anon })).resolves.toBeTruthy();
+    await expect(
+      payload.create({ collection: "events", data: { title: "X" } as never, ...anon }),
+    ).rejects.toThrow();
+  });
+
+  it("never returns the authenticator secret", async () => {
+    const me = await payload.findByID({ collection: "users", id: owner.id, ...asUser(owner) });
+    expect((me as unknown as Record<string, unknown>).totpSecret).toBeUndefined();
   });
 });

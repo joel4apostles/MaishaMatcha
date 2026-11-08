@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { hasRole } from "@/lib/auth/roles";
+import { verifiedBackOffice } from "@/lib/auth/roles";
 import { invoicesCsv, ivaCsv, ivaSummary } from "@/lib/reports";
 
 /**
@@ -15,7 +15,7 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 export async function GET(request: Request, { params }: { params: Promise<{ kind: string }> }) {
   const payload = await getPayload({ config });
   const { user } = await payload.auth({ headers: request.headers });
-  if (!user || !hasRole(user, "owner", "manager")) {
+  if (!verifiedBackOffice(user, "owner", "manager")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   const { kind } = await params;

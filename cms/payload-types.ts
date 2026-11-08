@@ -95,6 +95,7 @@ export interface Config {
     invoices: Invoice;
     'audit-log': AuditLog;
     sequences: Sequence;
+    'totp-attempts': TotpAttempt;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -130,6 +131,7 @@ export interface Config {
     invoices: InvoicesSelect<false> | InvoicesSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     sequences: SequencesSelect<false> | SequencesSelect<true>;
+    'totp-attempts': TotpAttemptsSelect<false> | TotpAttemptsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -464,6 +466,8 @@ export interface User {
   pinHash?: string | null;
   pinFailedCount?: number | null;
   pinLockedUntil?: string | null;
+  totpSecret?: string | null;
+  hasTotp?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -961,6 +965,15 @@ export interface Sequence {
   lastHash?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "totp-attempts".
+ */
+export interface TotpAttempt {
+  id: string;
+  attempts: number;
+  lockUntil?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1507,6 +1520,8 @@ export interface UsersSelect<T extends boolean = true> {
   pinHash?: T;
   pinFailedCount?: T;
   pinLockedUntil?: T;
+  totpSecret?: T;
+  hasTotp?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1683,6 +1698,15 @@ export interface SequencesSelect<T extends boolean = true> {
   lastHash?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "totp-attempts_select".
+ */
+export interface TotpAttemptsSelect<T extends boolean = true> {
+  id?: T;
+  attempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

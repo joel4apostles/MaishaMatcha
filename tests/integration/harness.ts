@@ -45,7 +45,12 @@ export async function staff(
       overrideAccess: true,
       data: { email, password: "test-password-123", name, role, ...(pin ? { pin } : {}) } as never,
     }));
-  return { ...(doc as unknown as Record<string, unknown>), id: doc.id, email, collection: "users" };
+  // A fully signed-in back-office session: password AND authenticator code
+  // (payload-totp marks it "totp"). Use passwordOnly() for one that still owes it.
+  return { ...(doc as unknown as Record<string, unknown>), id: doc.id, email, collection: "users", _strategy: "totp" };
 }
+
+/** The same account after the password only: the code is still owed. */
+export const passwordOnly = (u: Staff, hasTotp = true): Staff => ({ ...u, _strategy: "local-jwt", hasTotp });
 
 export const asUser = (u: Staff) => ({ user: u as never, overrideAccess: false });

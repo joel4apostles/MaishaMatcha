@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { hasRole } from "@/lib/auth/roles";
+import { verifiedBackOffice } from "@/lib/auth/roles";
 import { purchaseOrderPdfFor } from "@/lib/inventory";
 
 /** Staff (owner or manager, signed in to /admin) download a purchase order as PDF. */
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const payload = await getPayload({ config });
   const { user } = await payload.auth({ headers: request.headers });
-  if (!hasRole(user, "owner", "manager")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (!verifiedBackOffice(user, "owner", "manager")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return NextResponse.json({ error: "not found" }, { status: 404 });
   const pdf = await purchaseOrderPdfFor(payload, id).catch(() => null);

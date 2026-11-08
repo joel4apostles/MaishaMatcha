@@ -229,6 +229,15 @@ customer records (say so in the privacy notice, remove by hand on
 request). A founding fee paid with no place left (or paid twice) is flagged
 "DEVOLVER" on the order and in the audit log: refund it in Stripe.
 
+Two-step admin sign-in 2026-11-08: `payload-totp` (MIT, deps otpauth,
+qrcode, jsonwebtoken; no install scripts). It wraps EVERY collection's
+access: a new public collection must join `PUBLIC_READ` in
+payload.config.ts, and any custom route that trusts `payload.auth()` must
+check `verifiedBackOffice` (lib/auth/roles.ts), not just the role. The TOTP
+secret is stored in plain text in `payload.users.totp_secret` (same DB as
+the password hashes; never exposed by the API). Keep the plugin LAST
+except for our translations/transaction override right after it.
+
 Live Supabase check 2026-11-07: anon and authenticated have NO usage on
 the `payload` schema (has_schema_privilege false/false); "Automatically
 expose new tables" turned off in the Data API.

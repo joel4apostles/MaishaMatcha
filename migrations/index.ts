@@ -13,6 +13,7 @@ import * as migration_20261105_234950_subscription_event_at from './20261105_234
 import * as migration_20261106_005146_full_invoices from './20261106_005146_full_invoices';
 import * as migration_20261106_012347_table_orders from './20261106_012347_table_orders';
 import * as migration_20261106_101604_shop_product_pages from './20261106_101604_shop_product_pages';
+import * as migration_20261108_082339_totp from './20261108_082339_totp';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20261106_101604_shop_product_pages.up,
     down: migration_20261106_101604_shop_product_pages.down,
-    name: '20261106_101604_shop_product_pages'
+    name: '20261106_101604_shop_product_pages',
+  },
+  {
+    up: migration_20261108_082339_totp.up,
+    down: migration_20261108_082339_totp.down,
+    name: '20261108_082339_totp'
   },
 ];
