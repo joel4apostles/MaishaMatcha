@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-08 (Opus 5.5 session). Two-step admin sign-in committed locally, NOT pushed yet.
+Last updated: 2026-11-08, midday (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
@@ -39,7 +39,10 @@ Last updated: 2026-11-08 (Opus 5.5 session). Two-step admin sign-in committed lo
   column of its layers (cloud, tea, milk, purées), each named beside it.
   Founder rejected a flat SVG cup illustration as cheap; next step is REAL
   per-drink clips from a shoot (shot list below), not illustration or AI.
-- **Video**: home carta section (`components/home/MenuPreview.tsx`) shows
+- **Video**: home carta section (`components/home/MenuPreview.tsx`): words on
+  the LEFT like sections 一 and 二, the pour on the RIGHT, bottom-aligned so
+  "see the full menu" shares a line with the caption and Pausa control
+  (founder, 2026-11-08: consistency and alignment). It shows
   `public/video/pour.mp4` (`components/PourVideo.tsx`): founder clip
   IMG_8264, cropped square to hands, bowl and cup (no face, no audio, ~1.9
   MB), plays once in view, Pausa / Ver de nuevo (WCAG 2.2.2), still for
@@ -60,8 +63,14 @@ Last updated: 2026-11-08 (Opus 5.5 session). Two-step admin sign-in committed lo
   is entered the session gets nothing (API 403; our report/PDF/tablet routes
   use `verifiedBackOffice`). Public reads (carta, events, story, media, IVA)
   stay open via `PUBLIC_READ` in payload.config.ts. Login and code screens
-  restyled (narrow column, ink lines, "Entrar"); the admin opens in Spanish
-  until someone picks English (payload-lng cookie, set in proxy.ts).
+  restyled (narrow column, ink lines, "Entrar"). LIVE since 2026-11-08; Joel
+  signs in with the TEST owner account for now and has run the reset SQL
+  once (so he lands on the QR setup screen: scan, type code). Real owner
+  account later: create it in Users, it sets up its own code, then set the
+  test account inactive (never delete). The admin opens in Spanish
+  until someone picks English: account (bottom left) → Configuración de
+  Payload → Idioma → English (payload-lng cookie; proxy.ts sets "es" only
+  when absent; verified in a browser that the switch sticks).
   **Lost phone**: Joel runs in Supabase SQL editor
   `update payload.users set totp_secret = null where email = '<email>';`
   then signs in and scans a new QR. The plugin's own "has a code" check ran
