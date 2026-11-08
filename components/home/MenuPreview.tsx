@@ -25,8 +25,9 @@ export function MenuPreview() {
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
       {/* The words on the left like every numbered section above, the pour
           beside them on the right (founder, 2026-11-08: one reading line).
-          Bottom-aligned: "see the full menu" sits on the caption's line. */}
-      <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-20">
+          Sized so both columns stand the same height: the picture is no
+          taller than the words, so neither leaves an empty band. */}
+      <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,15rem)] md:gap-16">
         <Reveal>
           <Eyebrow numeral="三">{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>

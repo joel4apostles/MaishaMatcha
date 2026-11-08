@@ -40,9 +40,9 @@ Last updated: 2026-11-08, midday (Opus 5.5 session). main = origin/main, everyth
   Founder rejected a flat SVG cup illustration as cheap; next step is REAL
   per-drink clips from a shoot (shot list below), not illustration or AI.
 - **Video**: home carta section (`components/home/MenuPreview.tsx`): words on
-  the LEFT like sections 一 and 二, the pour on the RIGHT, bottom-aligned so
-  "see the full menu" shares a line with the caption and Pausa control
-  (founder, 2026-11-08: consistency and alignment). It shows
+  the LEFT like sections 一 and 二, the pour on the RIGHT at 15rem so the
+  picture stands as tall as the words (top-aligned; a bigger video left an
+  empty band beside the short text, founder 2026-11-08). It shows
   `public/video/pour.mp4` (`components/PourVideo.tsx`): founder clip
   IMG_8264, cropped square to hands, bowl and cup (no face, no audio, ~1.9
   MB), plays once in view, Pausa / Ver de nuevo (WCAG 2.2.2), still for
