@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-08, midday (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-08, afternoon (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
