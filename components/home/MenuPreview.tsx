@@ -13,7 +13,7 @@ import type { Locale } from "@/i18n/routing";
 /**
  * The carta on the home page: the three matchas as the same tasting cards
  * the carta page uses (one source, one look), then one way onward. Beside
- * the title, a real pour at the bar (PourVideo).
+ * the title, on the right, a real pour at the bar (PourVideo).
  */
 export function MenuPreview() {
   const t = useTranslations("home.menuPreview");
@@ -23,9 +23,10 @@ export function MenuPreview() {
   const matchas = carta.find((c) => c.slug === "matcha")?.items ?? [];
   return (
     <Section ariaLabel={t("eyebrow")} className="border-t border-wood/25">
-      {/* The pour on the left, the words centred beside it: no empty corner. */}
-      <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] md:gap-20">
-        <Reveal className="md:order-2">
+      {/* The words on the left like every numbered section above, the pour
+          beside them on the right (founder, 2026-11-08: one reading line). */}
+      <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-20">
+        <Reveal>
           <Eyebrow numeral="三">{t("eyebrow")}</Eyebrow>
           <Headline className="mt-5">{t("title")}</Headline>
           <p className="measure mt-5 text-lg text-sumi/80">{t("line")}</p>
@@ -33,8 +34,8 @@ export function MenuPreview() {
             <QuietLink href="/menu">{cta("toMenu")}</QuietLink>
           </div>
         </Reveal>
-        <Reveal className="md:order-1">
-          <PourVideo className="mx-auto w-full max-w-[22rem] md:mx-0" />
+        <Reveal>
+          <PourVideo className="mx-auto w-full max-w-[22rem] md:mr-0" />
         </Reveal>
       </div>
       <Reveal className="mt-14">
