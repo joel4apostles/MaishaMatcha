@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-09, evening (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-09, late evening (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
@@ -19,10 +19,13 @@ Last updated: 2026-11-09, evening (Opus 5.5 session). main = origin/main, everyt
   checks two-column heights and shared edges at desktop width). /crea =
   `LayerColumn`; real per-drink clips await the shoot (list below).
 - **Admin sign-in is two-step** (`payload-totp`, forceSetup; see CLAUDE.md).
-  Joel uses the TEST owner account. Real owner: Equipo → Invitar a alguien →
-  copy the link (until Resend) → set password → scan QR; then untick Activo
+  Joel uses the TEST owner account. Real owner: sidebar Atajos → Invitar a
+  alguien → copy the link (until Resend) → set password → scan QR; then untick Activo
   on the test account (never delete). Admin language: avatar top right →
   Configuración de Payload → Idioma ("Contenido en" = CONTENT language).
+  Custom admin pages (/admin/cajas, /admin/invitar) need a sidebar link in
+  `cms/components/NavShortcuts.tsx`. Admin link previews (WhatsApp) use
+  `admin.meta` in payload.config.ts: Spanish, brand voice.
   **Lost phone** (Joel, Supabase SQL editor):
   `update payload.users set totp_secret = null where email = '<email>';`
   `delete from payload.users_sessions where _parent_id = (select id from payload.users where email = '<email>');`
