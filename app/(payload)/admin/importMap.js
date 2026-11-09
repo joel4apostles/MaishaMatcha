@@ -3,6 +3,7 @@ import { TOTPField as TOTPField_4eaf6cb33cfb75be01716613e3c9a512 } from 'payload
 import { InviteLink as InviteLink_7a23368bb17271c2eb7f7f24a7017a77 } from '../../../cms/components/InviteLink'
 import { AdminIcon as AdminIcon_c7fdbd615166afffd15ee81a874b56b9 } from '../../../cms/components/AdminIcon'
 import { AdminLogo as AdminLogo_97f5c82efe5ea508e03c7ffe61b5f830 } from '../../../cms/components/AdminLogo'
+import { NavShortcuts as NavShortcuts_0d277c0b8a9da534dc48552459e07683 } from '../../../cms/components/NavShortcuts'
 import { TOTPProvider as TOTPProvider_4eaf6cb33cfb75be01716613e3c9a512 } from 'payload-totp/rsc'
 import { TOTPSetup as TOTPSetup_4eaf6cb33cfb75be01716613e3c9a512 } from 'payload-totp/rsc'
 import { TOTPVerify as TOTPVerify_4eaf6cb33cfb75be01716613e3c9a512 } from 'payload-totp/rsc'
@@ -18,6 +19,7 @@ export const importMap = {
   "/cms/components/InviteLink#InviteLink": InviteLink_7a23368bb17271c2eb7f7f24a7017a77,
   "/cms/components/AdminIcon#AdminIcon": AdminIcon_c7fdbd615166afffd15ee81a874b56b9,
   "/cms/components/AdminLogo#AdminLogo": AdminLogo_97f5c82efe5ea508e03c7ffe61b5f830,
+  "/cms/components/NavShortcuts#NavShortcuts": NavShortcuts_0d277c0b8a9da534dc48552459e07683,
   "payload-totp/rsc#TOTPProvider": TOTPProvider_4eaf6cb33cfb75be01716613e3c9a512,
   "payload-totp/rsc#TOTPSetup": TOTPSetup_4eaf6cb33cfb75be01716613e3c9a512,
   "payload-totp/rsc#TOTPVerify": TOTPVerify_4eaf6cb33cfb75be01716613e3c9a512,

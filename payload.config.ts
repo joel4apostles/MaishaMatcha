@@ -193,6 +193,8 @@ export default buildConfig({
         // Invite an owner or manager by email: they choose their own password.
         invite: { Component: "/cms/components/InviteView#InviteView", path: "/invitar", exact: true },
       },
+      // The non-collection pages (Cajas del mes, Invitar) in the sidebar.
+      afterNavLinks: ["/cms/components/NavShortcuts#NavShortcuts"],
       graphics: {
         Icon: "/cms/components/AdminIcon#AdminIcon",
         Logo: "/cms/components/AdminLogo#AdminLogo",
