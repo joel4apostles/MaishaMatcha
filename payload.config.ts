@@ -176,7 +176,15 @@ export default buildConfig({
     // mode otherwise flips it to a near-black look that reads unbranded).
     theme: "light",
     meta: {
-      titleSuffix: " · maisha matcha",
+      // Payload joins title and suffix with a space itself.
+      titleSuffix: "· maisha matcha",
+      // What a shared admin link (an invitation on WhatsApp) shows, instead
+      // of Payload's own English blurb.
+      description: "Administración de maisha matcha.",
+      openGraph: {
+        siteName: "maisha matcha",
+        description: "Administración de maisha matcha, el salón de matcha de Murcia.",
+      },
       // The brand mark in the browser tab, not Payload's default icon.
       icons: [
         { rel: "icon", type: "image/svg+xml", url: "/icon.svg" },
