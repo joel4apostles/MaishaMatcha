@@ -5,145 +5,91 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-09, afternoon (Opus 5.5 session). Security audit fixes pushed; shared rate limits + Turnstile committed locally.
+Last updated: 2026-11-09, evening (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
-- **Production is live with a database** (2026-11-07). Supabase (EU,
-  shared pooler :6543) in Vercel `DATABASE_URL`; `PAYLOAD_SECRET`,
-  `FIRST_OWNER_EMAIL`, `NEXT_PUBLIC_SITE_URL=https://www.maishamatcha.es`
-  set (Production). Migrations ran on deploy, seed run by Joel. Owner
-  account created at www.maishamatcha.es/admin. Live check: anon and
-  authenticated have NO usage on the `payload` schema; "auto expose new
-  tables" is off in Supabase's Data API.
-- **Use the www address.** `maishamatcha.es` (apex) STILL (checked 2026-11-07 night) has two GoDaddy
-  parking A records (76.223.105.230, 13.248.243.5) beside Vercel's
-  216.198.79.1: no valid cert there, and the admin fails from it (its API
-  calls go to www). Joel is removing them in GoDaddy DNS + Forwarding, then
-  setting apex → www redirect in Vercel. Re-check with `dig +short
-  maishamatcha.es A` (only 216.198.79.1) and curl both hosts.
-- **Design pass done and live** (founder-led): full-picture hero with the
-  matcha card (now the REAL salon photo), carta, ordering, shop + product
-  pages, home path 一 to 五, historia, eventos (printed programme), cuenta.
-  Kanji numerals are unframed brush glyphs (`components/Numeral.tsx`; the
-  outline square is the seal's alone, per design review). Real photos:
-  `public/images/salon-*.jpg`, `shop-tins.jpg`, `drinks-layered.jpg`
-  (EXIF stripped). The carta and /crea photos were removed at the founder's
-  request ("poorly placed"): keep new imagery to places agreed first.
-  Faces in founder photos need the person's OK before publishing.
-- **Phones**: header = leaf + Pedir + the word "Menú", which opens a
-  full-screen washi sheet (`components/MobileMenu.tsx`, native modal
-  dialog, 21 CDP checks passed). Desktop nav unchanged. The header keeps its
-  sumi/50 band over the hero: without it the nav measured ~2:1 on the wall.
-- **Crea tu bebida**: `components/LayerColumn.tsx`: the recipe as a quiet
-  column of its layers (cloud, tea, milk, purées), each named beside it.
-  Founder rejected a flat SVG cup illustration as cheap; next step is REAL
-  per-drink clips from a shoot (shot list below), not illustration or AI.
-- **Video**: home carta section (`components/home/MenuPreview.tsx`): words on
-  the LEFT like sections 一 and 二, the pour on the RIGHT at 15rem so the
-  picture stands as tall as the words (top-aligned; a bigger video left an
-  empty band beside the short text, founder 2026-11-08). It shows
-  `public/video/pour.mp4` (`components/PourVideo.tsx`): founder clip
-  IMG_8264, cropped square to hands, bowl and cup (no face, no audio, ~1.9
-  MB), plays once in view, Pausa / Ver de nuevo (WCAG 2.2.2), still for
-  reduced motion. Edges feathered into washi with a CSS mask (founder
-  liked it: "better"); recorded as an exemption in the brand skill. No ffmpeg on this Mac (install was blocked): clips are
-  cropped and re-encoded by recording a canvas in headless Chrome
-  (MediaRecorder, video/mp4 avc1), see the scratchpad recipe in git log.
-- **Admin**: own home dashboard (`cms/components/OwnerDashboard.tsx`, logic
-  in `lib/dashboard.ts`): today vs a week ago, launch checklist, pending
-  list (web orders, DEVOLVER payments, supplier orders, draft letters,
-  stock, events at 80%+), quick actions, compact collection lists. The
-  whole admin is Spanish or English (each user picks in Account →
-  Language); the top-right selector is "Contenido en" (content language).
-  Brand favicon in the admin.
-- **Admin sign-in is two-step** (2026-11-08, `payload-totp` 3.0.7): password,
-  then a 6-digit code from an authenticator app. Owner and manager MUST set
-  it up on their first sign-in after the deploy (QR screen). Until the code
-  is entered the session gets nothing (API 403; our report/PDF/tablet routes
-  use `verifiedBackOffice`). Public reads (carta, events, story, media, IVA)
-  stay open via `PUBLIC_READ` in payload.config.ts. Login and code screens
-  restyled (narrow column, ink lines, "Entrar"). LIVE since 2026-11-08; Joel
-  signs in with the TEST owner account for now and has run the reset SQL
-  once (so he lands on the QR setup screen: scan, type code). Real owner
-  account later: create it in Users, it sets up its own code, then set the
-  test account inactive (never delete). The admin opens in Spanish
-  until someone picks English: account (bottom left) → Configuración de
-  Payload → Idioma → English (payload-lng cookie; proxy.ts sets "es" only
-  when absent; verified in a browser that the switch sticks).
-  **Lost phone**: Joel runs in Supabase SQL editor
+- **Production live** on Supabase (EU) + Vercel at https://www.maishamatcha.es
+  (use www: the apex still had GoDaddy parking A records 76.223.105.230 and
+  13.248.243.5 on 2026-11-07; Joel removes them, then apex → www redirect
+  in Vercel; check `dig +short maishamatcha.es A` = only 216.198.79.1).
+  anon/authenticated have no usage on the `payload` schema (2026-11-07).
+- **Design** live and founder-led (see CLAUDE.md imagery + brand skill). Home
+  carta section: words LEFT, pour video RIGHT at 15rem, top-aligned (founder
+  checks two-column heights and shared edges at desktop width). /crea =
+  `LayerColumn`; real per-drink clips await the shoot (list below).
+- **Admin sign-in is two-step** (`payload-totp`, forceSetup; see CLAUDE.md).
+  Joel uses the TEST owner account. Real owner: Equipo → Invitar a alguien →
+  copy the link (until Resend) → set password → scan QR; then untick Activo
+  on the test account (never delete). Admin language: avatar top right →
+  Configuración de Payload → Idioma ("Contenido en" = CONTENT language).
+  **Lost phone** (Joel, Supabase SQL editor):
   `update payload.users set totp_secret = null where email = '<email>';`
   `delete from payload.users_sessions where _parent_id = (select id from payload.users where email = '<email>');`
-  (the second line signs out every session that had entered the old code); then
-  the person signs in and scans the new QR straight away.
-  Admin language: avatar top right → Configuración de Payload → Idioma
-  (the "Contenido en" menu is the CONTENT language, not the admin's).
-  then signs in and scans a new QR. The plugin's own "has a code" check ran
-  outside transactions and locked the pool under parallel sales: replaced
-  by `hasTotpInTransaction` (keep it when upgrading the plugin).
-- **Subscription box + subscriber events + staff invitations** (2026-11-09,
-  see CLAUDE.md). Founder chose: pickup AND shipping in Spain, one fixed
-  product, events for founders + subscribers. To switch on: Empresa →
-  Suscripción premium (price, IVA, box product from Tienda, shipping price
-  or empty for pickup only, perks, the switch) + Stripe keys. IVA of the
-  fee/box/shipping: confirm with the gestoría (one rate for all lines now;
-  Canarias addresses are allowed by Stripe "ES" but IGIC differs).
-  Real owner: Equipo → Invitar a alguien (link to WhatsApp until Resend).
-- **Security audit 2026-11-09** done (see CLAUDE.md): every finding fixed
-  and pushed; shared Postgres rate limits + Turnstile added after.
-  Joel: create Turnstile keys (Cloudflare dashboard → Turnstile → Add
-  widget → hostname www.maishamatcha.es, mode "Managed"), put the site key
-  in NEXT_PUBLIC_TURNSTILE_SITE_KEY and the secret in TURNSTILE_SECRET_KEY
-  (Vercel, Production), redeploy.
-- 166 tests pass. Forms use sumi/50
-  underlines (AA). Admin fonts self-hosted via next/font.
+  then sign in and scan the new QR straight away.
+- **Monthly subscription box + subscriber events** (2026-11-09, CLAUDE.md):
+  one fixed product, pickup at the bar or posted in Spain, /admin/cajas,
+  events for founders + paid-up subscribers, event types. OFF until Empresa
+  is filled and Stripe keys exist.
+- **Security audit 2026-11-09**: three reviewers + mechanical checks; every
+  finding fixed and live (details and the one accepted baseline in
+  CLAUDE.md). Then: shared rate limits in Postgres (locked-down SECURITY
+  DEFINER `payload.rate_limit_hit`) and Cloudflare Turnstile (off until keys).
+  Vercel Firewall (DDoS, Hobby: 3 custom rules, 1 rate-limit rule) is the
+  outer layer; app-level checks stay necessary.
+- 166 tests pass (25 files).
 
 ## Next
 
-- Joel (setup): GoDaddy DNS cleanup; Stripe in TEST mode first (secret
-  key, webhook to https://www.maishamatcha.es/api/stripe/webhook with the
-  8 events listed in CLAUDE.md, customer portal), then live keys; Resend
-  key + audience; Empresa (NIF, legal name, founding/monthly prices, IVA,
-  places, open days); shop products with photos (tins photo 13-50-54 is
-  the good one; ask for the original file); real event dates; English
-  content.
-- Joel (facts): cultivar, harvest, allergens; "Calidad diaria" vs "Para
-  cada día"; OJ 9,50 / Yuzu 9,80; map pin.
-- Engineering: full script-src CSP with nonces (trade-off: makes pages
-  dynamic, wait until payments are live); real-iPhone keyboard test (Joel);
-  legal review of the privacy notice; a sticky bottom "Pedir" bar on
-  phones once online ordering is switched on in Empresa.
-- Design review NITs left on purpose: footer language switch alone in its
-  column, home repeats address/hours above the footer, events repeat
-  "Reservado a socios fundadores", historia sticky glyph sits ~90px low.
-- Blocked on founder: Stripe Terminal, AEAT submission, R1 to R4
-  corrective invoices, CafeRadar stamps.
+- Joel (setup): GoDaddy DNS cleanup; Turnstile keys (Cloudflare → Turnstile
+  → Add widget, hostname www.maishamatcha.es, Managed → Vercel
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY, Production,
+  redeploy); invite his real owner account; Stripe in TEST mode first
+  (webhook https://www.maishamatcha.es/api/stripe/webhook, the 8 events in
+  CLAUDE.md, customer portal), then live; Resend key + audience (also makes
+  invitations and "forgot password" email out); Empresa (NIF, legal name,
+  founding/monthly prices, IVA, places, open days, box product, shipping
+  price); shop products with photos; real event dates; English content.
+- Joel (gestoría): IVA of the monthly fee, the tin and shipping (one rate for
+  all lines now); Canarias addresses (IGIC) accepted by Stripe "ES".
+- Joel (facts): cultivar, harvest, allergens; "Calidad diaria" vs "Para cada
+  día"; OJ 9,50 / Yuzu 9,80; map pin.
+- Engineering: script-src CSP with nonces (after payments go live);
+  real-iPhone keyboard test; legal review of the privacy notice; sticky
+  "Pedir" bar on phones once online ordering is on. Optional: one Vercel WAF
+  rate-limit rule on /api/ as an outer layer.
+- Design NITs left on purpose: footer language switch alone, home repeats
+  address/hours, historia sticky glyph ~90px low.
+- Blocked on founder: Stripe Terminal, AEAT submission, R1 to R4 invoices,
+  CafeRadar stamps.
 
 ## Video shot list (for the founder)
 
-Same spot on the green tile counter, white wall behind, daylight, LED strip
-off, hands only (no faces), iPhone on a tripod, 4K 30fps, exposure locked,
-side-on at cup height. Clips of 6 to 8 s: usucha whisked in the black bowl
-(Uji, Nishio, Kagoshima) from above; each as a latte poured over ice and
-milk in the Maisha cup; hojicha and black tea solo and latte; purée going in
-(mango, ube); Coconut Cloud on top; one wide clip of the bar. AirDrop the
-originals (not WhatsApp). Then /crea can switch clip by tea and preparation.
+Green tile counter, white wall, daylight, LED strip off, hands only, iPhone
+on a tripod, 4K 30fps, exposure locked, side-on at cup height, 6 to 8 s:
+usucha whisked in the black bowl (Uji, Nishio, Kagoshima) from above; each
+as a latte over ice and milk in the Maisha cup; hojicha and black tea solo
+and latte; purée going in (mango, ube); Coconut Cloud on top; one wide clip
+of the bar. AirDrop the originals. Then /crea can switch clip per drink.
 
 ## Environment gotchas
 
-- Postgres for dev/tests: `npm run db:up` (Docker Desktop must be running).
-- Use Node 24: `export PATH=$HOME/.nvm/versions/node/v24.16.0/bin:$PATH`.
+- Postgres for dev/tests: `npm run db:up` (Docker Desktop running).
+- Node 24: `export PATH=$HOME/.nvm/versions/node/v24.16.0/bin:$PATH`.
 - git at `/Applications/Xcode.app/Contents/Developer/usr/bin/git`.
-- Payload Local API scripts: a temporary `.tmp-*.mts` in the repo root run
-  with `PAYLOAD_SECRET=... npx tsx` (scratchpad scripts fail on top-level
-  await and the @/ aliases). Delete it after. For admin screenshots create
-  a throwaway owner that way and delete it (and its sessions) after.
-- The seed skips existing items: fix old dev-DB copy with SQL.
-- e2e: CDP scripts (Node 24); member sign-in links are HMAC-signed with the
-  dev PAYLOAD_SECRET. Headless capture of long pages can hang: wrap in
-  `timeout`.
-- Never ask for or accept production secrets in chat; Joel pastes them in
-  Vercel and runs prod `migrate`/`seed` in his own terminal (`read -s`).
-- Commits are authored by Joel alone (no Claude co-author trailer); ask
-  before each push (push to main deploys).
-- Never `npm run build` while `next dev` runs (shared `.next`).
+- Payload Local API scripts: temporary `.tmp-*.mts` in the repo root, run
+  with `PAYLOAD_SECRET=... npx tsx`; delete after. Admin screenshots: a
+  throwaway owner with a known TOTP secret set by SQL
+  (`totp_secret='JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP'`, codes from `otpauth`
+  in node_modules); delete it, its sessions, totp_attempts and audit rows after.
+- Account/subscription UI only shows with Stripe on: run dev with
+  placeholder `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` for screenshots.
+- Restart `next dev` after payload.config changes (plugins, translations);
+  a killed dev server can leave a bad `.next`: `rm -rf .next`.
+- Tests importing admin components: `vi.doMock("@payloadcms/ui", …)` (its
+  CSS cannot load in Node).
+- e2e: CDP scripts (Node 24), wrap long captures in `timeout`.
+- Never ask for or accept production secrets in chat (Vercel / Joel's own
+  terminal only). Commits by Joel alone, no co-author trailer; ask before
+  each push (push to main deploys). Never `npm run build` while `next dev`
+  runs.
