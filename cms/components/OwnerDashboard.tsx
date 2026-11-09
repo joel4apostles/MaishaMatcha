@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Gutter } from "@payloadcms/ui";
 import { inventoryAlerts } from "@/lib/inventory";
 import { pendingBoxes } from "@/lib/premium";
+import { verifiedBackOffice } from "@/lib/auth/roles";
 import { madridDay, today } from "@/lib/reports";
 import { COLLECTION_NOTES, COLLECTION_NOTES_EN, DASH, SECONDARY, setupSteps } from "@/lib/dashboard";
 
@@ -22,8 +23,21 @@ const clock = () => ({ now: new Date(), weekAgo: new Date(Date.now() - 7 * 86400
 
 type Pending = { key: string; text: string; href: string };
 
-export async function OwnerDashboardView({ payload, navGroups = [], i18n }: { payload: Payload; navGroups?: NavGroup[]; i18n?: { language?: string } }) {
+export async function OwnerDashboardView({
+  payload,
+  navGroups = [],
+  i18n,
+  user,
+}: {
+  payload: Payload;
+  navGroups?: NavGroup[];
+  i18n?: { language?: string };
+  user?: Parameters<typeof verifiedBackOffice>[0];
+}) {
   const lang: "es" | "en" = i18n?.language === "en" ? "en" : "es";
+  // Figures only for a session that entered its authenticator code; a
+  // password-only session is on its way to the code screen (review 2026-11-09).
+  if (!verifiedBackOffice(user, "owner", "manager")) return <Gutter><div className="maisha-dash" /></Gutter>;
   const T = DASH[lang];
   const notes = lang === "en" ? COLLECTION_NOTES_EN : COLLECTION_NOTES;
   const euro = (cents: number) => new Intl.NumberFormat(lang === "en" ? "en-GB" : "es-ES", { style: "currency", currency: "EUR" }).format(cents / 100);

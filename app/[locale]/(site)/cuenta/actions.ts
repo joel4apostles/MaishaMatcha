@@ -6,7 +6,7 @@ import { z } from "zod";
 import config from "@payload-config";
 import { rsvp } from "@/lib/events";
 import { startFounding } from "@/lib/founding";
-import { premiumPortal, startPremium } from "@/lib/premium";
+import { premiumPortal, startPremium, subscriptionLive } from "@/lib/premium";
 import { eraseMember, revokeSessions, safeNext, sendSignInLink } from "@/lib/members";
 import { clearMemberSession, currentMember } from "@/lib/members-server";
 import { rateLimit } from "@/lib/rateLimit";
@@ -63,7 +63,11 @@ export async function deleteAccountAction(confirmEmail: string) {
   const m = await currentMember();
   if (!m) return { ok: false, error: "signed-out" };
   if (String(confirmEmail).trim().toLowerCase() !== m.email) return { ok: false, error: "confirm" };
-  await eraseMember(await getPayload({ config }), m.id);
+  const payload = await getPayload({ config });
+  // A live subscription would keep charging with nobody left to credit:
+  // cancel it in the portal first (security review 2026-11-09).
+  if (await subscriptionLive(payload, m.id)) return { ok: false, error: "subscribed" };
+  await eraseMember(payload, m.id);
   await clearMemberSession();
   return { ok: true };
 }
@@ -101,6 +105,7 @@ export async function startPremiumAction(locale: "es" | "en", delivery: "pickup"
 export async function premiumPortalAction(locale: "es" | "en") {
   const m = await currentMember();
   if (!m) return { ok: false as const, error: "signed-out" };
+  if (!rateLimit(`portal:${m.id}`, 5)) return { ok: false as const, error: "rate-limited" };
   const base = await siteBase();
   if (!base) return { ok: false as const, error: "closed" };
   return premiumPortal(m, `${base}/${locale === "en" ? "en/account" : "es/cuenta"}`);

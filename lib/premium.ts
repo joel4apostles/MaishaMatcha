@@ -84,6 +84,23 @@ export async function startPremium(payload: Payload, member: MemberLike, locale:
   }
 }
 
+/**
+ * Could Stripe still charge this member? Our mirrored status first; then, if
+ * they ever had a Stripe customer, Stripe itself (unreachable = assume yes,
+ * so an outage never lets an account with a live subscription be erased).
+ */
+export async function subscriptionLive(payload: Payload, memberId: number) {
+  const m = await payload.findByID({ collection: "members", id: memberId, depth: 0, overrideAccess: true, showHiddenFields: true }).catch(() => null);
+  if (!m) return false;
+  if (m.subscriptionStatus === "active" || m.subscriptionStatus === "past_due") return true;
+  if (!m.stripeCustomerId || !stripeEnabled()) return false;
+  try {
+    return (await liveSubscriptions(m.stripeCustomerId)) > 0;
+  } catch {
+    return true;
+  }
+}
+
 export async function premiumPortal(member: MemberLike, returnUrl: string) {
   if (!member.stripeCustomerId || !stripeEnabled()) return { ok: false as const, error: "closed" };
   try {

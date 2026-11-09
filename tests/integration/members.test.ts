@@ -92,6 +92,33 @@ describe("accounts", () => {
     expect(kept).toMatchObject({ customerName: "Eva", customerEmail: null, customerPhone: null, member: null });
     expect((await payload.find({ collection: "members", where: { email: { equals: "erase@example.com" } }, overrideAccess: true })).docs).toHaveLength(0);
   });
+
+  it("erases delivery addresses too, and the owner's delete in the admin does the same", async () => {
+    const m = await member("erase-box@example.com", "Iris Gil");
+    const order = await payload.create({
+      collection: "orders",
+      overrideAccess: true,
+      data: { channel: "online", service: "takeaway", status: "ready", paymentStatus: "paid", lines: [], totalCents: 0, kind: "subscription", fulfilment: "shipping", member: m.id, customerName: "Iris Gil", customerEmail: m.email, shipTo: { name: "Iris Gil", phone: "600111222", line1: "Calle Real, 1", postalCode: "30001", city: "Murcia", province: "Murcia" }, idempotencyKey: crypto.randomUUID() } as never,
+    });
+    // The owner deletes the member from the admin (not the member's own page).
+    await payload.delete({ collection: "members", id: m.id, overrideAccess: true });
+    const kept = await payload.findByID({ collection: "orders", id: order.id, overrideAccess: true, depth: 0 });
+    expect(kept).toMatchObject({ customerEmail: null, member: null });
+    expect(kept.shipTo).toMatchObject({ name: null, phone: null, line1: null, postalCode: null, city: null });
+  });
+
+  it("refuses to erase a member whose subscription Stripe may still charge", async () => {
+    const m = await member("erase-sub@example.com");
+    await payload.update({ collection: "members", id: m.id, overrideAccess: true, data: { subscriptionStatus: "active" } as never });
+    await expect(eraseMember(payload, m.id)).rejects.toThrow();
+    expect((await payload.findByID({ collection: "members", id: m.id, overrideAccess: true })).id).toBe(m.id);
+  });
+
+  it("does not let a manager create a founding member", async () => {
+    const manager = await staff(payload, "mgr-create@test.local", "manager", "Manager");
+    const created = await payload.create({ collection: "members", data: { name: "Fake", email: "fake-founder@example.com", tier: "founding" } as never, user: manager, overrideAccess: false });
+    expect(created.tier).toBe("customer");
+  });
 });
 
 describe("founding membership", () => {

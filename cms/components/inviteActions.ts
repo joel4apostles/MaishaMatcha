@@ -22,6 +22,7 @@ export async function inviteAction(input: z.infer<typeof schema>) {
   const { user } = await payload.auth({ headers: await headers() });
   if (!verifiedBackOffice(user, "owner")) return { ok: false as const, error: "forbidden" };
   const r = await inviteStaff(payload, parsed.data);
-  if (r.ok) await writeAudit({ payload }, { action: "staff.invite", entity: "users", reason: `${parsed.data.email} (${parsed.data.role})`, actorId: user!.id });
-  return r;
+  if (!r.ok) return r;
+  await writeAudit({ payload }, { action: "staff.invite", entity: "users", entityId: r.userId, reason: parsed.data.role, actorId: user!.id });
+  return { ok: true as const, link: r.link, sent: r.sent };
 }

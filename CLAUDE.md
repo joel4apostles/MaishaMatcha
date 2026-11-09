@@ -250,6 +250,25 @@ secret is stored in plain text in `payload.users.totp_secret` (same DB as
 the password hashes; never exposed by the API). Keep the plugin LAST
 except for our translations/transaction override right after it.
 
+Full security audit 2026-11-09 (security-audit skill + three read-only
+reviewers: access/privacy, auth/sessions, entry points/payments). FIXED:
+deleting a member with a live Stripe subscription (refused, also from the
+admin), erasure now also clears box delivery addresses and runs on every
+member delete (beforeDelete hook), dashboard figures need the code
+(`verifiedBackOffice`), managers cannot create founding members, a
+repeated founding webhook no longer flags DEVOLVER (`members.foundingOrder`),
+forgot-password and login throttled per IP and address, admin cookie
+Secure in production, hasTotp check fails closed, member tokens on their
+own derived key, orders readable by owner/manager only, raster-only
+uploads, GraphQL disabled, OG fetch from SITE_URL, portal rate limit,
+first-owner rule on any production host. OPEN (SHOULD, before launch):
+public email-sending forms (order at pickup, sign-in link, waitlist,
+forgot password) rely on the per-instance in-memory limiter; Resend's free
+100/day could be drained. Fix = shared limiter (Upstash/Vercel KV free tier)
+or Turnstile, or a paid Resend plan: founder's call. Same 5 low + 5 moderate
+advisories as accepted above. Live Supabase SQL not re-run (needs the prod
+password; schema-level "no USAGE" from 2026-11-07 covers new tables).
+
 Live Supabase check 2026-11-07: anon and authenticated have NO usage on
 the `payload` schema (has_schema_privilege false/false); "Automatically
 expose new tables" turned off in the Data API.
@@ -260,7 +279,7 @@ registry.npmjs.org, every collection spells out access, headers present
 on /es, /pos, /admin. A build and every public page work with NO reachable
 database (ordering shows "no disponible", events fall back to the static
 list). Pending: the live Supabase checks (section 3) once DATABASE_URL
-exists; Payload GraphQL is on (same access rules), disable it if unused.
+exists; Payload GraphQL is disabled (2026-11-09).
 
 ## Content editing
 

@@ -1,6 +1,6 @@
-import type { Payload } from "payload";
+import type { Payload, PayloadRequest } from "payload";
 import { emailFrame, escapeHtml, sendEmail } from "@/lib/email";
-import { signToken, verifyToken } from "@/lib/pos/token";
+import { deriveKey, signToken, verifyToken } from "@/lib/pos/token";
 import { appSecret } from "@/lib/secret";
 import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
 
@@ -29,12 +29,15 @@ export function safeNext(next: string | null | undefined): string | undefined {
   return next.slice(0, 200);
 }
 
+/** Members' links and sessions have their own key, derived from the app secret. */
+const membersKey = () => deriveKey(appSecret(), "members");
+
 export function signInToken(email: string, locale: Loc, name?: string, next?: string, now = nowS()) {
-  return signToken({ exp: now + LINK_MINUTES * 60, p: "signin", e: normEmail(email), n: name?.trim().slice(0, 80) || undefined, l: locale, next: safeNext(next) }, appSecret());
+  return signToken({ exp: now + LINK_MINUTES * 60, p: "signin", e: normEmail(email), n: name?.trim().slice(0, 80) || undefined, l: locale, next: safeNext(next) }, membersKey());
 }
 
 export function readSignInToken(token: string | null | undefined, now = nowS()) {
-  const p = verifyToken<LinkPayload>(token, appSecret(), now);
+  const p = verifyToken<LinkPayload>(token, membersKey(), now);
   return p && p.p === "signin" && typeof p.e === "string" ? p : null;
 }
 
@@ -72,11 +75,11 @@ export async function consumeSignIn(payload: Payload, token: string, now = nowS(
 }
 
 export function sessionToken(member: { id: number; sessionVersion?: number | null }, now = nowS()) {
-  return signToken({ exp: now + SESSION_DAYS * 86400, p: "member", mid: member.id, v: member.sessionVersion ?? 0 }, appSecret());
+  return signToken({ exp: now + SESSION_DAYS * 86400, p: "member", mid: member.id, v: member.sessionVersion ?? 0 }, membersKey());
 }
 
 export async function memberFromSession(payload: Payload, token: string | null | undefined, now = nowS()) {
-  const p = verifyToken<SessionPayload>(token, appSecret(), now);
+  const p = verifyToken<SessionPayload>(token, membersKey(), now);
   if (!p || p.p !== "member") return null;
   // sessionVersion is hidden from API reads, so read it with showHiddenFields.
   const m = await payload.findByID({ collection: "members", id: p.mid, depth: 0, overrideAccess: true, showHiddenFields: true }).catch(() => null);
@@ -85,7 +88,7 @@ export async function memberFromSession(payload: Payload, token: string | null |
 }
 
 export function unsubscribeToken(memberId: number, now = nowS()) {
-  return signToken({ exp: now + UNSUB_DAYS * 86400, p: "unsub", mid: memberId }, appSecret());
+  return signToken({ exp: now + UNSUB_DAYS * 86400, p: "unsub", mid: memberId }, membersKey());
 }
 
 export function unsubscribeUrl(memberId: number) {
@@ -93,7 +96,7 @@ export function unsubscribeUrl(memberId: number) {
 }
 
 export async function unsubscribe(payload: Payload, token: string | null | undefined) {
-  const p = verifyToken<UnsubPayload>(token, appSecret());
+  const p = verifyToken<UnsubPayload>(token, membersKey());
   if (!p || p.p !== "unsub") return false;
   await payload.update({ collection: "members", id: p.mid, overrideAccess: true, data: { emailOptIn: false } }).catch(() => null);
   return true;
@@ -106,27 +109,37 @@ export async function revokeSessions(payload: Payload, memberId: number) {
 }
 
 /**
- * GDPR erasure from the member's own page. Orders and invoices are kept
- * (tax law) but unlinked and stripped of contact details; RSVPs go.
+ * GDPR erasure. Orders and invoices are kept (tax law) but unlinked and
+ * stripped of contact details and delivery addresses; RSVPs go. Runs from
+ * the members beforeDelete hook, so the member's own page and an owner's
+ * delete in the admin erase exactly the same (security review 2026-11-09).
  */
-export async function eraseMember(payload: Payload, memberId: number) {
-  const m = await payload.findByID({ collection: "members", id: memberId, depth: 0, overrideAccess: true });
+export async function scrubMemberData(payload: Payload, memberId: number, req?: PayloadRequest) {
+  const m = await payload.findByID({ collection: "members", id: memberId, depth: 0, overrideAccess: true, req }).catch(() => null);
+  if (!m) return;
   const orders = await payload.find({
     collection: "orders",
     overrideAccess: true,
     depth: 0,
     limit: 5000,
+    req,
     where: { or: [{ member: { equals: memberId } }, { customerEmail: { equals: m.email } }] },
   });
+  const noAddress = { name: null, phone: null, line1: null, line2: null, postalCode: null, city: null, province: null };
   for (const o of orders.docs) {
     await payload.update({
       collection: "orders",
       id: o.id,
       overrideAccess: true,
-      data: { member: null, customerEmail: null, customerPhone: null, customerName: (o.customerName ?? "").split(" ")[0] || null },
+      req,
+      data: { member: null, customerEmail: null, customerPhone: null, customerName: (o.customerName ?? "").split(" ")[0] || null, shipTo: noAddress },
     });
   }
-  await payload.delete({ collection: "rsvps", overrideAccess: true, where: { member: { equals: memberId } } });
+  await payload.delete({ collection: "rsvps", overrideAccess: true, req, where: { member: { equals: memberId } } });
+}
+
+/** The member's own "delete my account": the hook does the scrub. */
+export async function eraseMember(payload: Payload, memberId: number) {
   await payload.delete({ collection: "members", id: memberId, overrideAccess: true });
 }
 

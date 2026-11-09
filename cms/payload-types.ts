@@ -436,6 +436,7 @@ export interface Member {
   status: 'active' | 'paused' | 'cancelled';
   foundingNumber?: number | null;
   foundingSince?: string | null;
+  foundingOrder?: number | null;
   subscriptionStatus?: ('none' | 'active' | 'past_due' | 'cancelled') | null;
   subscriptionPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean | null;
@@ -1521,6 +1522,7 @@ export interface MembersSelect<T extends boolean = true> {
   status?: T;
   foundingNumber?: T;
   foundingSince?: T;
+  foundingOrder?: T;
   subscriptionStatus?: T;
   subscriptionPeriodEnd?: T;
   cancelAtPeriodEnd?: T;

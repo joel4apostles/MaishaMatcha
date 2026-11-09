@@ -19,7 +19,7 @@ export async function inviteStaff(payload: Payload, input: { name: string; email
   const name = input.name.trim();
   const taken = await payload.count({ collection: "users", overrideAccess: true, where: { email: { equals: email } } });
   if (taken.totalDocs) return { ok: false as const, error: "exists" };
-  await payload.create({
+  const created = await payload.create({
     collection: "users",
     overrideAccess: true,
     data: { email, name, role: input.role, active: true, password: randomBytes(32).toString("base64url") } as never,
@@ -41,7 +41,7 @@ export async function inviteStaff(payload: Payload, input: { name: string; email
        <p>Al entrar por primera vez te pediremos un segundo paso: escanear un código con una app de autenticación en tu móvil.</p>`,
     ),
   );
-  return { ok: true as const, link, sent: sent.sent };
+  return { ok: true as const, link, sent: sent.sent, userId: created.id };
 }
 
 /** The password-reset email, in the house frame (Payload builds the token). */

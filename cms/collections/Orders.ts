@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { anyStaff, nobody } from "../access";
+import { nobody, ownerOrManager } from "../access";
 import { shipToFields } from "../shipTo";
 
 /**
@@ -18,7 +18,9 @@ export const Orders: CollectionConfig = {
     description: { es: "Se crean desde la barra o la web. Aquí se consultan; no se editan.", en: "Created from the bar or the website. Viewed here; not edited." },
   },
   defaultSort: "-createdAt",
-  access: { read: anyStaff, create: nobody, update: nobody, delete: nobody },
+  // Customer contact details and addresses: owner and manager. The counter
+  // reads through its own server code, never this API.
+  access: { read: ownerOrManager, create: nobody, update: nobody, delete: nobody },
   hooks: {
     beforeValidate: [
       ({ data }) => {

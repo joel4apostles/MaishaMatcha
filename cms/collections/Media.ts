@@ -11,7 +11,8 @@ export const Media: CollectionConfig = {
       { name: "card", width: 960 },
       { name: "wide", width: 1800 },
     ],
-    mimeTypes: ["image/*"],
+    // Raster photos only (no SVG: it can carry script).
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/avif"],
   },
   access: editorialAccess,
   fields: [

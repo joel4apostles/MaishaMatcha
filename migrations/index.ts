@@ -15,6 +15,7 @@ import * as migration_20261106_012347_table_orders from './20261106_012347_table
 import * as migration_20261106_101604_shop_product_pages from './20261106_101604_shop_product_pages';
 import * as migration_20261108_082339_totp from './20261108_082339_totp';
 import * as migration_20261109_104251_subscription_box from './20261109_104251_subscription_box';
+import * as migration_20261109_110329_founding_order from './20261109_110329_founding_order';
 
 export const migrations = [
   {
@@ -100,6 +101,11 @@ export const migrations = [
   {
     up: migration_20261109_104251_subscription_box.up,
     down: migration_20261109_104251_subscription_box.down,
-    name: '20261109_104251_subscription_box'
+    name: '20261109_104251_subscription_box',
+  },
+  {
+    up: migration_20261109_110329_founding_order.up,
+    down: migration_20261109_110329_founding_order.down,
+    name: '20261109_110329_founding_order'
   },
 ];

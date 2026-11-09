@@ -122,6 +122,11 @@ export async function completeFounding(payload: Payload, orderId: number, provid
     const m = await payload.findByID({ collection: "members", id: memberId, req, depth: 0, overrideAccess: true });
     const cap = (await payload.findGlobal({ slug: "business", req, overrideAccess: true })).foundingCap ?? 50;
     const founders = (await payload.count({ collection: "members", req, overrideAccess: true, where: { tier: { equals: "founding" } } })).totalDocs;
+    if (m.tier === "founding" && m.foundingOrder === orderId) {
+      // Stripe delivered the same payment again: the place is already given.
+      await commitTransaction(req);
+      return true;
+    }
     if (m.tier === "founding" || founders >= cap) {
       // Paid but no place to give (a second payment, or the last place went
       // to a checkout that finished first): flag it for a refund, loudly.
@@ -148,7 +153,7 @@ export async function completeFounding(payload: Payload, orderId: number, provid
         id: memberId,
         req,
         overrideAccess: true,
-        data: { tier: "founding", foundingNumber: number, foundingSince: new Date().toISOString() },
+        data: { tier: "founding", foundingNumber: number, foundingSince: new Date().toISOString(), foundingOrder: orderId },
       });
     }
     await commitTransaction(req);

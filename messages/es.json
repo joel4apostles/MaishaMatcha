@@ -706,7 +706,8 @@
       "closed": "La membresía fundadora no está abierta ahora.",
       "already": "Ya eres socio fundador.",
       "signed-out": "Tu sesión ha terminado. Vuelve a entrar.",
-      "pending": "Ya tienes un pago empezado. Termínalo en la otra pestaña o espera media hora."
+      "pending": "Ya tienes un pago empezado. Termínalo en la otra pestaña o espera media hora.",
+      "subscribed": "Tienes una suscripción activa. Cancélala primero en Gestionar la suscripción y después borra la cuenta."
     },
     "premiumTitle": "Suscripción mensual",
     "premiumBody": "Una cuota al mes. La cancelas cuando quieras.",

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { Payload } from "payload";
 import { asUser, boot, passwordOnly, staff, type Staff } from "./harness";
 
@@ -333,5 +333,34 @@ describe("invitations (owner invites, the person sets their own password)", () =
     expect(login.user?.id).toBe(user.id);
 
     expect(await inviteStaff(payload, { name: "Again", email: "carmen@invite.test", role: "manager" })).toMatchObject({ ok: false, error: "exists" });
+  });
+});
+
+describe("security review 2026-11-09 (admin)", () => {
+  it("throttles 'forgot password' per address, so nobody can drain the email quota", async () => {
+    const req = { headers: new Headers({ "x-real-ip": "203.0.113.9" }) };
+    const ask = () => payload.forgotPassword({ collection: "users", data: { email: "manager@test.local" }, disableEmail: true, req: req as never });
+    await ask();
+    await ask();
+    await expect(ask()).rejects.toThrow();
+  });
+
+  it("shows no dashboard figures to a session that still owes its code", async () => {
+    // The admin UI kit pulls in stylesheets Node cannot load; the layout piece is all we need.
+    vi.doMock("@payloadcms/ui", () => ({ Gutter: ({ children }: { children: unknown }) => children }));
+    const { OwnerDashboardView } = await import("@/cms/components/OwnerDashboard");
+    // Every className in the rendered tree (React elements, without the circular bits).
+    const classes = (node: unknown, seen = new Set<unknown>()): string[] => {
+      if (!node || typeof node !== "object" || seen.has(node)) return [];
+      seen.add(node);
+      if (Array.isArray(node)) return node.flatMap((n) => classes(n, seen));
+      const props = (node as { props?: { className?: string; children?: unknown } }).props;
+      if (!props) return [];
+      return [...(props.className ? [props.className] : []), ...classes(props.children, seen)];
+    };
+    const empty = classes(await OwnerDashboardView({ payload, user: passwordOnly(owner) as never }));
+    expect(empty.join(" ")).not.toContain("md-kpis");
+    const full = classes(await OwnerDashboardView({ payload, user: owner as never }));
+    expect(full.join(" ")).toContain("md-kpis");
   });
 });

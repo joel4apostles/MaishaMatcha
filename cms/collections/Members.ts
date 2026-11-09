@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import { APIError, type CollectionConfig } from "payload";
 import { hiddenField, owner, ownerField, ownerOrManager } from "../access";
 import { shipToFields } from "../shipTo";
 
@@ -17,6 +17,20 @@ export const Members: CollectionConfig = {
   },
   access: { read: ownerOrManager, create: ownerOrManager, update: ownerOrManager, delete: owner },
   hooks: {
+    // Never erase someone Stripe still bills (owner delete in the admin too):
+    // cancel the subscription first, then delete.
+    beforeDelete: [
+      async ({ id, req }) => {
+        const { subscriptionLive } = await import("@/lib/premium");
+        if (await subscriptionLive(req.payload, Number(id))) {
+          throw new APIError("Tiene una suscripción activa: cancélala en Stripe antes de borrar al socio.", 400, null, true);
+        }
+        // Same erasure as the member's own page: contact details and
+        // addresses off the kept orders, bookings removed.
+        const { scrubMemberData } = await import("@/lib/members");
+        await scrubMemberData(req.payload, Number(id), req);
+      },
+    ],
     beforeValidate: [
       ({ data }) => {
         if (data?.email) data.email = String(data.email).trim().toLowerCase();
@@ -33,7 +47,7 @@ export const Members: CollectionConfig = {
       required: true,
       defaultValue: "customer",
       label: { es: "Tipo", en: "Type" },
-      access: { update: ownerField },
+      access: { create: ownerField, update: ownerField },
       options: [
         { label: { es: "Cliente", en: "Customer" }, value: "customer" },
         { label: { es: "Socio fundador", en: "Founding member" }, value: "founding" },
@@ -58,6 +72,9 @@ export const Members: CollectionConfig = {
       fields: [
         { name: "foundingNumber", type: "number", label: { es: "Nº de socio fundador", en: "Founding member no." }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
         { name: "foundingSince", type: "date", label: { es: "Fundador desde", en: "Founder since" }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
+        // The paid order that gave the place: a repeated Stripe notice for the
+        // same order is "already done", never a second payment to refund.
+        { name: "foundingOrder", type: "number", access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
       ],
     },
     {

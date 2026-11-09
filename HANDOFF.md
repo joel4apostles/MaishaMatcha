@@ -73,6 +73,9 @@ Last updated: 2026-11-09 (Opus 5.5 session). Subscription box + invitations comm
   when absent; verified in a browser that the switch sticks).
   **Lost phone**: Joel runs in Supabase SQL editor
   `update payload.users set totp_secret = null where email = '<email>';`
+  `delete from payload.users_sessions where _parent_id = (select id from payload.users where email = '<email>');`
+  (the second line signs out every session that had entered the old code); then
+  the person signs in and scans the new QR straight away.
   Admin language: avatar top right → Configuración de Payload → Idioma
   (the "Contenido en" menu is the CONTENT language, not the admin's).
   then signs in and scans a new QR. The plugin's own "has a code" check ran

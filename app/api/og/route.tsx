@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SITE_URL } from "@/lib/seo";
 
 export const runtime = "nodejs";
 
@@ -10,7 +11,7 @@ const gold = "#786000";
 const wood = "#B08D57";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const locale = searchParams.get("locale") === "en" ? "en" : "es";
   const eyebrow =
     locale === "en" ? "MURCIA · MATCHA SALON" : "MURCIA · SALÓN DE MATCHA";
@@ -19,7 +20,8 @@ export async function GET(request: Request) {
   // fails, fall back to the flat washi + lattice composition.
   let bgSrc: string | null = null;
   try {
-    const res = await fetch(new URL("/images/og-salon.jpg", origin));
+    // Our canonical origin, never the request's Host header.
+    const res = await fetch(new URL("/images/og-salon.jpg", SITE_URL));
     if (res.ok) {
       const buf = Buffer.from(await res.arrayBuffer());
       bgSrc = `data:image/jpeg;base64,${buf.toString("base64")}`;

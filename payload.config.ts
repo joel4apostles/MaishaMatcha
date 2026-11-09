@@ -96,7 +96,9 @@ function hasTotpInTransaction(field: Field): Field {
       });
       return Boolean((doc as { totpSecret?: string | null }).totpSecret);
     } catch {
-      return false;
+      // Fail closed: an error must never make an enrolled account look
+      // unenrolled (that would let a password alone set a new authenticator).
+      return true;
     }
   };
   return { ...field, hooks: { ...(field as { hooks?: object }).hooks, afterRead: [afterRead] } } as Field;
@@ -155,6 +157,8 @@ export default buildConfig({
   ...(siteURL ? { serverURL: siteURL, csrf: [siteURL] } : {}),
   db,
   sharp,
+  // Not used (no /api/graphql route either); off so no scaffold brings it back.
+  graphQL: { disable: true },
   // Password resets and invitations go out through Resend (silent without a key).
   email: resendEmail,
   localization: {

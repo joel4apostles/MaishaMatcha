@@ -5,6 +5,7 @@ import { hiddenField, nobody, owner, ownerField } from "../access";
 import { changed, writeAudit } from "../audit";
 import { integerCents } from "../validators";
 import { resetEmailHTML } from "@/lib/invite";
+import { rateLimit } from "@/lib/rateLimit";
 
 /**
  * Staff accounts (never customers). Owner creates, edits and deactivates
@@ -16,6 +17,8 @@ export const Users: CollectionConfig = {
   labels: { singular: { es: "Persona del equipo", en: "Team member" }, plural: { es: "Equipo", en: "Team" } },
   auth: {
     tokenExpiration: 60 * 60 * 12,
+    // Never sent over plain http in production (review 2026-11-09).
+    cookies: { secure: process.env.NODE_ENV === "production" },
     // The reset email in our words and frame (no expiration here: an
     // invitation passes its own 7 days, a reset keeps Payload's hour).
     forgotPassword: {
@@ -99,6 +102,24 @@ export const Users: CollectionConfig = {
     { name: "pinLockedUntil", type: "date", hidden: true, access: { read: hiddenField, update: hiddenField, create: hiddenField } },
   ],
   hooks: {
+    // "Forgot password" sends an email from the shared daily quota and a
+    // login lock-out can be triggered by anyone: throttle both per IP and
+    // per address (in-memory per instance; review 2026-11-09).
+    beforeOperation: [
+      ({ operation, args, req }) => {
+        if (operation !== "forgotPassword" && operation !== "login") return args;
+        const h = req.headers;
+        const ip = (h?.get("x-vercel-forwarded-for") ?? h?.get("x-real-ip") ?? h?.get("x-forwarded-for") ?? "").split(",")[0].trim();
+        // Our own server code (invitations, tests) has no client address.
+        if (!ip) return args;
+        const email = String((args as { data?: { email?: string } }).data?.email ?? "").trim().toLowerCase();
+        const perMinute = operation === "forgotPassword" ? 2 : 10;
+        if (!rateLimit(`${operation}:ip:${ip}`, perMinute) || (email && !rateLimit(`${operation}:email:${email}`, perMinute))) {
+          throw new APIError("Demasiados intentos. Espera un minuto.", 429, null, true);
+        }
+        return args;
+      },
+    ],
     beforeChange: [
       async ({ data, operation, originalDoc, req }) => {
         // Nobody can demote or deactivate themselves (no owner lock-out).
@@ -125,7 +146,7 @@ export const Users: CollectionConfig = {
             // In production nobody but the named owner can claim the empty
             // database through /admin/create-first-user.
             const allowed = process.env.FIRST_OWNER_EMAIL?.trim().toLowerCase();
-            if (process.env.VERCEL && (!allowed || String(data.email ?? "").toLowerCase() !== allowed)) {
+            if ((process.env.VERCEL || process.env.NODE_ENV === "production") && (!allowed || String(data.email ?? "").toLowerCase() !== allowed)) {
               throw new APIError(
                 "La primera cuenta solo puede crearla el propietario indicado en FIRST_OWNER_EMAIL.",
                 403,
