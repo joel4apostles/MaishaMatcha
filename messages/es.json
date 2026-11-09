@@ -112,10 +112,17 @@
     "eyebrow": "Eventos",
     "title": "Un programa por venir",
     "intro": "Catas, tardes de ceremonia y colaboraciones con artistas.",
-    "memberBadge": "Reservado a socios fundadores",
-    "invite": "El programa se abre primero a los socios fundadores.",
+    "memberBadge": "Para socios y suscriptores",
+    "invite": "El programa se abre primero a socios y suscriptores.",
     "phrase": "Chakai: una reunión alrededor del té.",
-    "soon": "Las reservas se abren con la fecha."
+    "soon": "Las reservas se abren con la fecha.",
+    "kinds": {
+      "tasting": "Cata",
+      "cupping": "Cupping",
+      "workshop": "Taller",
+      "ceremony": "Ceremonia",
+      "gathering": "Encuentro"
+    }
   },
   "legal": {
     "provisional": "Texto provisional, pendiente de revisión legal.",
@@ -205,7 +212,7 @@
     },
     "events": {
       "title": "Eventos · maisha matcha",
-      "description": "Catas, tardes de ceremonia y colaboraciones. Reservado a los socios fundadores."
+      "description": "Catas, cuppings, tardes de ceremonia y colaboraciones. Para socios fundadores y suscriptores."
     },
     "notice": {
       "title": "Aviso legal · maisha matcha",
@@ -566,6 +573,11 @@
       "table": "Mesa {n}",
       "hint": "Escanea y pide desde aquí",
       "link": "Mesas"
+    },
+    "boxes": {
+      "title": "{count, plural, one {# caja para recoger} other {# cajas para recoger}}",
+      "hand": "Entregada",
+      "error": "No se ha podido marcar. Prueba otra vez."
     }
   },
   "order": {
@@ -714,7 +726,18 @@
     "benefitFounding": "Hacerte socio fundador, cuando se abra.",
     "orderAgain": "Hacer un pedido",
     "bothClosed": "La membresía fundadora y la suscripción mensual aún no están abiertas.",
-    "membershipTitle": "Socio y suscripción"
+    "membershipTitle": "Socio y suscripción",
+    "premiumBox": "Cada mes, una lata de {product}.",
+    "premiumDeliveryLegend": "Cómo recibes la caja",
+    "premiumPickup": "Recoger en el salón",
+    "premiumPickupNote": "Plaza Cetina, 3, Murcia. Sin coste.",
+    "premiumShip": "Envío a casa",
+    "premiumShipNote": "{price} más al mes. Solo en España.",
+    "boxReadyPickup": "Tu caja de {month} te espera en la barra.",
+    "boxReadyShip": "Preparamos tu caja de {month}. Te avisamos cuando salga.",
+    "boxShipped": "Tu caja de {month} salió el {date}.",
+    "boxCollected": "Recogiste tu caja de {month}.",
+    "premiumActiveShort": "Activa."
   },
   "rsvp": {
     "seats": "Plazas",
@@ -723,10 +746,10 @@
     "cancel": "Cancelar reserva",
     "remaining": "{count, plural, =0 {Completo} one {Queda # plaza} other {Quedan # plazas}}",
     "signIn": "Entra para reservar",
-    "foundingOnly": "Reservado a socios fundadores",
+    "foundingOnly": "Para socios y suscriptores",
     "errors": {
       "full": "Ya no quedan plazas.",
-      "members-only": "Este evento es para socios fundadores.",
+      "members-only": "Este evento es para socios fundadores y suscriptores.",
       "not-bookable": "Este evento ya no admite reservas.",
       "invalid": "No se ha podido reservar.",
       "rate-limited": "Demasiados intentos. Espera un minuto.",

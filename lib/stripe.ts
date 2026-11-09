@@ -120,7 +120,10 @@ export async function createSubscriptionCheckout(input: {
   successUrl: string;
   cancelUrl: string;
   locale: "es" | "en";
+  /** Home delivery of the monthly box: a second monthly line, and Stripe asks for an address in Spain. */
+  shipping?: { cents: number; name: string } | null;
 }) {
+  const delivery = input.shipping ? "shipping" : "pickup";
   const data: Record<string, string | number> = {
     mode: "subscription",
     success_url: input.successUrl,
@@ -131,16 +134,28 @@ export async function createSubscriptionCheckout(input: {
     "subscription_data[metadata][kind]": "premium",
     "subscription_data[metadata][memberId]": input.memberId,
     "subscription_data[metadata][taxBp]": input.taxRateBasisPoints,
+    "metadata[delivery]": delivery,
+    "subscription_data[metadata][delivery]": delivery,
     "line_items[0][quantity]": 1,
     "line_items[0][price_data][currency]": "eur",
     "line_items[0][price_data][unit_amount]": input.monthlyCents,
     "line_items[0][price_data][recurring][interval]": "month",
     "line_items[0][price_data][product_data][name]": input.name,
   };
+  if (input.shipping) {
+    data["subscription_data[metadata][shipCents]"] = input.shipping.cents;
+    data["line_items[1][quantity]"] = 1;
+    data["line_items[1][price_data][currency]"] = "eur";
+    data["line_items[1][price_data][unit_amount]"] = input.shipping.cents;
+    data["line_items[1][price_data][recurring][interval]"] = "month";
+    data["line_items[1][price_data][product_data][name]"] = input.shipping.name;
+    data["shipping_address_collection[allowed_countries][0]"] = "ES";
+    data["phone_number_collection[enabled]"] = "true";
+  }
   if (input.customerId) data.customer = input.customerId;
   else data.customer_email = input.email;
   // Two clicks in the same minute reuse one Checkout session, never two subscriptions.
-  return stripePost("checkout/sessions", data, `premium:${input.memberId}:${input.monthlyCents}:${Math.floor(Date.now() / 60000)}`);
+  return stripePost("checkout/sessions", data, `premium:${input.memberId}:${input.monthlyCents}:${delivery}:${Math.floor(Date.now() / 60000)}`);
 }
 
 /** Stripe's hosted page where a subscriber changes card or cancels. */

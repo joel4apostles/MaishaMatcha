@@ -89,6 +89,11 @@ type Premium = {
   periodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   justSubscribed: boolean;
+  /** The tin in the monthly box, if any. */
+  product: string | null;
+  /** null = pickup only. */
+  shippingCents: number | null;
+  box: { createdAt: string; status: string; fulfilment: string; shippedAt: string | null } | null;
 };
 type Founding = { open: boolean; priceCents: number | null; cap: number; remaining: number; perks: string[] };
 
@@ -115,6 +120,7 @@ export function AccountPanel({
   const [foundingMsg, setFoundingMsg] = useState("");
   const [deleteMsg, setDeleteMsg] = useState("");
   const [premiumMsg, setPremiumMsg] = useState("");
+  const [delivery, setDelivery] = useState<"pickup" | "shipping">("pickup");
   const go = (fn: () => Promise<{ ok: true; url: string } | { ok: false; error: string }>, onErr: (m: string) => void) =>
     start(async () => {
       const r = await fn().catch(() => ({ ok: false as const, error: "generic" }));
@@ -124,6 +130,19 @@ export function AccountPanel({
   const until = premium.periodEnd
     ? new Date(premium.periodEnd).toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", { timeZone: "Europe/Madrid", day: "numeric", month: "long" })
     : "";
+
+  const fmtDate = (iso: string, o: Intl.DateTimeFormatOptions) =>
+    new Date(iso).toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", { timeZone: "Europe/Madrid", ...o });
+  const boxText = (b: NonNullable<Premium["box"]>) => {
+    const month = fmtDate(b.createdAt, { month: "long" });
+    if (b.status === "ready") return b.fulfilment === "shipping" ? t("boxReadyShip", { month }) : t("boxReadyPickup", { month });
+    if (b.status === "collected") return b.fulfilment === "shipping" && b.shippedAt ? t("boxShipped", { month, date: fmtDate(b.shippedAt, { day: "numeric", month: "long" }) }) : t("boxCollected", { month });
+    return null;
+  };
+  const tile = (selected: boolean) =>
+    `option-tile flex min-h-[56px] w-full cursor-pointer flex-col justify-center rounded-[2px] border px-4 py-3 transition-[border-color,background-color] duration-200 ease-out ${
+      selected ? "border-sumi/60 bg-matcha/[0.06]" : "border-wood/40 hover:border-wood/70"
+    }`;
 
   const isFounding = member.tier === "founding";
   // Nothing to offer yet: one quiet line instead of two closed doors.
@@ -223,8 +242,11 @@ export function AccountPanel({
                   ? t("premiumPastDue")
                   : premium.cancelAtPeriodEnd
                     ? t("premiumEnds", { date: until })
-                    : t("premiumActive", { date: until })}
+                    : until
+                      ? t("premiumActive", { date: until })
+                      : t("premiumActiveShort")}
               </p>
+              {premium.box && boxText(premium.box) ? <p className="mt-2 text-sumi">{boxText(premium.box)}</p> : null}
               <button type="button" disabled={pending} onClick={() => go(() => premiumPortalAction(locale), setPremiumMsg)} className={`${quietButton} mt-5`}>
                 {t("premiumManage")}
               </button>
@@ -236,6 +258,7 @@ export function AccountPanel({
           ) : premium.open && premium.priceCents ? (
             <>
               <p className="mt-4 text-sumi/80">{premium.foundingPrice ? t("premiumFoundingPrice") : t("premiumBody")}</p>
+              {premium.product ? <p className="mt-2 text-sumi">{t("premiumBox", { product: premium.product })}</p> : null}
               {premium.perks.length ? (
                 <ul className="mt-4 border-t border-wood/25">
                   {premium.perks.map((p) => (
@@ -245,8 +268,32 @@ export function AccountPanel({
                   ))}
                 </ul>
               ) : null}
-              <button type="button" disabled={pending} onClick={() => go(() => startPremiumAction(locale), setPremiumMsg)} className={`${quietButton} mt-6 w-full sm:w-auto`}>
-                {t("premiumCta", { price: formatEuro(premium.priceCents, locale) })}
+              {premium.product && premium.shippingCents != null ? (
+                <fieldset className="mt-6">
+                  <legend className="text-eyebrow font-medium uppercase text-sumi/70">{t("premiumDeliveryLegend")}</legend>
+                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <label className={tile(delivery === "pickup")}>
+                      <input type="radio" name="box-delivery" className="sr-only" checked={delivery === "pickup"} onChange={() => setDelivery("pickup")} />
+                      <span className="text-sumi">{t("premiumPickup")}</span>
+                      <span className="mt-0.5 text-sm text-sumi/70">{t("premiumPickupNote")}</span>
+                    </label>
+                    <label className={tile(delivery === "shipping")}>
+                      <input type="radio" name="box-delivery" className="sr-only" checked={delivery === "shipping"} onChange={() => setDelivery("shipping")} />
+                      <span className="text-sumi">{t("premiumShip")}</span>
+                      <span className="mt-0.5 text-sm text-sumi/70">{t("premiumShipNote", { price: formatEuro(premium.shippingCents, locale) })}</span>
+                    </label>
+                  </div>
+                </fieldset>
+              ) : null}
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => go(() => startPremiumAction(locale, delivery), setPremiumMsg)}
+                className={`${quietButton} mt-6 w-full sm:w-auto`}
+              >
+                {t("premiumCta", {
+                  price: formatEuro(premium.priceCents + (delivery === "shipping" && premium.shippingCents ? premium.shippingCents : 0), locale),
+                })}
               </button>
             </>
           ) : (

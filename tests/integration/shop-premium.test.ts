@@ -4,7 +4,8 @@ import type { Payload } from "payload";
 import { consumeSignIn, signInToken } from "@/lib/members";
 import { cancelUnpaidOnline, markOnlinePaid, placeOnlineOrder } from "@/lib/online";
 import { loadCatalog } from "@/lib/pos/sales";
-import { monthlyPriceFor, onPremiumCheckout, onPremiumInvoicePaid, onPremiumSubscription, premiumSettings, startPremium } from "@/lib/premium";
+import { markBoxCollected, markBoxShipped, monthlyPriceFor, onPremiumCheckout, onPremiumInvoicePaid, onPremiumSubscription, pendingBoxes, premiumSettings, startPremium } from "@/lib/premium";
+import { rsvp } from "@/lib/events";
 import { boot, staff } from "./harness";
 
 /**
@@ -133,6 +134,122 @@ describe("premium subscription", () => {
     const owner = await staff(payload, "owner-sp@test.local", "owner", "Owner");
     const seen = await payload.findByID({ collection: "members", id: m.id, user: owner, overrideAccess: false });
     expect(JSON.stringify(seen)).not.toContain("cus_1");
+  });
+});
+
+describe("monthly box (pickup or post) and subscriber events", () => {
+  const member = async (email: string) => (await consumeSignIn(payload, signInToken(email, "es")))!.member;
+  let boxId: number;
+  let owner: Awaited<ReturnType<typeof staff>>;
+
+  beforeAll(async () => {
+    owner = await staff(payload, "owner-box@test.local", "owner", "Owner");
+    const cat = (await payload.find({ collection: "menu-categories", overrideAccess: true, where: { slug: { equals: "tienda-test" } } })).docs[0];
+    const rate = (await payload.find({ collection: "tax-rates", overrideAccess: true, where: { name: { equals: "IVA 21 shop test" } } })).docs[0];
+    const box = await payload.create({
+      collection: "menu-items",
+      overrideAccess: true,
+      data: { name: "Lata Nishio 30 g", category: cat.id, priceCents: 2000, taxRate: rate.id, description: "Para cada día.", stock: 2, color: "#7A8F3A" } as never,
+    });
+    boxId = box.id;
+    await payload.updateGlobal({ slug: "business", data: { premiumProduct: boxId, premiumShippingCents: 490 } });
+  });
+  afterAll(async () => {
+    await payload.updateGlobal({ slug: "business", data: { premiumProduct: null, premiumShippingCents: null } });
+  });
+
+  it("offers home delivery only when a shipping price is set, and asks Stripe for an address in Spain", async () => {
+    const m = await member("post@box.test");
+    fetchMock.mockClear();
+    expect(await startPremium(payload, m, "es", "http://x", "shipping")).toMatchObject({ ok: true });
+    const body = new URLSearchParams(fetchMock.mock.calls[0][1].body);
+    expect(body.get("line_items[1][price_data][unit_amount]")).toBe("490");
+    expect(body.get("line_items[1][price_data][recurring][interval]")).toBe("month");
+    expect(body.get("shipping_address_collection[allowed_countries][0]")).toBe("ES");
+    expect(body.get("subscription_data[metadata][delivery]")).toBe("shipping");
+    expect(body.get("subscription_data[metadata][shipCents]")).toBe("490");
+
+    fetchMock.mockClear();
+    await startPremium(payload, await member("pick@box.test"), "es", "http://x", "pickup");
+    const pickup = new URLSearchParams(fetchMock.mock.calls[0][1].body);
+    expect(pickup.get("line_items[1][price_data][unit_amount]")).toBeNull();
+    expect(pickup.get("shipping_address_collection[allowed_countries][0]")).toBeNull();
+
+    await payload.updateGlobal({ slug: "business", data: { premiumShippingCents: null } });
+    expect(await startPremium(payload, await member("late@box.test"), "es", "http://x", "shipping")).toMatchObject({ ok: false, error: "closed" });
+    await payload.updateGlobal({ slug: "business", data: { premiumShippingCents: 490 } });
+  });
+
+  it("puts a pickup box at the bar: the tin as the line, one unit taken, handed over once", async () => {
+    const m = await member("pick@box.test");
+    const meta = { kind: "premium", memberId: String(m.id), taxBp: "2100", delivery: "pickup" };
+    const inv = { id: "in_box_p1", amount_paid: 1500, customer: "cus_p", subscription: "sub_p", payment_intent: "pi_p1", subscription_details: { metadata: meta } };
+    await Promise.all([onPremiumInvoicePaid(payload, inv), onPremiumInvoicePaid(payload, inv)]);
+    const orders = await payload.find({ collection: "orders", overrideAccess: true, where: { and: [{ member: { equals: m.id } }, { kind: { equals: "subscription" } }] } });
+    expect(orders.docs).toHaveLength(1);
+    const o = orders.docs[0];
+    expect(o).toMatchObject({ status: "ready", fulfilment: "pickup", paymentStatus: "paid", totalCents: 1500 });
+    expect(o.lines?.[0]?.name).toBe("Caja mensual: Lata Nishio 30 g");
+    expect((await payload.findByID({ collection: "menu-items", id: boxId, overrideAccess: true })).stock).toBe(1);
+    expect((await pendingBoxes(payload)).pickup.map((b) => b.id)).toContain(o.id);
+
+    expect(await markBoxCollected(payload, o.id, owner.id)).toBe(true);
+    expect(await markBoxCollected(payload, o.id, owner.id)).toBe(false);
+    expect((await pendingBoxes(payload)).pickup.map((b) => b.id)).not.toContain(o.id);
+  });
+
+  it("posts a box to the address Stripe collected, with shipping as its own line, marked shipped once", async () => {
+    const m = await member("post@box.test");
+    const meta = { kind: "premium", memberId: String(m.id), taxBp: "2100", delivery: "shipping", shipCents: "490" };
+    await onPremiumCheckout(payload, {
+      metadata: meta,
+      customer: "cus_s",
+      subscription: "sub_s",
+      collected_information: { shipping_details: { name: "Lucía Pérez", address: { line1: "Calle Mayor, 5", line2: "2º B", postal_code: "28013", city: "Madrid", state: "Madrid", country: "ES" } } },
+      customer_details: { phone: "+34600000000" },
+    });
+    const saved = await payload.findByID({ collection: "members", id: m.id, overrideAccess: true });
+    expect(saved.boxDelivery).toBe("shipping");
+    expect(saved.shipTo).toMatchObject({ name: "Lucía Pérez", line1: "Calle Mayor, 5", postalCode: "28013", city: "Madrid", phone: "+34600000000" });
+
+    await onPremiumInvoicePaid(payload, { id: "in_box_s1", amount_paid: 1990, customer: "cus_s", subscription: "sub_s", payment_intent: "pi_s1", subscription_details: { metadata: meta } });
+    const o = (await payload.find({ collection: "orders", overrideAccess: true, where: { and: [{ member: { equals: m.id } }, { kind: { equals: "subscription" } }] } })).docs[0];
+    expect(o).toMatchObject({ status: "ready", fulfilment: "shipping", totalCents: 1990 });
+    expect(o.lines?.map((l) => [l.name, l.unitCents])).toEqual([["Caja mensual: Lata Nishio 30 g", 1500], ["Envío a casa", 490]]);
+    expect(o.shipTo).toMatchObject({ city: "Madrid", line1: "Calle Mayor, 5" });
+    expect((await pendingBoxes(payload)).shipping.map((b) => b.id)).toContain(o.id);
+
+    expect(await markBoxShipped(payload, o.id, owner.id)).toBe(true);
+    expect(await markBoxShipped(payload, o.id, owner.id)).toBe(false);
+    const after = await payload.findByID({ collection: "orders", id: o.id, overrideAccess: true });
+    expect(after.status).toBe("collected");
+    expect(after.shippedAt).toBeTruthy();
+    expect((await payload.count({ collection: "audit-log", overrideAccess: true, where: { and: [{ action: { equals: "box.shipped" } }, { entityId: { equals: String(o.id) } }] } })).totalDocs).toBe(1);
+  });
+
+  it("still owes the box when the tins ran out, and says so on the order", async () => {
+    await payload.update({ collection: "menu-items", id: boxId, overrideAccess: true, data: { stock: 0 } });
+    const m = await member("empty@box.test");
+    const meta = { kind: "premium", memberId: String(m.id), taxBp: "2100", delivery: "pickup" };
+    await onPremiumInvoicePaid(payload, { id: "in_box_e1", amount_paid: 1500, customer: "cus_e", subscription: "sub_e", payment_intent: "pi_e1", subscription_details: { metadata: meta } });
+    const o = (await payload.find({ collection: "orders", overrideAccess: true, where: { member: { equals: m.id } } })).docs[0];
+    expect(o.status).toBe("ready");
+    expect(o.note).toContain("SIN EXISTENCIAS");
+    expect((await payload.findByID({ collection: "menu-items", id: boxId, overrideAccess: true })).stock).toBe(0);
+  });
+
+  it("opens members-only events to founders and paid-up subscribers, not to everyone", async () => {
+    const event = await payload.create({
+      collection: "events",
+      overrideAccess: true,
+      data: { title: "Cupping de Uji", when: "Sábado", description: "Tres cosechas.", startsAt: "2031-05-10T17:00:00.000Z", capacity: 10, membersOnly: true, kind: "cupping" } as never,
+    });
+    const sub = await member("sub-event@box.test");
+    const guest = await member("guest-event@box.test");
+    await payload.update({ collection: "members", id: sub.id, overrideAccess: true, data: { subscriptionStatus: "active" } as never });
+    expect(await rsvp(payload, { ...sub, subscriptionStatus: "active" }, event.id, 1)).toMatchObject({ ok: true });
+    expect(await rsvp(payload, guest, event.id, 1)).toMatchObject({ ok: false, error: "members-only" });
+    expect(await rsvp(payload, { ...guest, subscriptionStatus: "past_due" }, event.id, 1)).toMatchObject({ ok: false, error: "members-only" });
   });
 });
 

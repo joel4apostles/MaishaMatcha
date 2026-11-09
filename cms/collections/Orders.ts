@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { anyStaff, nobody } from "../access";
+import { shipToFields } from "../shipTo";
 
 /**
  * A sale. Created ONLY by the counter's server actions (lib/pos/orders.ts),
@@ -131,6 +132,24 @@ export const Orders: CollectionConfig = {
         { label: { es: "Suscripción premium", en: "Monthly subscription" }, value: "subscription" },
       ],
     },
+    {
+      name: "fulfilment",
+      type: "select",
+      label: { es: "Entrega de la caja", en: "Box delivery" },
+      admin: { readOnly: true, condition: (data) => data?.kind === "subscription" },
+      options: [
+        { label: { es: "Recoge en el salón", en: "Collects at the salon" }, value: "pickup" },
+        { label: { es: "Envío a casa", en: "Home delivery" }, value: "shipping" },
+      ],
+    },
+    {
+      name: "shipTo",
+      type: "group",
+      label: { es: "Enviar a", en: "Ship to" },
+      admin: { condition: (data) => data?.fulfilment === "shipping" },
+      fields: shipToFields(true),
+    },
+    { name: "shippedAt", type: "date", label: { es: "Enviada", en: "Shipped" }, admin: { readOnly: true, condition: (data) => data?.fulfilment === "shipping" } },
     { name: "staff", type: "relationship", relationTo: "users", label: { es: "Atendido por", en: "Served by" }, admin: { readOnly: true } },
     { name: "device", type: "relationship", relationTo: "pos-devices", label: "Tablet", admin: { readOnly: true } },
     { name: "shift", type: "relationship", relationTo: "shifts", label: { es: "Turno", en: "Shift" }, admin: { readOnly: true } },

@@ -179,7 +179,11 @@ export default buildConfig({
     components: {
       // Our own admin home: today, the launch checklist, what is pending, and
       // every collection as a compact list with counts (no tile grid).
-      views: { dashboard: { Component: "/cms/components/OwnerDashboard#OwnerDashboardView" } },
+      views: {
+        dashboard: { Component: "/cms/components/OwnerDashboard#OwnerDashboardView" },
+        // Subscribers' monthly boxes still owed: to post, and to collect.
+        boxes: { Component: "/cms/components/BoxesView#BoxesView", path: "/cajas", exact: true },
+      },
       graphics: {
         Icon: "/cms/components/AdminIcon#AdminIcon",
         Logo: "/cms/components/AdminLogo#AdminLogo",

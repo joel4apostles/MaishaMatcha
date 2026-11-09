@@ -21,7 +21,9 @@ export type AuditAction =
   | "pos.approval"
   | "pos.approval.failed"
   | "po.sent"
-  | "po.received";
+  | "po.received"
+  | "box.shipped"
+  | "box.collected";
 
 type Entry = {
   action: AuditAction;

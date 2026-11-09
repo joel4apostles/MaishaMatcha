@@ -4,7 +4,7 @@ import { editorialAccess } from "../access";
 /**
  * Salon events. Bookable when they have a date (startsAt) and a capacity;
  * otherwise they show as "date to be announced". Members-only events are
- * for founding members.
+ * for founding members and monthly subscribers (founder, 2026-11-09).
  */
 export const Events: CollectionConfig = {
   slug: "events",
@@ -29,7 +29,30 @@ export const Events: CollectionConfig = {
         { name: "capacity", type: "number", min: 1, max: 200, label: { es: "Plazas", en: "Seats" } },
       ],
     },
-    { name: "membersOnly", type: "checkbox", defaultValue: true, label: { es: "Solo socios fundadores", en: "Founding members only" } },
+    {
+      type: "row",
+      fields: [
+        {
+          name: "kind",
+          type: "select",
+          label: { es: "Tipo", en: "Type" },
+          options: [
+            { label: { es: "Cata", en: "Tasting" }, value: "tasting" },
+            { label: "Cupping", value: "cupping" },
+            { label: { es: "Taller", en: "Workshop" }, value: "workshop" },
+            { label: { es: "Ceremonia", en: "Ceremony" }, value: "ceremony" },
+            { label: { es: "Encuentro", en: "Gathering" }, value: "gathering" },
+          ],
+        },
+        {
+          name: "membersOnly",
+          type: "checkbox",
+          defaultValue: true,
+          label: { es: "Solo socios y suscriptores", en: "Members and subscribers only" },
+          admin: { description: { es: "Socios fundadores y suscriptores con la cuota al día.", en: "Founding members and subscribers whose fee is paid up." } },
+        },
+      ],
+    },
     { name: "photo", type: "upload", relationTo: "media", label: { es: "Foto", en: "Photo" } },
     { name: "order", type: "number", defaultValue: 0, label: { es: "Orden", en: "Order" } },
   ],

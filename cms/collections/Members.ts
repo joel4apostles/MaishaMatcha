@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { hiddenField, owner, ownerField, ownerOrManager } from "../access";
+import { shipToFields } from "../shipTo";
 
 /**
  * Customer accounts. Optional: nobody needs one to order. Signing in is by
@@ -83,6 +84,24 @@ export const Members: CollectionConfig = {
             { name: "subscriptionPeriodEnd", type: "date", label: { es: "Pagada hasta", en: "Paid until" }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
             { name: "cancelAtPeriodEnd", type: "checkbox", label: { es: "Termina al final del periodo", en: "Ends at the end of the period" }, access: { create: hiddenField, update: hiddenField }, admin: { readOnly: true } },
           ],
+        },
+        {
+          name: "boxDelivery",
+          type: "select",
+          defaultValue: "pickup",
+          label: { es: "Caja mensual", en: "Monthly box" },
+          options: [
+            { label: { es: "Recoge en el salón", en: "Collects at the salon" }, value: "pickup" },
+            { label: { es: "Envío a casa", en: "Home delivery" }, value: "shipping" },
+          ],
+          admin: { description: { es: "Lo elige al suscribirse. El cambio vale desde la próxima caja.", en: "Chosen when subscribing. A change applies from the next box." } },
+        },
+        {
+          name: "shipTo",
+          type: "group",
+          label: { es: "Dirección de envío", en: "Delivery address" },
+          admin: { condition: (data) => data?.boxDelivery === "shipping" },
+          fields: shipToFields(false),
         },
         // Stripe references: server only, never shown or editable.
         { name: "stripeCustomerId", type: "text", index: true, access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },

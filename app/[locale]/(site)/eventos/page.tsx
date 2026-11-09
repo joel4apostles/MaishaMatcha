@@ -7,7 +7,7 @@ import { Numeral } from "@/components/Numeral";
 import { Reveal } from "@/components/Reveal";
 import { inkButtonClass } from "@/components/Button";
 import { EventRsvp } from "@/components/EventRsvp";
-import { listEvents, memberRsvps } from "@/lib/events";
+import { listEvents, mayBookMembersOnly, memberRsvps } from "@/lib/events";
 import { currentMember } from "@/lib/members-server";
 import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/i18n/routing";
@@ -82,8 +82,12 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
                     )}
                   </div>
                   <div className="min-w-0">
-                    {event.membersOnly ? <p className="text-eyebrow uppercase text-leaf">{t("memberBadge")}</p> : null}
-                    <h2 className={`${event.membersOnly ? "mt-3" : ""} text-balance font-serif text-3xl font-light text-sumi sm:text-4xl`}>{event.title}</h2>
+                    {event.kind || event.membersOnly ? (
+                      <p className="text-eyebrow uppercase text-leaf">
+                        {[event.kind ? t(`kinds.${event.kind}`) : null, event.membersOnly ? t("memberBadge") : null].filter(Boolean).join(" · ")}
+                      </p>
+                    ) : null}
+                    <h2 className={`${event.kind || event.membersOnly ? "mt-3" : ""} text-balance font-serif text-3xl font-light text-sumi sm:text-4xl`}>{event.title}</h2>
                     <p className="measure mt-4 text-sumi/80">{event.description}</p>
                   </div>
                   <div className="md:pt-1">
@@ -94,7 +98,7 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
                         remaining={event.remaining ?? 0}
                         mine={mine.get(event.id) ?? 0}
                         signedIn={Boolean(member)}
-                        allowed={!event.membersOnly || member?.tier === "founding"}
+                        allowed={!event.membersOnly || Boolean(member && mayBookMembersOnly(member))}
                       />
                     ) : (
                       <p className="text-sm text-sumi/70">{t("soon")}</p>

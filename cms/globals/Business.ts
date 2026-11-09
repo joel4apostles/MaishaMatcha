@@ -137,6 +137,36 @@ export const Business: GlobalConfig = {
             { name: "premiumTaxRate", type: "relationship", relationTo: "tax-rates", label: { es: "IVA de la cuota", en: "VAT on the fee" } },
           ],
         },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "premiumProduct",
+              type: "relationship",
+              relationTo: "menu-items",
+              label: { es: "Producto de la caja mensual", en: "Monthly box product" },
+              filterOptions: { "category.shop": { equals: true } },
+              admin: {
+                description: {
+                  es: "La lata (de la Tienda) que cada suscriptor recibe cada mes. Se descuenta una unidad por caja. Vacío = la cuota no incluye producto.",
+                  en: "The tin (from the Shop) every subscriber gets each month. One unit is taken per box. Empty = the fee includes no product.",
+                },
+              },
+            },
+            {
+              name: "premiumShippingCents",
+              type: "number",
+              min: 0,
+              label: { es: "Envío a casa al mes (céntimos, IVA incluido)", en: "Home delivery per month (cents, VAT included)" },
+              admin: {
+                description: {
+                  es: "Vacío = solo recogida en el salón. Solo direcciones en España; las etiquetas las compras tú (Correos u otro).",
+                  en: "Empty = pickup at the salon only. Addresses in Spain only; you buy the labels (Correos or another).",
+                },
+              },
+            },
+          ],
+        },
         { name: "premiumPerks", type: "textarea", localized: true, label: { es: "Qué incluye (una línea por ventaja)", en: "What it includes (one line per benefit)" } },
       ],
     },

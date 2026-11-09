@@ -2,6 +2,7 @@ import type { Payload } from "payload";
 import Link from "next/link";
 import { Gutter } from "@payloadcms/ui";
 import { inventoryAlerts } from "@/lib/inventory";
+import { pendingBoxes } from "@/lib/premium";
 import { madridDay, today } from "@/lib/reports";
 import { COLLECTION_NOTES, COLLECTION_NOTES_EN, DASH, SECONDARY, setupSteps } from "@/lib/dashboard";
 
@@ -82,7 +83,10 @@ export async function OwnerDashboardView({ payload, navGroups = [], i18n }: { pa
   }, lang);
   const done = steps.filter((s) => s.done).length;
 
+  const boxes = await pendingBoxes(payload).catch(() => ({ pickup: [], shipping: [] }));
   const pending: Pending[] = [
+    ...(boxes.shipping.length ? [{ key: "box-ship", text: T.boxesShip(boxes.shipping.length), href: "/admin/cajas" }] : []),
+    ...(boxes.pickup.length ? [{ key: "box-pickup", text: T.boxesPickup(boxes.pickup.length), href: "/admin/cajas" }] : []),
     ...(webOrders.totalDocs ? [{ key: "web", text: T.webOrders(webOrders.totalDocs), href: "/admin/collections/orders" }] : []),
     ...(refundFlags.totalDocs ? [{ key: "refund", text: T.refundFlags(refundFlags.totalDocs), href: "/admin/collections/orders" }] : []),
     ...alerts.draftOrders.map((d) => ({ key: `po-${d.id}`, text: T.po(String(d.label), d.supplier, euro(d.totalCents)), href: `/admin/collections/purchase-orders/${d.id}` })),

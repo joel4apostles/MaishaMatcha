@@ -338,3 +338,18 @@ body {
     display: none !important;
   }
 }
+
+/* ---------- Cajas del mes (cms/components/BoxesView.tsx) ---------- */
+.maisha-dash {
+  .md-boxes { margin-top: 12px; }
+  .md-boxes li { padding: 14px 0; border-top: 1px solid rgba(176, 141, 87, 0.25); }
+  .md-boxes li:first-child { border-top: 0; padding-top: 4px; }
+  .md-address { margin-top: 8px; font-style: normal; line-height: 1.5; user-select: all; }
+  .md-boxbtn { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; }
+  .md-boxbtn button {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; cursor: pointer;
+    background: #1c1b18; color: #f5f1e8; border: 1px solid #1c1b18; border-radius: 2px; font: inherit; font-size: 14px;
+  }
+  .md-boxbtn button:disabled { opacity: 0.6; cursor: default; }
+  .md-boxbtn [role="status"] { font-size: 13px; }
+}

@@ -89,13 +89,13 @@ async function siteBase() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === "production" ? null : `http://${(await headers()).get("host")}`);
 }
 
-export async function startPremiumAction(locale: "es" | "en") {
+export async function startPremiumAction(locale: "es" | "en", delivery: "pickup" | "shipping" = "pickup") {
   const m = await currentMember();
   if (!m) return { ok: false as const, error: "signed-out" };
   if (!rateLimit(`premium:${m.id}`, 5)) return { ok: false as const, error: "rate-limited" };
   const base = await siteBase();
   if (!base) return { ok: false as const, error: "closed" };
-  return startPremium(await getPayload({ config }), m, locale === "en" ? "en" : "es", base);
+  return startPremium(await getPayload({ config }), m, locale === "en" ? "en" : "es", base, delivery === "shipping" ? "shipping" : "pickup");
 }
 
 export async function premiumPortalAction(locale: "es" | "en") {

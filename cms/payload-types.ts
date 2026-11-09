@@ -233,6 +233,17 @@ export interface Order {
   publicToken?: string | null;
   member?: (number | null) | Member;
   kind?: ('sale' | 'membership' | 'subscription') | null;
+  fulfilment?: ('pickup' | 'shipping') | null;
+  shipTo?: {
+    name?: string | null;
+    phone?: string | null;
+    line1?: string | null;
+    line2?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    province?: string | null;
+  };
+  shippedAt?: string | null;
   staff?: (number | null) | User;
   device?: (number | null) | PosDevice;
   shift?: (number | null) | Shift;
@@ -428,6 +439,19 @@ export interface Member {
   subscriptionStatus?: ('none' | 'active' | 'past_due' | 'cancelled') | null;
   subscriptionPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean | null;
+  /**
+   * Chosen when subscribing. A change applies from the next box.
+   */
+  boxDelivery?: ('pickup' | 'shipping') | null;
+  shipTo?: {
+    name?: string | null;
+    phone?: string | null;
+    line1?: string | null;
+    line2?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    province?: string | null;
+  };
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
   subscriptionEventAt?: number | null;
@@ -863,6 +887,10 @@ export interface Event {
   description: string;
   startsAt?: string | null;
   capacity?: number | null;
+  kind?: ('tasting' | 'cupping' | 'workshop' | 'ceremony' | 'gathering') | null;
+  /**
+   * Founding members and subscribers whose fee is paid up.
+   */
   membersOnly?: boolean | null;
   photo?: (number | null) | Media;
   order?: number | null;
@@ -1189,6 +1217,19 @@ export interface OrdersSelect<T extends boolean = true> {
   publicToken?: T;
   member?: T;
   kind?: T;
+  fulfilment?: T;
+  shipTo?:
+    | T
+    | {
+        name?: T;
+        phone?: T;
+        line1?: T;
+        line2?: T;
+        postalCode?: T;
+        city?: T;
+        province?: T;
+      };
+  shippedAt?: T;
   staff?: T;
   device?: T;
   shift?: T;
@@ -1483,6 +1524,18 @@ export interface MembersSelect<T extends boolean = true> {
   subscriptionStatus?: T;
   subscriptionPeriodEnd?: T;
   cancelAtPeriodEnd?: T;
+  boxDelivery?: T;
+  shipTo?:
+    | T
+    | {
+        name?: T;
+        phone?: T;
+        line1?: T;
+        line2?: T;
+        postalCode?: T;
+        city?: T;
+        province?: T;
+      };
   stripeCustomerId?: T;
   stripeSubscriptionId?: T;
   subscriptionEventAt?: T;
@@ -1550,6 +1603,7 @@ export interface EventsSelect<T extends boolean = true> {
   description?: T;
   startsAt?: T;
   capacity?: T;
+  kind?: T;
   membersOnly?: T;
   photo?: T;
   order?: T;
@@ -1806,6 +1860,14 @@ export interface Business {
    */
   premiumFoundingMonthlyCents?: number | null;
   premiumTaxRate?: (number | null) | TaxRate;
+  /**
+   * The tin (from the Shop) every subscriber gets each month. One unit is taken per box. Empty = the fee includes no product.
+   */
+  premiumProduct?: (number | null) | MenuItem;
+  /**
+   * Empty = pickup at the salon only. Addresses in Spain only; you buy the labels (Correos or another).
+   */
+  premiumShippingCents?: number | null;
   premiumPerks?: string | null;
   /**
    * Flags drinks whose margin drops below this.
@@ -1844,6 +1906,8 @@ export interface BusinessSelect<T extends boolean = true> {
   premiumMonthlyCents?: T;
   premiumFoundingMonthlyCents?: T;
   premiumTaxRate?: T;
+  premiumProduct?: T;
+  premiumShippingCents?: T;
   premiumPerks?: T;
   targetMarginPercent?: T;
   updatedAt?: T;

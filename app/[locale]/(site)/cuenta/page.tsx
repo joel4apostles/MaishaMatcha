@@ -6,7 +6,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { Numeral } from "@/components/Numeral";
 import { AccountPanel, SignInForm } from "@/components/Account";
 import { foundingSettings } from "@/lib/founding";
-import { monthlyPriceFor, premiumSettings } from "@/lib/premium";
+import { latestBox, monthlyPriceFor, premiumSettings } from "@/lib/premium";
 import { memberOrders } from "@/lib/members";
 import { currentMember } from "@/lib/members-server";
 import { pageMetadata } from "@/lib/seo";
@@ -104,6 +104,7 @@ export default async function AccountPage({
     foundingSettings(payload, locale as "es" | "en").catch(() => null),
     premiumSettings(payload, locale as "es" | "en").catch(() => null),
   ]);
+  const box = await latestBox(payload, member.id).catch(() => null);
 
   return (
     <div className={shell}>
@@ -132,6 +133,9 @@ export default async function AccountPage({
             periodEnd: member.subscriptionPeriodEnd ?? null,
             cancelAtPeriodEnd: Boolean(member.cancelAtPeriodEnd),
             justSubscribed: sp.premium === "1",
+            product: premium?.product?.name ?? null,
+            shippingCents: premium?.shippingCents ?? null,
+            box,
           }}
         />
       </div>

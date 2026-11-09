@@ -4,14 +4,23 @@ import { events as fallbackEvents } from "@/content/events";
 
 /**
  * Events from the CMS, with seats. Booking locks the event row so the last
- * seat cannot be sold twice. Members-only events are for founding members.
+ * seat cannot be sold twice. Members-only events are for founding members
+ * and subscribers whose monthly fee is paid up (founder, 2026-11-09).
  */
+export const EVENT_KINDS = ["tasting", "cupping", "workshop", "ceremony", "gathering"] as const;
+export type EventKind = (typeof EVENT_KINDS)[number];
+
+/** Who may book a members-only event: a founder, or a subscriber in good standing. */
+export const mayBookMembersOnly = (m: { tier: string; subscriptionStatus?: string | null }) =>
+  m.tier === "founding" || m.subscriptionStatus === "active";
+
 export type PublicEvent = {
   id: number | string;
   title: string;
   when: string;
   description: string;
   membersOnly: boolean;
+  kind: EventKind | null;
   bookable: boolean;
   remaining: number | null;
   startsAt: string | null;
@@ -52,6 +61,7 @@ export async function listEvents(payload: Payload | null, locale: "es" | "en", n
         when: d.when,
         description: d.description,
         membersOnly: Boolean(d.membersOnly),
+        kind: (d.kind as EventKind | null | undefined) ?? null,
         startsAt: d.startsAt ?? null,
         bookable: isBookable(d, now),
         remaining: d.capacity ? Math.max(0, d.capacity - (taken.get(d.id) ?? 0)) : null,
@@ -68,6 +78,7 @@ function fallback(locale: "es" | "en"): PublicEvent[] {
     when: e.when[locale],
     description: e.description[locale],
     membersOnly: e.membersOnly,
+    kind: null,
     bookable: false,
     remaining: null,
     startsAt: null,
@@ -78,7 +89,7 @@ export type RsvpResult = { ok: true; seats: number } | { ok: false; error: "not-
 
 export async function rsvp(
   payload: Payload,
-  member: { id: number; tier: string; status: string },
+  member: { id: number; tier: string; status: string; subscriptionStatus?: string | null },
   eventId: number,
   seats: number,
   now = new Date(),
@@ -94,7 +105,7 @@ export async function rsvp(
       return { ok: false as const, error };
     };
     if (!event || !isBookable(event, now)) return fail("not-bookable");
-    if (event.membersOnly && member.tier !== "founding") return fail("members-only");
+    if (event.membersOnly && !mayBookMembersOnly(member)) return fail("members-only");
     if (member.status !== "active") return fail("invalid");
 
     const existing = (
