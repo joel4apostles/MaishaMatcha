@@ -135,7 +135,7 @@
     "privacy": {
       "title": "Privacidad",
       "intro": "Qué datos guardamos, para qué, cuánto tiempo y cómo puedes pedir que los borremos. Lo escribimos claro a propósito.",
-      "updated": "Actualizado el 6 de noviembre de 2026.",
+      "updated": "Actualizado el 9 de noviembre de 2026.",
       "sections": [
         {
           "title": "Quién es responsable",
@@ -156,6 +156,10 @@
         {
           "title": "Tu cuenta",
           "body": "La cuenta es opcional. Guarda tu nombre, tu correo, tu idioma, tus pedidos, tus reservas y, si eres socio, tu número y tu suscripción. Entras con un enlace que te enviamos, sin contraseñas. Base: el contrato de la cuenta."
+        },
+        {
+          "title": "Suscripción mensual",
+          "body": "Si te suscribes, guardamos cómo recibes la caja. Si eliges envío a casa, también el nombre, la dirección y el teléfono que das en el pago, para enviarla; cada caja enviada conserva la dirección a la que salió. Base: el contrato de la suscripción. Puedes cambiar la dirección escribiéndonos."
         },
         {
           "title": "Cartas por email",

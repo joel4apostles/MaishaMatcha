@@ -4,6 +4,7 @@ import { hashPin, pinProblem } from "@/lib/pos/pin";
 import { hiddenField, nobody, owner, ownerField } from "../access";
 import { changed, writeAudit } from "../audit";
 import { integerCents } from "../validators";
+import { resetEmailHTML } from "@/lib/invite";
 
 /**
  * Staff accounts (never customers). Owner creates, edits and deactivates
@@ -15,12 +16,19 @@ export const Users: CollectionConfig = {
   labels: { singular: { es: "Persona del equipo", en: "Team member" }, plural: { es: "Equipo", en: "Team" } },
   auth: {
     tokenExpiration: 60 * 60 * 12,
+    // The reset email in our words and frame (no expiration here: an
+    // invitation passes its own 7 days, a reset keeps Payload's hour).
+    forgotPassword: {
+      generateEmailSubject: () => "Una contraseña nueva para maisha matcha",
+      generateEmailHTML: (args) => resetEmailHTML({ token: args?.token, user: args?.user as { name?: string } }),
+    },
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
   },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "email", "role", "active"],
+    components: { beforeListTable: ["/cms/components/InviteLink#InviteLink"] },
   },
   access: {
     admin: ({ req }) => canUseBackOffice(req.user),

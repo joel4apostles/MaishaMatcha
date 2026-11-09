@@ -135,7 +135,7 @@
     "privacy": {
       "title": "Privacy",
       "intro": "What data we keep, why, for how long, and how to ask us to delete it. Written plainly on purpose.",
-      "updated": "Updated 6 November 2026.",
+      "updated": "Updated 9 November 2026.",
       "sections": [
         {
           "title": "Who is responsible",
@@ -156,6 +156,10 @@
         {
           "title": "Your account",
           "body": "The account is optional. It keeps your name, email, language, orders, bookings and, if you are a member, your number and subscription. You sign in with a link we email you, without passwords. Basis: the account contract."
+        },
+        {
+          "title": "Monthly subscription",
+          "body": "If you subscribe, we keep how you get the box. If you choose home delivery, also the name, address and phone you give at checkout, to post it; each box sent keeps the address it went to. Basis: the subscription contract. Write to us to change the address."
         },
         {
           "title": "Email letters",

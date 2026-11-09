@@ -33,6 +33,7 @@ import { Members } from "./cms/collections/Members";
 import { Rsvps } from "./cms/collections/Rsvps";
 import { Campaigns } from "./cms/collections/Campaigns";
 import { appSecret } from "./lib/secret";
+import { resendEmail } from "./lib/payloadEmail";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -154,6 +155,8 @@ export default buildConfig({
   ...(siteURL ? { serverURL: siteURL, csrf: [siteURL] } : {}),
   db,
   sharp,
+  // Password resets and invitations go out through Resend (silent without a key).
+  email: resendEmail,
   localization: {
     // Named, so the selector reads "Español / English", not "es / en".
     locales: [
@@ -183,6 +186,8 @@ export default buildConfig({
         dashboard: { Component: "/cms/components/OwnerDashboard#OwnerDashboardView" },
         // Subscribers' monthly boxes still owed: to post, and to collect.
         boxes: { Component: "/cms/components/BoxesView#BoxesView", path: "/cajas", exact: true },
+        // Invite an owner or manager by email: they choose their own password.
+        invite: { Component: "/cms/components/InviteView#InviteView", path: "/invitar", exact: true },
       },
       graphics: {
         Icon: "/cms/components/AdminIcon#AdminIcon",
@@ -197,8 +202,31 @@ export default buildConfig({
     // The top-right selector switches which language of the CONTENT you
     // edit (event titles, descriptions), not the admin's own language.
     translations: {
-      es: { general: { locale: "Contenido en" }, authentication: { login: "Entrar" } },
-      en: { general: { locale: "Content in" }, authentication: { login: "Sign in" } },
+      // Sign-in, reset and invitation screens in the salon's words.
+      es: {
+        general: { locale: "Contenido en" },
+        authentication: {
+          login: "Entrar",
+          resetPassword: "Elige tu contraseña",
+          newPassword: "Contraseña",
+          confirmPassword: "Repite la contraseña",
+          backToLogin: "Volver a entrar",
+          forgotPassword: "Contraseña olvidada",
+          forgotPasswordEmailInstructions: "Escribe tu correo y te enviaremos un enlace para elegir una contraseña nueva.",
+        },
+      },
+      en: {
+        general: { locale: "Content in" },
+        authentication: {
+          login: "Sign in",
+          resetPassword: "Choose your password",
+          newPassword: "Password",
+          confirmPassword: "Repeat the password",
+          backToLogin: "Back to sign in",
+          forgotPassword: "Forgotten password",
+          forgotPasswordEmailInstructions: "Type your email and we will send you a link to choose a new password.",
+        },
+      },
     },
   },
   // Dashboard order and groups follow how the salon works, not the schema.

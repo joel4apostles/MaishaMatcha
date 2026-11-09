@@ -23,7 +23,8 @@ export type AuditAction =
   | "po.sent"
   | "po.received"
   | "box.shipped"
-  | "box.collected";
+  | "box.collected"
+  | "staff.invite";
 
 type Entry = {
   action: AuditAction;

@@ -353,3 +353,45 @@ body {
   .md-boxbtn button:disabled { opacity: 0.6; cursor: default; }
   .md-boxbtn [role="status"] { font-size: 13px; }
 }
+
+/* ---------- Invitar (cms/components/InviteView.tsx) ---------- */
+.maisha-dash {
+  .md-measure { max-width: 60ch; }
+  .md-narrow { max-width: 480px; }
+  .md-form { display: grid; gap: 20px; }
+  .md-form label { display: grid; gap: 6px; font-size: 13px; color: rgba(28, 27, 24, 0.8); }
+  .md-form input[type="email"], .md-form input:not([type]) {
+    font: inherit; font-size: 16px; min-height: 44px; padding: 0; color: #1c1b18;
+    background: transparent; border: 0; border-bottom: 1px solid rgba(28, 27, 24, 0.5); border-radius: 0;
+  }
+  .md-form input:focus { outline: none; border-bottom: 2px solid #1c1b18; }
+  .md-form fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .md-form legend { font-size: 13px; color: rgba(28, 27, 24, 0.8); margin-bottom: 6px; }
+  .md-form .md-radio { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 15px; color: #1c1b18; }
+  .md-form .md-radio input { width: 18px; height: 18px; accent-color: #1c1b18; }
+  .md-form > button, .md-result button {
+    justify-self: start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; cursor: pointer;
+    background: #1c1b18; color: #f5f1e8; border: 1px solid #1c1b18; border-radius: 2px; font: inherit; font-size: 14px;
+  }
+  .md-form > button:disabled { opacity: 0.6; }
+  .md-result { display: grid; gap: 10px; }
+  .md-result p { margin: 0; }
+  .md-link { font-size: 13px; word-break: break-all; padding: 10px 12px; border: 1px solid rgba(176, 141, 87, 0.4); user-select: all; }
+}
+
+.maisha-invite-link {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px;
+  margin: 0 0 20px; padding: 14px 18px; border: 1px solid rgba(176, 141, 87, 0.35); border-radius: 2px;
+  p { margin: 0; font-size: 14px; color: rgba(28, 27, 24, 0.8); max-width: 70ch; }
+  a {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; text-decoration: none;
+    background: #1c1b18; color: #f5f1e8; border-radius: 2px; font-size: 14px;
+  }
+}
+
+/* Reset and forgotten-password screens: the serif title of the code screens. */
+.template-minimal h1 {
+  font-family: var(--md-serif);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}

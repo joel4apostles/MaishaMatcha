@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-08, afternoon (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-09 (Opus 5.5 session). Subscription box + invitations committed locally, NOT pushed yet.
 
 ## Where things stand
 
@@ -73,10 +73,20 @@ Last updated: 2026-11-08, afternoon (Opus 5.5 session). main = origin/main, ever
   when absent; verified in a browser that the switch sticks).
   **Lost phone**: Joel runs in Supabase SQL editor
   `update payload.users set totp_secret = null where email = '<email>';`
+  Admin language: avatar top right → Configuración de Payload → Idioma
+  (the "Contenido en" menu is the CONTENT language, not the admin's).
   then signs in and scans a new QR. The plugin's own "has a code" check ran
   outside transactions and locked the pool under parallel sales: replaced
   by `hasTotpInTransaction` (keep it when upgrading the plugin).
-- 151 tests pass (one removed with blendColor). Forms use sumi/50
+- **Subscription box + subscriber events + staff invitations** (2026-11-09,
+  see CLAUDE.md). Founder chose: pickup AND shipping in Spain, one fixed
+  product, events for founders + subscribers. To switch on: Empresa →
+  Suscripción premium (price, IVA, box product from Tienda, shipping price
+  or empty for pickup only, perks, the switch) + Stripe keys. IVA of the
+  fee/box/shipping: confirm with the gestoría (one rate for all lines now;
+  Canarias addresses are allowed by Stripe "ES" but IGIC differs).
+  Real owner: Equipo → Invitar a alguien (link to WhatsApp until Resend).
+- 157 tests pass. Forms use sumi/50
   underlines (AA). Admin fonts self-hosted via next/font.
 
 ## Next

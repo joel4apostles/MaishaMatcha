@@ -79,6 +79,18 @@ OG, admin) inherits them.
   web price, `stock` units). /tienda reuses the pickup checkout; units are
   taken atomically (`lib/units.ts`), max 5 per product per order, paid
   online when cards are on, and returned exactly once on cancel/void/expiry.
+- **Monthly box** (2026-11-09, founder): the subscription includes one
+  fixed shop product (Empresa → "Producto de la caja mensual"); each paid
+  month the order carries it, takes one unit (flagged SIN EXISTENCIAS when
+  none) and waits as "ready". Pickup: the counter's Pedidos page lists it,
+  "Entregada". Post (only if Empresa has a shipping price): Stripe Checkout
+  collects a Spanish address + a second monthly line; /admin/cajas lists
+  addresses, "Marcar enviada" (conditional update, audited, emails). Members-
+  only events = founders + subscribers with status active (`mayBookMembersOnly`).
+- **Staff invitations** (/admin/invitar, owner only): account with a random
+  password + a 7-day reset link (`lib/invite.ts`), emailed via Resend or
+  shown to copy. Never a self-claim by email (no proof of ownership).
+  Payload's emails use `lib/payloadEmail.ts` (Resend HTTP, silent w/o key).
 - **Monthly membership** (`lib/premium.ts`; the word "premium" is internal
   only, customers read "suscripción mensual"): Stripe subscription, founding
   price for founders, one invoiced order per paid month (invoice.paid),

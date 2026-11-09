@@ -316,3 +316,22 @@ describe("authenticator code (two-step sign-in)", () => {
     expect((me as unknown as Record<string, unknown>).totpSecret).toBeUndefined();
   });
 });
+
+describe("invitations (owner invites, the person sets their own password)", () => {
+  it("creates the account with an unknown password and a 7-day link that sets theirs", async () => {
+    const { inviteStaff } = await import("@/lib/invite");
+    const r = await inviteStaff(payload, { name: "Carmen López", email: "Carmen@Invite.test", role: "manager" });
+    if (!r.ok) throw new Error(r.error);
+    expect(r.sent).toBe(false); // no RESEND_API_KEY in tests: the link comes back instead
+    expect(r.link).toMatch(/\/admin\/reset\/[A-Za-z0-9]+$/);
+    const user = (await payload.find({ collection: "users", overrideAccess: true, where: { email: { equals: "carmen@invite.test" } } })).docs[0];
+    expect(user).toMatchObject({ role: "manager", active: true });
+
+    const token = r.link.split("/").pop()!;
+    await payload.resetPassword({ collection: "users", overrideAccess: true, data: { token, password: "carmen-chose-this-1" } });
+    const login = await payload.login({ collection: "users", data: { email: "carmen@invite.test", password: "carmen-chose-this-1" } });
+    expect(login.user?.id).toBe(user.id);
+
+    expect(await inviteStaff(payload, { name: "Again", email: "carmen@invite.test", role: "manager" })).toMatchObject({ ok: false, error: "exists" });
+  });
+});
