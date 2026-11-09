@@ -2,7 +2,10 @@ import { createElement } from "react";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
+import { getPayload } from "payload";
+import config from "@payload-config";
 import { rateLimit } from "@/lib/rateLimit";
+import { LIMITS, allowed, humanCheck } from "@/lib/limits";
 import { WaitlistConfirmation } from "@/emails/waitlist-confirmation";
 
 export const runtime = "nodejs";
@@ -58,14 +61,17 @@ export async function POST(request: Request) {
   }
 
   let json: unknown;
+  let token: unknown;
   try {
     if (isForm) {
       const form = await request.formData();
       formLocale = form.get("locale") === "en" ? "en" : "es";
       if (form.get("consent") !== "on") return reply({ error: "consent_required" }, 400);
       json = { name: form.get("name"), email: form.get("email"), locale: formLocale };
+      token = form.get("cf-turnstile-response");
     } else {
       json = await request.json();
+      token = (json as { turnstile?: unknown } | null)?.turnstile;
     }
   } catch {
     return reply({ error: "invalid_body" }, 400);
@@ -76,6 +82,11 @@ export async function POST(request: Request) {
     return reply({ error: "invalid_input" }, 400);
   }
   const { name, email, locale } = parsed.data;
+
+  // Shared limits (every instance) and, once its keys are set, Turnstile.
+  const payload = await getPayload({ config }).catch(() => null);
+  if (payload && !(await allowed(payload, LIMITS.waitlist(clientIp(request), email)))) return reply({ error: "rate_limited" }, 429);
+  if (!(await humanCheck(token, clientIp(request)))) return reply({ error: "challenge_failed" }, 400);
 
   const apiKey = process.env.RESEND_API_KEY;
   const audienceId = process.env.RESEND_AUDIENCE_ID;

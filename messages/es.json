@@ -175,7 +175,7 @@
         },
         {
           "title": "Con quién trabajamos",
-          "body": "Supabase (base de datos, en la Unión Europea), Vercel (alojamiento de la web), Stripe (pagos) y Resend (envío de correos). Algunos tienen servidores fuera de la Unión Europea; las transferencias se amparan en el Marco de Privacidad de Datos UE y EE. UU. o en cláusulas contractuales tipo. No vendemos datos ni los cedemos a nadie más."
+          "body": "Supabase (base de datos, en la Unión Europea), Vercel (alojamiento de la web), Stripe (pagos), Resend (envío de correos) y Cloudflare Turnstile (comprueba que los formularios los envía una persona, sin cookies de seguimiento). Algunos tienen servidores fuera de la Unión Europea; las transferencias se amparan en el Marco de Privacidad de Datos UE y EE. UU. o en cláusulas contractuales tipo. No vendemos datos ni los cedemos a nadie más."
         },
         {
           "title": "Cookies",
@@ -629,7 +629,8 @@
       "unavailable-option": "Una opción se ha agotado.",
       "too-many": "Ya tienes varios pedidos abiertos. Espera a recoger uno.",
       "too-many-units": "Como mucho cinco unidades de cada producto.",
-      "pay-online": "Los productos de la tienda se pagan al pedir."
+      "pay-online": "Los productos de la tienda se pagan al pedir.",
+      "challenge": "No hemos podido comprobar que no eres un robot. Recarga la página y prueba otra vez."
     },
     "status": {
       "eyebrow": "Tu pedido",
@@ -707,7 +708,8 @@
       "already": "Ya eres socio fundador.",
       "signed-out": "Tu sesión ha terminado. Vuelve a entrar.",
       "pending": "Ya tienes un pago empezado. Termínalo en la otra pestaña o espera media hora.",
-      "subscribed": "Tienes una suscripción activa. Cancélala primero en Gestionar la suscripción y después borra la cuenta."
+      "subscribed": "Tienes una suscripción activa. Cancélala primero en Gestionar la suscripción y después borra la cuenta.",
+      "challenge": "No hemos podido comprobar que no eres un robot. Recarga la página y prueba otra vez."
     },
     "premiumTitle": "Suscripción mensual",
     "premiumBody": "Una cuota al mes. La cancelas cuando quieras.",

@@ -11,11 +11,12 @@ import type { Slot } from "@/lib/slots";
 import { Link } from "@/i18n/navigation";
 import { productSlug, restoreLines } from "@/lib/shop";
 import { Numeral } from "@/components/Numeral";
+import { useHumanCheck } from "@/components/HumanCheck";
 
 type Line = { uid: string; item: CatalogItem; quantity: number; modifierKeys: string[] };
 /** Section markers, as on the carta: kanji numerals in the brush face. */
 const NUMERALS = ["一", "二", "三", "四", "五", "六", "七", "八"];
-const KNOWN = ["closed", "too-many", "too-many-units", "pay-online", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option"];
+const KNOWN = ["closed", "too-many", "too-many-units", "pay-online", "slot-full", "invalid", "rate-limited", "missing-required", "unavailable-item", "unavailable-option", "challenge"];
 
 const unitOf = (l: Line) =>
   l.item.priceCents +
@@ -59,6 +60,7 @@ export function OnlineOrder({
   table?: number | null;
 }) {
   const t = useTranslations("order");
+  const human = useHumanCheck(useLocale() === "en" ? "en" : "es");
   const locale = useLocale() as "es" | "en";
   const [lines, setLines] = useState<Line[]>(() =>
     initialLines.flatMap((l, i) => {
@@ -258,7 +260,9 @@ export function OnlineOrder({
           table,
           payOnline: payOnline || hasShopItem,
           lines: lines.map((l) => ({ menuItemId: l.item.id, quantity: l.quantity, modifierKeys: l.modifierKeys })),
+          turnstile: human.token,
         });
+        human.reset();
         if (r.ok) {
           if (persistKey) {
             try {
@@ -532,6 +536,7 @@ export function OnlineOrder({
                 </fieldset>
               ) : null}
 
+              {human.box}
               <p role="status" className="min-h-[1.25rem] text-sm text-sumi">
                 {error}
               </p>

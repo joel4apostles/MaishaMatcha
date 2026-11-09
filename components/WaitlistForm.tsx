@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { buttonClass } from "./Button";
+import { useHumanCheck } from "@/components/HumanCheck";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -40,6 +41,7 @@ const toneStyles = {
 export function WaitlistForm({ dark = false }: { dark?: boolean }) {
   const s = toneStyles[dark ? "dark" : "light"];
   const t = useTranslations("waitlist");
+  const human = useHumanCheck(useLocale() === "en" ? "en" : "es");
   const locale = useLocale();
   const ids = useId();
   const nameId = `${ids}-name`;
@@ -103,8 +105,9 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, locale }),
+        body: JSON.stringify({ name, email, locale, turnstile: human.token }),
       });
+      human.reset();
       if (res.status === 429) {
         setStatus("error");
         setErrors({ form: t("errorRate") });
@@ -222,6 +225,7 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
         </div>
 
         <div className="flex flex-col gap-3">
+          {human.box}
           <button
             type="submit"
             disabled={status === "submitting"}

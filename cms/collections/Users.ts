@@ -5,7 +5,7 @@ import { hiddenField, nobody, owner, ownerField } from "../access";
 import { changed, writeAudit } from "../audit";
 import { integerCents } from "../validators";
 import { resetEmailHTML } from "@/lib/invite";
-import { rateLimit } from "@/lib/rateLimit";
+import { LIMITS, allowed, clientIp } from "@/lib/limits";
 
 /**
  * Staff accounts (never customers). Owner creates, edits and deactivates
@@ -106,16 +106,15 @@ export const Users: CollectionConfig = {
     // login lock-out can be triggered by anyone: throttle both per IP and
     // per address (in-memory per instance; review 2026-11-09).
     beforeOperation: [
-      ({ operation, args, req }) => {
+      async ({ operation, args, req }) => {
         if (operation !== "forgotPassword" && operation !== "login") return args;
-        const h = req.headers;
-        const ip = (h?.get("x-vercel-forwarded-for") ?? h?.get("x-real-ip") ?? h?.get("x-forwarded-for") ?? "").split(",")[0].trim();
+        const ip = clientIp(req.headers);
         // Our own server code (invitations, tests) has no client address.
         if (!ip) return args;
-        const email = String((args as { data?: { email?: string } }).data?.email ?? "").trim().toLowerCase();
-        const perMinute = operation === "forgotPassword" ? 2 : 10;
-        if (!rateLimit(`${operation}:ip:${ip}`, perMinute) || (email && !rateLimit(`${operation}:email:${email}`, perMinute))) {
-          throw new APIError("Demasiados intentos. Espera un minuto.", 429, null, true);
+        const email = String((args as { data?: { email?: string } }).data?.email ?? "");
+        const rules = operation === "forgotPassword" ? LIMITS.forgotPassword(ip, email) : LIMITS.login(ip, email);
+        if (!(await allowed(req.payload, rules))) {
+          throw new APIError("Demasiados intentos. Espera un poco y vuelve a probar.", 429, null, true);
         }
         return args;
       },

@@ -7,6 +7,7 @@ import config from "@payload-config";
 import { placeOnlineOrder, sendConfirmation } from "@/lib/online";
 import { MAX_NOTE, MAX_QUANTITY } from "@/lib/pos/pricing";
 import { rateLimit } from "@/lib/rateLimit";
+import { LIMITS, allowed, humanCheck } from "@/lib/limits";
 import { createCheckoutSession, stripeEnabled } from "@/lib/stripe";
 import { currentMember } from "@/lib/members-server";
 
@@ -16,6 +17,7 @@ import { currentMember } from "@/lib/members-server";
  * webhook (not this redirect) is what marks the order paid.
  */
 const schema = z.object({
+  turnstile: z.string().max(2048).optional(),
   idempotencyKey: z.string().uuid(),
   locale: z.enum(["es", "en"]),
   name: z.string().trim().min(1).max(80),
@@ -48,6 +50,9 @@ export async function placeOrderAction(input: z.infer<typeof schema>): Promise<{
   const p = schema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
   const payload = await getPayload({ config });
+  // Shared limits (an order at pickup sends a confirmation email) and Turnstile.
+  if (!(await allowed(payload, LIMITS.order(clientIp(h), p.data.email)))) return { ok: false, error: "rate-limited" };
+  if (!(await humanCheck(p.data.turnstile, clientIp(h)))) return { ok: false, error: "challenge" };
   // Never build payment return URLs from the Host header in production.
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === "production" ? null : `http://${h.get("host")}`);
   const payOnline = p.data.payOnline && stripeEnabled() && base !== null;

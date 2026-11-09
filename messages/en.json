@@ -175,7 +175,7 @@
         },
         {
           "title": "Who we work with",
-          "body": "Supabase (database, in the European Union), Vercel (website hosting), Stripe (payments) and Resend (email delivery). Some have servers outside the European Union; transfers rely on the EU and US Data Privacy Framework or standard contractual clauses. We do not sell data or pass it to anyone else."
+          "body": "Supabase (database, in the European Union), Vercel (website hosting), Stripe (payments), Resend (email delivery) and Cloudflare Turnstile (checks that a person sends the forms, without tracking cookies). Some have servers outside the European Union; transfers rely on the EU and US Data Privacy Framework or standard contractual clauses. We do not sell data or pass it to anyone else."
         },
         {
           "title": "Cookies",
@@ -629,7 +629,8 @@
       "unavailable-option": "An option has sold out.",
       "too-many": "You already have several open orders. Collect one first.",
       "too-many-units": "At most five of each product.",
-      "pay-online": "Shop products are paid when ordering."
+      "pay-online": "Shop products are paid when ordering.",
+      "challenge": "We could not check that you are not a robot. Reload the page and try again."
     },
     "status": {
       "eyebrow": "Your order",
@@ -707,7 +708,8 @@
       "already": "You are already a founding member.",
       "signed-out": "Your session has ended. Sign in again.",
       "pending": "You already have a payment in progress. Finish it in the other tab or wait half an hour.",
-      "subscribed": "You have an active subscription. Cancel it first in Manage the subscription, then delete the account."
+      "subscribed": "You have an active subscription. Cancel it first in Manage the subscription, then delete the account.",
+      "challenge": "We could not check that you are not a robot. Reload the page and try again."
     },
     "premiumTitle": "Monthly membership",
     "premiumBody": "A monthly fee. Cancel whenever you like.",

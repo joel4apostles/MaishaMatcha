@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-09 (Opus 5.5 session). Subscription box + invitations committed locally, NOT pushed yet.
+Last updated: 2026-11-09, afternoon (Opus 5.5 session). Security audit fixes pushed; shared rate limits + Turnstile committed locally.
 
 ## Where things stand
 
@@ -89,7 +89,13 @@ Last updated: 2026-11-09 (Opus 5.5 session). Subscription box + invitations comm
   fee/box/shipping: confirm with the gestoría (one rate for all lines now;
   Canarias addresses are allowed by Stripe "ES" but IGIC differs).
   Real owner: Equipo → Invitar a alguien (link to WhatsApp until Resend).
-- 157 tests pass. Forms use sumi/50
+- **Security audit 2026-11-09** done (see CLAUDE.md): every finding fixed
+  and pushed; shared Postgres rate limits + Turnstile added after.
+  Joel: create Turnstile keys (Cloudflare dashboard → Turnstile → Add
+  widget → hostname www.maishamatcha.es, mode "Managed"), put the site key
+  in NEXT_PUBLIC_TURNSTILE_SITE_KEY and the secret in TURNSTILE_SECRET_KEY
+  (Vercel, Production), redeploy.
+- 166 tests pass. Forms use sumi/50
   underlines (AA). Admin fonts self-hosted via next/font.
 
 ## Next

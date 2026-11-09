@@ -10,6 +10,7 @@ import { premiumPortal, startPremium, subscriptionLive } from "@/lib/premium";
 import { eraseMember, revokeSessions, safeNext, sendSignInLink } from "@/lib/members";
 import { clearMemberSession, currentMember } from "@/lib/members-server";
 import { rateLimit } from "@/lib/rateLimit";
+import { LIMITS, allowed, humanCheck } from "@/lib/limits";
 
 /**
  * Member actions. Every one re-reads the session cookie; ids from the
@@ -25,13 +26,18 @@ const signInSchema = z.object({
   name: z.string().trim().max(80).optional(),
   locale: z.enum(["es", "en"]),
   next: z.string().max(200).optional(),
+  turnstile: z.string().max(2048).optional(),
 });
 
 /** Always answers the same way, so it cannot tell who has an account. */
 export async function requestSignInAction(input: z.infer<typeof signInSchema>): Promise<{ ok: boolean; error?: string }> {
   const p = signInSchema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
-  if (!rateLimit(`signin:${await ip()}`) || !rateLimit(`signin:${p.data.email.toLowerCase()}`, 3)) return { ok: false, error: "rate-limited" };
+  const addr = await ip();
+  if (!rateLimit(`signin:${addr}`) || !rateLimit(`signin:${p.data.email.toLowerCase()}`, 3)) return { ok: false, error: "rate-limited" };
+  // Shared across instances, per minute and per day (each link is an email).
+  if (!(await allowed(await getPayload({ config }), LIMITS.signIn(addr, p.data.email)))) return { ok: false, error: "rate-limited" };
+  if (!(await humanCheck(p.data.turnstile, addr))) return { ok: false, error: "challenge" };
   await sendSignInLink(p.data.email, p.data.locale, p.data.name, safeNext(p.data.next)).catch(() => undefined);
   return { ok: true };
 }

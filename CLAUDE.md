@@ -216,6 +216,8 @@ PAYLOAD_SECRET          # 32+ chars; signs admin + POS cookies (random per insta
 DATABASE_URL            # Supabase pooler :6543 in prod, PRODUCTION env only on Vercel
 FIRST_OWNER_EMAIL       # prod: only this email may create the first (owner) account
 STRIPE_SECRET_KEY       # web orders + founding fee (both unset = card payment hidden)
+NEXT_PUBLIC_TURNSTILE_SITE_KEY  # Cloudflare Turnstile (both empty = off)
+TURNSTILE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET   # events: checkout.session.{completed,async_payment_succeeded,expired,async_payment_failed},
                         # invoice.paid, customer.subscription.{created,updated,deleted}. Enable the customer portal in Stripe.
 ```
@@ -261,11 +263,18 @@ forgot-password and login throttled per IP and address, admin cookie
 Secure in production, hasTotp check fails closed, member tokens on their
 own derived key, orders readable by owner/manager only, raster-only
 uploads, GraphQL disabled, OG fetch from SITE_URL, portal rate limit,
-first-owner rule on any production host. OPEN (SHOULD, before launch):
-public email-sending forms (order at pickup, sign-in link, waitlist,
-forgot password) rely on the per-instance in-memory limiter; Resend's free
-100/day could be drained. Fix = shared limiter (Upstash/Vercel KV free tier)
-or Turnstile, or a paid Resend plan: founder's call. Same 5 low + 5 moderate
+first-owner rule on any production host. Then (same day, founder's choice): shared
+rate limits in Postgres (`lib/limits.ts` → the ONE locked-down function
+`payload.rate_limit_hit`: SECURITY DEFINER, `search_path = pg_catalog,
+pg_temp`, schema-qualified names, EXECUTE revoked from PUBLIC/anon/
+authenticated; migration 20261109_120000_rate_limits) on waitlist, sign-in
+links, orders, admin login and forgot-password (per IP per minute and per
+day, per email); falls back to the in-memory limiter if the DB is down.
+Cloudflare Turnstile (`components/HumanCheck.tsx`, server `humanCheck`,
+fails closed) on the waitlist, sign-in and order forms: OFF until
+NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY are set in Vercel.
+Rule: any future database function follows the same pattern (definer only
+if needed, fixed search_path, revoke from PUBLIC and Supabase roles). Same 5 low + 5 moderate
 advisories as accepted above. Live Supabase SQL not re-run (needs the prod
 password; schema-level "no USAGE" from 2026-11-07 covers new tables).
 

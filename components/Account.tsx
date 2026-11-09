@@ -16,13 +16,14 @@ import { inkButtonClass, quietLinkClass } from "@/components/Button";
 import { Numeral } from "@/components/Numeral";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatEuro } from "@/lib/money";
+import { useHumanCheck } from "@/components/HumanCheck";
 
 const field =
   "mt-2 block min-h-[48px] w-full border-b border-sumi/50 bg-transparent py-2 text-base text-sumi placeholder:text-sumi/60 focus:border-sumi";
 const label = "text-eyebrow uppercase text-sumi/70";
 const quietButton =
   "inline-flex min-h-[44px] items-center justify-center rounded-[2px] border border-wood/50 px-5 text-sm font-medium text-sumi hover:border-sumi/60 disabled:opacity-40";
-const KNOWN = ["invalid", "rate-limited", "generic", "confirm", "closed", "already", "pending", "signed-out", "subscribed"];
+const KNOWN = ["invalid", "rate-limited", "generic", "confirm", "closed", "already", "pending", "signed-out", "subscribed", "challenge"];
 
 function useError() {
   const t = useTranslations("account");
@@ -33,6 +34,7 @@ export function SignInForm({ next }: { next?: string }) {
   const t = useTranslations("account");
   const err = useError();
   const locale = useLocale() as "es" | "en";
+  const human = useHumanCheck(locale);
   const [state, setState] = useState<"idle" | "sent">("idle");
   const [message, setMessage] = useState("");
   const [pending, start] = useTransition();
@@ -50,7 +52,9 @@ export function SignInForm({ next }: { next?: string }) {
             name: String(form.get("name") ?? "") || undefined,
             locale,
             next,
+            turnstile: human.token,
           }).catch(() => ({ ok: false, error: "generic" }));
+          human.reset();
           if (r.ok) setState("sent");
           else setMessage(err(r.error));
         })
@@ -69,6 +73,7 @@ export function SignInForm({ next }: { next?: string }) {
         </label>
         <input id="a-name" name="name" autoComplete="name" autoCapitalize="words" enterKeyHint="send" maxLength={80} className={field} />
       </div>
+      {human.box}
       <p role="status" className="min-h-[1.25rem] text-sm text-sumi">
         {message}
       </p>
