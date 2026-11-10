@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-09, late evening (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-10 (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
@@ -16,7 +16,10 @@ Last updated: 2026-11-09, late evening (Opus 5.5 session). main = origin/main, e
   anon/authenticated have no usage on the `payload` schema (2026-11-07).
 - **Design** live and founder-led (see CLAUDE.md imagery + brand skill). Home
   carta section: words LEFT, pour video RIGHT at 15rem, top-aligned (founder
-  checks two-column heights and shared edges at desktop width). /crea =
+  checks two-column heights and shared edges at desktop width). Header
+  (2026-11-10): desktop Carta, Historia, Eventos, Tienda, Pedir | Cuenta,
+  ES/EN; phone header (Pedir + Menú sheet) below 768px. Keep desktop nav and
+  the phone menu (`MobileMenu.tsx`) listing the same pages. /crea =
   `LayerColumn`; real per-drink clips await the shoot (list below).
 - **Admin sign-in is two-step** (`payload-totp`, forceSetup; see CLAUDE.md).
   Joel uses the TEST owner account. Real owner: sidebar Atajos → Invitar a
