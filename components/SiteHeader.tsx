@@ -9,10 +9,11 @@ import { BrandMark } from "./BrandMark";
 import { BrandWordmark } from "./BrandWordmark";
 import { MobileMenu } from "./MobileMenu";
 
-const NAV: { href: AppPathname; key: "menu" | "story" | "events" | "order" }[] = [
+const NAV: { href: AppPathname; key: "menu" | "story" | "events" | "shop" | "order" }[] = [
   { href: "/menu", key: "menu" },
   { href: "/historia", key: "story" },
   { href: "/eventos", key: "events" },
+  { href: "/tienda", key: "shop" },
   { href: "/pedir", key: "order" },
 ];
 
@@ -68,7 +69,7 @@ export function SiteHeader() {
           <BrandWordmark className="hidden h-8 w-auto shrink-0 sm:block" />
         </Link>
         {/* Phones: the one action people come for, and the word "Menú". */}
-        <div className="flex items-center gap-5 sm:hidden">
+        <div className="flex items-center gap-5 md:hidden">
           <Link
             href="/pedir"
             aria-current={pathname === "/pedir" ? "page" : undefined}
@@ -78,7 +79,7 @@ export function SiteHeader() {
           </Link>
           <MobileMenu tone={overlay ? "light" : "dark"} />
         </div>
-        <div className="hidden items-center gap-7 sm:flex">
+        <div className="hidden items-center gap-7 md:flex">
           <ul className="flex items-center gap-6">
             {NAV.map((item) => (
               <li key={item.key}>
@@ -92,7 +93,18 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
-          <LocaleSwitcher tone={overlay ? "light" : "dark"} />
+          {/* Utility links, set apart by one hairline: the account, then the language. */}
+          <div className="flex items-center gap-5">
+            <span aria-hidden="true" className={`h-4 w-px ${overlay ? "bg-washi/40" : "bg-wood/40"}`} />
+            <Link
+              href="/cuenta"
+              aria-current={pathname === "/cuenta" ? "page" : undefined}
+              className={`${linkBase} ${linkTone}`}
+            >
+              {t("account")}
+            </Link>
+            <LocaleSwitcher tone={overlay ? "light" : "dark"} />
+          </div>
         </div>
       </nav>
       {/* Without JavaScript the header can't turn opaque on scroll: let it
