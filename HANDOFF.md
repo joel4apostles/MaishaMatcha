@@ -44,6 +44,9 @@ Last updated: 2026-11-09, late evening (Opus 5.5 session). main = origin/main, e
 
 ## Next
 
+- **REMIND JOEL FIRST (asked 2026-11-10): Turnstile keys.** Steps in auto-memory
+  `turnstile-setup.md` (Cloudflare widget → 2 Vercel env vars, Production →
+  redeploy → test waitlist + sign-in). Drop this line once he confirms.
 - Joel (setup): GoDaddy DNS cleanup; Turnstile keys (Cloudflare → Turnstile
   → Add widget, hostname www.maishamatcha.es, Managed → Vercel
   NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY, Production,
