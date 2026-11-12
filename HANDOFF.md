@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-12, evening (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-12, night (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
@@ -72,7 +72,9 @@ Last updated: 2026-11-12, evening (Opus 5.5 session). main = origin/main, everyt
 - Performance 2026-11-12: DONE functions in fra1 (vercel.json, Supabase is
   eu-central-1), client translations allowlist (i18n/clientMessages.ts, 9.9 KB
   not 29.7 KB), brush kanji subset font (lib/brushGlyphs.ts, CSS 101 KB to
-  7 KB). LEFT: /eventos fully dynamic (cache with revalidation on change).
+  7 KB). Live check: x-vercel-id cdg1::fra1, /eventos warm 0.25 to 0.43 s
+  (was 0.6 to 2.8 s). LEFT: /eventos fully dynamic (cache with revalidation
+  on change).
 - Engineering: script-src CSP with nonces (after payments go live);
   real-iPhone keyboard test; legal review of the privacy notice; sticky
   "Pedir" bar on phones once online ordering is on. Optional: one Vercel WAF
