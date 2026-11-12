@@ -69,13 +69,10 @@ Last updated: 2026-11-12, evening (Opus 5.5 session). main = origin/main, everyt
   all lines now); Canarias addresses (IGIC) accepted by Stripe "ES".
 - Joel (facts): cultivar, harvest, allergens; "Calidad diaria" vs "Para cada
   día"; OJ 9,50 / Yuzu 9,80; map pin.
-- Performance (measured 2026-11-12, founder to choose): (1) server functions run
-  in iad1 (US) while Supabase is in the EU: set vercel.json regions to the
-  Supabase region (ask Joel which); (2) every page ships ALL messages (35 KB,
-  legal + POS) to the client: pass only the namespaces client components
-  use; (3) 146 @font-face rules (Yuji Syuku slices) in render-blocking CSS:
-  self-host a subset of the ~20 kanji used; (4) /eventos is fully dynamic
-  (0.6 to 2.8 s): cache with revalidation on change.
+- Performance 2026-11-12: DONE functions in fra1 (vercel.json, Supabase is
+  eu-central-1), client translations allowlist (i18n/clientMessages.ts, 9.9 KB
+  not 29.7 KB), brush kanji subset font (lib/brushGlyphs.ts, CSS 101 KB to
+  7 KB). LEFT: /eventos fully dynamic (cache with revalidation on change).
 - Engineering: script-src CSP with nonces (after payments go live);
   real-iPhone keyboard test; legal review of the privacy notice; sticky
   "Pedir" bar on phones once online ordering is on. Optional: one Vercel WAF
