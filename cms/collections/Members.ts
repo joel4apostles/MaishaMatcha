@@ -125,6 +125,8 @@ export const Members: CollectionConfig = {
         { name: "stripeSubscriptionId", type: "text", index: true, access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
         // Time of the last subscription event applied: older events are ignored.
         { name: "subscriptionEventAt", type: "number", access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
+        // The subscription the welcome email went out for: once per subscription.
+        { name: "welcomedSubscription", type: "text", access: { read: hiddenField, create: hiddenField, update: hiddenField }, admin: { hidden: true } },
       ],
     },
     {

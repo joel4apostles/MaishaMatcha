@@ -3,7 +3,7 @@ import type { Payload, Where } from "payload";
 import { query, sql, table } from "@/cms/db";
 import { writeAudit } from "@/cms/audit";
 import { emailFrame, escapeHtml, sendEmail } from "@/lib/email";
-import { taxBreakdown } from "@/lib/money";
+import { formatEuro, taxBreakdown } from "@/lib/money";
 import { markOnlinePaid } from "@/lib/online";
 import { createPortalSession, createSubscriptionCheckout, liveSubscriptions, stripeEnabled } from "@/lib/stripe";
 
@@ -440,5 +440,94 @@ export async function onPremiumSubscription(payload: Payload, sub: StripeSubscri
       ...(eventCreated ? { subscriptionEventAt: eventCreated } : {}),
     },
   });
+  if (!deleted && STATUS[sub.status] === "active") await sendPremiumWelcome(payload, m.id, sub.id).catch(() => undefined);
   return true;
+}
+
+/**
+ * The welcome, once per subscription (claimed by a conditional update, so
+ * Stripe's repeated or concurrent events send it once). Built from what the
+ * owner set in Empresa: the box product, the perks list; nothing invented.
+ */
+export async function sendPremiumWelcome(payload: Payload, memberId: number, subscriptionId: string) {
+  const members = table(payload, "members");
+  const claimed = await query(
+    payload,
+    sql`update ${members} set welcomed_subscription = ${subscriptionId} where id = ${memberId} and welcomed_subscription is distinct from ${subscriptionId} returning id`,
+  );
+  if (claimed.length === 0) return false;
+  const m = await payload.findByID({ collection: "members", id: memberId, depth: 0, overrideAccess: true });
+  const locale = m.locale === "en" ? "en" : "es";
+  const s = await premiumSettings(payload, locale);
+  const { subject, html } = premiumWelcomeEmail({
+    locale,
+    name: m.name,
+    product: s.product?.name ?? null,
+    delivery: m.boxDelivery === "shipping" ? "shipping" : "pickup",
+    city: m.shipTo?.city ?? null,
+    perks: s.perks,
+    shippingCents: m.boxDelivery === "shipping" ? s.shippingCents : null,
+  });
+  await sendEmail(m.email, subject, html);
+  return true;
+}
+
+// Absolute links in email (lib/seo pulls in next-intl, which Node tests cannot load).
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.maishamatcha.es").replace(/\/+$/, "");
+
+/** The welcome email itself (pure, for tests and previews). */
+export function premiumWelcomeEmail(i: {
+  locale: "es" | "en";
+  name: string;
+  product: string | null;
+  delivery: BoxDelivery;
+  city: string | null;
+  perks: string[];
+  shippingCents: number | null;
+}) {
+  const es = i.locale === "es";
+  const link = (path: string, label: string) =>
+    `<a href="${SITE_URL}/${i.locale}${path}" style="color:#1C1B18;text-decoration:underline">${label}</a>`;
+  const p = (text: string) => `<p style="margin:0 0 14px">${text}</p>`;
+  const box = i.product
+    ? es
+      ? `Cada mes, ${escapeHtml(i.product)}.`
+      : `Every month, ${escapeHtml(i.product)}.`
+    : es
+      ? "Cada mes, tu caja de matcha."
+      : "Every month, your box of matcha.";
+  const where =
+    i.delivery === "shipping"
+      ? es
+        ? `Te la enviamos${i.city ? ` a ${escapeHtml(i.city)}` : ""} y te escribimos cuando salga.`
+        : `We post it${i.city ? ` to ${escapeHtml(i.city)}` : ""} and write when it leaves.`
+      : es
+        ? "La recoges en la barra, a tu nombre, en Plaza Cetina, 3. Te escribimos cuando esté lista."
+        : "Collect it at the bar, under your name, at Plaza Cetina, 3. We write when it is ready.";
+  const perks = i.perks.length
+    ? `<ul style="margin:0 0 14px;padding-left:18px">${i.perks.map((x) => `<li style="margin:0 0 4px">${escapeHtml(x)}</li>`).join("")}</ul>`
+    : "";
+  const body = [
+    p(es ? `Gracias, ${escapeHtml(i.name)}. Desde hoy formas parte de la suscripción mensual de maisha matcha.` : `Thank you, ${escapeHtml(i.name)}. From today you are part of the maisha matcha monthly subscription.`),
+    p(`${box} ${where}`),
+    perks,
+    p(
+      es
+        ? `Los eventos para socios y suscriptores (catas, cuppings, talleres) ya están abiertos para ti, con plazas contadas. Los verás en la ${link("/eventos", "agenda")}.`
+        : `Events for members and subscribers (tastings, cuppings, workshops) are now open to you, with limited places. See them in the ${link("/events", "calendar")}.`,
+    ),
+    p(
+      es
+        ? `Desde ${link("/cuenta", "tu cuenta")} puedes ver tu caja del mes, cambiar la tarjeta o cancelar cuando quieras.`
+        : `From ${link("/account", "your account")} you can see this month's box, change your card or cancel at any time.`,
+    ),
+    i.shippingCents
+      ? `<p style="margin:0 0 14px;font-size:13px;opacity:0.75">${es ? `El envío, ${formatEuro(i.shippingCents, "es")} al mes, va en el mismo cargo.` : `Delivery, ${formatEuro(i.shippingCents, "en")} a month, is in the same charge.`}</p>`
+      : "",
+    p(es ? "Hasta pronto en la barra." : "See you soon at the bar."),
+  ].join("");
+  return {
+    subject: es ? "Te damos la bienvenida · maisha matcha" : "Welcome · maisha matcha",
+    html: emailFrame(es ? "Te damos la bienvenida" : "Welcome", body),
+  };
 }

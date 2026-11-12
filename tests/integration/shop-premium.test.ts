@@ -4,7 +4,7 @@ import type { Payload } from "payload";
 import { consumeSignIn, signInToken } from "@/lib/members";
 import { cancelUnpaidOnline, markOnlinePaid, placeOnlineOrder } from "@/lib/online";
 import { loadCatalog } from "@/lib/pos/sales";
-import { markBoxCollected, markBoxShipped, monthlyPriceFor, onPremiumCheckout, onPremiumInvoicePaid, onPremiumSubscription, pendingBoxes, premiumSettings, startPremium } from "@/lib/premium";
+import { markBoxCollected, markBoxShipped, monthlyPriceFor, premiumWelcomeEmail, onPremiumCheckout, onPremiumInvoicePaid, onPremiumSubscription, pendingBoxes, premiumSettings, startPremium } from "@/lib/premium";
 import { rsvp } from "@/lib/events";
 import { boot, staff } from "./harness";
 
@@ -127,6 +127,55 @@ describe("premium subscription", () => {
     // Events without our kind (a manual dashboard invoice) are ignored.
     expect(await onPremiumInvoicePaid(payload, { id: "in_manual", amount_paid: 900, customer: "cus_1" })).toBe(false);
     expect(await onPremiumSubscription(payload, { id: "sub_other", status: "active", customer: "cus_1" }, false, 400)).toBe(false);
+  });
+
+  it("welcomes a new subscriber once per subscription, in their language, from the owner's own settings", async () => {
+    process.env.RESEND_API_KEY = "re_test";
+    try {
+      await payload.updateGlobal({ slug: "business", data: { premiumPerks: "Una lata al mes\nPrecio de socio en la barra" } as never });
+      const m = await consumeSignIn(payload, signInToken("welcome@premium.test", "es")).then((r) => r!.member);
+      const meta = { kind: "premium", memberId: String(m.id), taxBp: "2100" };
+      const welcomes = () => fetchMock.mock.calls.filter(([url]) => String(url).includes("api.resend.com"));
+      fetchMock.mockClear();
+      // Stripe repeats and races its events: still one welcome.
+      await Promise.all([
+        onPremiumSubscription(payload, { id: "sub_w", status: "active", metadata: meta }, false, 10),
+        onPremiumSubscription(payload, { id: "sub_w", status: "active", metadata: meta }, false, 11),
+      ]);
+      await onPremiumSubscription(payload, { id: "sub_w", status: "active", cancel_at_period_end: true, metadata: meta }, false, 12);
+      expect(welcomes()).toHaveLength(1);
+      const sent = JSON.parse(welcomes()[0][1].body);
+      expect(sent.to).toBe("welcome@premium.test");
+      expect(sent.subject).toContain("Te damos la bienvenida");
+      expect(sent.html).toContain("Una lata al mes");
+      expect(sent.html).toContain("/es/cuenta");
+      // A cancellation sends nothing; a NEW subscription later is welcomed again.
+      await onPremiumSubscription(payload, { id: "sub_w", status: "canceled", metadata: meta }, true, 20);
+      expect(welcomes()).toHaveLength(1);
+      await onPremiumSubscription(payload, { id: "sub_w2", status: "active", metadata: meta }, false, 30);
+      expect(welcomes()).toHaveLength(2);
+      // Not yet paid (incomplete): no welcome.
+      const n = await consumeSignIn(payload, signInToken("unpaid@premium.test", "es")).then((r) => r!.member);
+      await onPremiumSubscription(payload, { id: "sub_u", status: "incomplete", metadata: { ...meta, memberId: String(n.id) } }, false, 40);
+      expect(welcomes()).toHaveLength(2);
+    } finally {
+      delete process.env.RESEND_API_KEY;
+    }
+  });
+
+  it("writes the welcome in the house voice and escapes what people typed", () => {
+    for (const locale of ["es", "en"] as const) {
+      for (const delivery of ["pickup", "shipping"] as const) {
+        const { subject, html } = premiumWelcomeEmail({ locale, name: "<Ana>", product: "Lata Uji 30 g", delivery, city: "Cartagena", perks: ["Una lata al mes"], shippingCents: delivery === "shipping" ? 495 : null });
+        const text = subject + html.replace(/<[^>]+>/g, " ");
+        expect(text).not.toMatch(/[!\u2013\u2014]/);
+        expect(text.toLowerCase()).not.toContain("premium");
+        expect(html).not.toContain("<Ana>");
+        expect(html).toContain("&lt;Ana&gt;");
+        expect(html).toContain("Lata Uji 30 g");
+        if (delivery === "shipping") expect(html).toContain("Cartagena");
+      }
+    }
   });
 
   it("hides Stripe ids from the API", async () => {

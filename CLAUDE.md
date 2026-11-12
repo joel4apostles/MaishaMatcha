@@ -95,6 +95,10 @@ OG, admin) inherits them.
   only, customers read "suscripción mensual"): Stripe subscription, founding
   price for founders, one invoiced order per paid month (invoice.paid),
   status ONLY from customer.subscription.* events, applied in event order.
+  Welcome email (2026-11-12, `premiumWelcomeEmail`): once per subscription
+  when its status first turns active (claimed by `members.welcomedSubscription`,
+  conditional update), in the member's language, built only from Empresa
+  (box product, perks list, shipping price). Needs Resend to actually send.
 - **Content split**: events come from the CMS (bookable when they have a
   date and capacity). The carta (`content/carta.ts`) and the story
   (`content/story.ts`) stay in code on purpose: the till seed and the

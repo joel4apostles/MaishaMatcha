@@ -456,6 +456,7 @@ export interface Member {
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
   subscriptionEventAt?: number | null;
+  welcomedSubscription?: string | null;
   /**
    * Only the member changes it. Campaigns go only to those who accepted.
    */
@@ -1541,6 +1542,7 @@ export interface MembersSelect<T extends boolean = true> {
   stripeCustomerId?: T;
   stripeSubscriptionId?: T;
   subscriptionEventAt?: T;
+  welcomedSubscription?: T;
   emailOptIn?: T;
   locale?: T;
   favoriteRecipeCode?: T;
