@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-12 (Opus 5.5 session).
+Last updated: 2026-11-12, evening (Opus 5.5 session). main = origin/main, everything pushed and live.
 
 ## Where things stand
 
@@ -39,14 +39,17 @@ Last updated: 2026-11-12 (Opus 5.5 session).
   is filled and Stripe keys exist.
 - **Waitlist fixed 2026-11-12**: sign-ups were DROPPED while Resend is unset;
   now stored as members (tier waitlist, consent) first. Admin: Atajos → Lista
-  de espera. Sign-ups before this fix are lost (only a log line).
+  de espera. Sign-ups before this fix are lost (only a log line). Joel to
+  test once: sign up with his own email, check the list.
+- **Subscriber welcome email** (2026-11-12, `premiumWelcomeEmail`): once per
+  subscription when it turns active; sends only once Resend is set.
 - **Security audit 2026-11-09**: three reviewers + mechanical checks; every
   finding fixed and live (details and the one accepted baseline in
   CLAUDE.md). Then: shared rate limits in Postgres (locked-down SECURITY
   DEFINER `payload.rate_limit_hit`) and Cloudflare Turnstile (off until keys).
   Vercel Firewall (DDoS, Hobby: 3 custom rules, 1 rate-limit rule) is the
   outer layer; app-level checks stay necessary.
-- 166 tests pass (25 files).
+- 175 tests pass (27 files); phase1 always runs first (vitest.config.ts).
 
 ## Next
 
@@ -66,6 +69,13 @@ Last updated: 2026-11-12 (Opus 5.5 session).
   all lines now); Canarias addresses (IGIC) accepted by Stripe "ES".
 - Joel (facts): cultivar, harvest, allergens; "Calidad diaria" vs "Para cada
   día"; OJ 9,50 / Yuzu 9,80; map pin.
+- Performance (measured 2026-11-12, founder to choose): (1) server functions run
+  in iad1 (US) while Supabase is in the EU: set vercel.json regions to the
+  Supabase region (ask Joel which); (2) every page ships ALL messages (35 KB,
+  legal + POS) to the client: pass only the namespaces client components
+  use; (3) 146 @font-face rules (Yuji Syuku slices) in render-blocking CSS:
+  self-host a subset of the ~20 kanji used; (4) /eventos is fully dynamic
+  (0.6 to 2.8 s): cache with revalidation on change.
 - Engineering: script-src CSP with nonces (after payments go live);
   real-iPhone keyboard test; legal review of the privacy notice; sticky
   "Pedir" bar on phones once online ordering is on. Optional: one Vercel WAF
