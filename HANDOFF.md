@@ -79,7 +79,11 @@ on a tripod, 4K 30fps, exposure locked, side-on at cup height, 6 to 8 s:
 usucha whisked in the black bowl (Uji, Nishio, Kagoshima) from above; each
 as a latte over ice and milk in the Maisha cup; hojicha and black tea solo
 and latte; purée going in (mango, ube); Coconut Cloud on top; one wide clip
-of the bar. AirDrop the originals. Then /crea can switch clip per drink.
+of the bar. Same day, STILLS of the signature drinks only (Uji, Nishio, Kagoshima,
+ube latte, one with Coconut Cloud, maybe hojicha): same setup, side-on at
+cup height plus one top-down each; the rest of the carta stays text +
+swatches (founder agreed 2026-11-12). AirDrop the originals. Then /crea can
+switch clip per drink, and mock 2 or 3 menu placements before building.
 
 ## Environment gotchas
 
