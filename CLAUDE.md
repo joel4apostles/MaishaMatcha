@@ -193,9 +193,15 @@ restart dev. And after ANY `npm install`, repair the lockfile:
 3. **Localized URLs** are produced by middleware; the build "Route" column shows
    the internal file path (e.g. `/[locale]/eventos`), while `/en/events` is the
    public URL. `usePathname()` returns the internal (locale-agnostic) pathname.
-4. **Waitlist degrades without env**: missing `RESEND_API_KEY`/
-   `RESEND_AUDIENCE_ID` → log a non-sensitive payload, return success. Never
-   crash, never leak config.
+4. **The waitlist is stored in our database first** (2026-11-12: before
+   this, with no Resend env, sign-ups were thanked and dropped). `lib/waitlist.ts`
+   creates a member with tier `waitlist` + `emailOptIn` (the form's consent box),
+   so the owner reaches them through Campaigns (one-click unsubscribe); admin
+   sidebar Atajos → Lista de espera. An EXISTING address is never changed by
+   the public form (it must not re-subscribe someone who unsubscribed). Resend
+   (audience + confirmation) is extra: missing or failing, the sign-up still
+   succeeds; stored nowhere → an error, never a false "thanks". Tests share one
+   database, so `vitest.config.ts` runs phase1 first (first account = owner).
 5. **Seed runs via `tsx`, not `payload run`.** `payload run` exits as soon
    as the module loads, so the seed silently did nothing. The package is
    `"type": "module"` because Payload is ESM-only.
@@ -277,6 +283,11 @@ Rule: any future database function follows the same pattern (definer only
 if needed, fixed search_path, revoke from PUBLIC and Supabase roles). Same 5 low + 5 moderate
 advisories as accepted above. Live Supabase SQL not re-run (needs the prod
 password; schema-level "no USAGE" from 2026-11-07 covers new tables).
+
+Waitlist in the database 2026-11-12: accepted single opt-in (anyone can
+type a NEW address; rate limits + Turnstile per IP and email, letters need
+the owner's approval and carry one-click unsubscribe). Add a confirm link
+(double opt-in) once Resend is live.
 
 Live Supabase check 2026-11-07: anon and authenticated have NO usage on
 the `payload` schema (has_schema_privilege false/false); "Automatically

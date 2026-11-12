@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-10 (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-12 (Opus 5.5 session).
 
 ## Where things stand
 
@@ -37,6 +37,9 @@ Last updated: 2026-11-10 (Opus 5.5 session). main = origin/main, everything push
   one fixed product, pickup at the bar or posted in Spain, /admin/cajas,
   events for founders + paid-up subscribers, event types. OFF until Empresa
   is filled and Stripe keys exist.
+- **Waitlist fixed 2026-11-12**: sign-ups were DROPPED while Resend is unset;
+  now stored as members (tier waitlist, consent) first. Admin: Atajos → Lista
+  de espera. Sign-ups before this fix are lost (only a log line).
 - **Security audit 2026-11-09**: three reviewers + mechanical checks; every
   finding fixed and live (details and the one accepted baseline in
   CLAUDE.md). Then: shared rate limits in Postgres (locked-down SECURITY

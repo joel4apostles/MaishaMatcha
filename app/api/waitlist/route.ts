@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { rateLimit } from "@/lib/rateLimit";
 import { LIMITS, allowed, humanCheck } from "@/lib/limits";
+import { joinWaitlist } from "@/lib/waitlist";
 import { WaitlistConfirmation } from "@/emails/waitlist-confirmation";
 
 export const runtime = "nodejs";
@@ -88,16 +89,25 @@ export async function POST(request: Request) {
   if (payload && !(await allowed(payload, LIMITS.waitlist(clientIp(request), email)))) return reply({ error: "rate_limited" }, 429);
   if (!(await humanCheck(token, clientIp(request)))) return reply({ error: "challenge_failed" }, 400);
 
+  // Our own record first: the sign-up is kept even with no email service.
+  let stored = false;
+  if (payload) {
+    try {
+      await joinWaitlist(payload, { name, email, locale });
+      stored = true;
+    } catch (error) {
+      console.error("[waitlist] could not store the sign-up:", error instanceof Error ? error.message : "unknown");
+    }
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   const audienceId = process.env.RESEND_AUDIENCE_ID;
 
-  // Graceful degradation: without env, log (no PII in production) and succeed.
+  // No email service: fine when the sign-up is stored; never claim success
+  // for a sign-up kept nowhere.
   if (!apiKey || !audienceId) {
-    if (process.env.NODE_ENV !== "production") {
-      console.info("[waitlist] no Resend env; payload:", { name, email, locale });
-    } else {
-      console.info("[waitlist] no Resend env; skipped send", { locale });
-    }
+    if (!stored) return reply({ error: "send_failed" }, 503);
+    console.info("[waitlist] stored; no Resend env, no confirmation email", { locale });
     return reply({ ok: true, degraded: true });
   }
 
@@ -121,6 +131,7 @@ export async function POST(request: Request) {
     return reply({ ok: true });
   } catch (error) {
     console.error("[waitlist] Resend error:", error);
-    return reply({ error: "send_failed" }, 502);
+    // Stored with us: the place is kept even if the email did not go out.
+    return stored ? reply({ ok: true, degraded: true }) : reply({ error: "send_failed" }, 502);
   }
 }
