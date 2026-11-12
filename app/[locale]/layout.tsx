@@ -5,6 +5,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Analytics } from "@vercel/analytics/next";
 import { routing } from "@/i18n/routing";
+import { pickClientMessages } from "@/i18n/clientMessages";
 import { brush, sans, serif } from "@/lib/fonts";
 import { KeyboardSafeFields } from "@/components/KeyboardSafeFields";
 import "../globals.css";
@@ -33,9 +34,9 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
 
-  // The counter's strings (pos) never ship to public visitors.
-  const { pos: _pos, ...messages } = await getMessages();
-  void _pos;
+  // Only what client components read reaches the browser (the counter's
+  // strings, the legal text and the rest stay on the server).
+  const messages = pickClientMessages(await getMessages());
 
   return (
     <html lang={locale} className={`${serif.variable} ${sans.variable} ${brush.variable}`}>
