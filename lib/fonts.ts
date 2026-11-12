@@ -1,4 +1,5 @@
-import { Fraunces, Hanken_Grotesk, Yuji_Syuku } from "next/font/google";
+import { Fraunces, Hanken_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 
 // Brand-kit typography: the kit's serif has warm, rounded terminals —
 // Fraunces (soft optical serif) is its closest Google face. Body stays
@@ -20,13 +21,13 @@ export const sans = Hanken_Grotesk({
   display: "swap",
 });
 
-// The story's era characters (茶 点 禅 …) in a real brush-calligraphy face.
-// Fraunces has no Japanese glyphs, so they fell back to a blocky system
-// gothic. Google serves this font in unicode-range slices: the browser only
-// downloads the slices holding the eight characters on the page. Not preloaded.
-export const brush = Yuji_Syuku({
+// The kanji (一期一会, 和敬清寂, 抹茶, the story's era characters) in a real
+// brush-calligraphy face, Yuji Syuku. Fraunces has no Japanese glyphs. A
+// subset holding only the characters the site uses (lib/brushGlyphs.ts):
+// one 12.5 KB file instead of 146 @font-face slices in the blocking CSS.
+export const brush = localFont({
+  src: "../app/fonts/yuji-syuku-subset.woff2",
   weight: "400",
   variable: "--font-brush-face",
   display: "swap",
-  preload: false,
 });
