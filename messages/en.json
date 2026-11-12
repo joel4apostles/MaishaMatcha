@@ -171,7 +171,7 @@
         },
         {
           "title": "At the bar",
-          "body": "Counter receipts keep no personal data unless you ask for a full invoice with your tax details."
+          "body": "Bar receipts keep no personal data except, if you like, the name you give so we can call you (only that, with the order) or your tax details if you ask for a full invoice."
         },
         {
           "title": "Who we work with",
@@ -421,7 +421,15 @@
       "cashPart": "In cash: {amount}",
       "splitHint": "The rest is paid in cash.",
       "splitCancel": "All in cash",
-      "chargeSplit": "Charge: {card} by card, the rest in cash"
+      "chargeSplit": "Charge: {card} by card, the rest in cash",
+      "all": "All",
+      "favourites": "Most ordered · one tap",
+      "callName": "Name to call",
+      "callNameHint": "Optional",
+      "backToMenu": "Back to the menu",
+      "drinkPicture": "How the drink looks",
+      "oneTap": "One tap",
+      "lineOptions": "Change {name}"
     },
     "kds": {
       "title": "Bar",

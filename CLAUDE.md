@@ -58,6 +58,12 @@ OG, admin) inherits them.
   staff then sign in by name + PIN on that device only. Logic in
   `lib/pos/core.ts` (testable), cookies in `lib/pos/server.ts`. Baristas
   cannot password-login at all (`beforeLogin`); owner/manager use `/admin`.
+  Barra v2 (2026-11-12, mock 5 on the "maisha barra mocks" canvas): "Lo más
+  pedido" = `topCounterLines` (paid counter orders, last 30 days, exact
+  options, 3+ sold; nothing invented), category tabs, coloured cards, options
+  in place with the live drink picture (`lib/pos/drinkBands.ts`, option hues
+  fall back to content/carta), −/+ on lines, optional name to call
+  (orders.customerName, letters only, shown on the KDS; privacy notice says so).
 - **The carta** source of truth is `content/carta.ts` (from the founder's
   carta PDF): seeded into Payload with option groups (usucha/latte +1,40,
   milk, extras, mochi flavours). The public menu and home preview render it

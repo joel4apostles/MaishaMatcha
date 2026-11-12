@@ -171,7 +171,7 @@
         },
         {
           "title": "En la barra",
-          "body": "Los tickets de la barra no guardan datos personales salvo que pidas factura completa con tus datos fiscales."
+          "body": "Los tickets de la barra no guardan datos personales salvo, si quieres, el nombre que das para que te llamemos (solo eso, con el pedido) o tus datos fiscales si pides factura completa."
         },
         {
           "title": "Con quién trabajamos",
@@ -421,7 +421,15 @@
       "cashPart": "En efectivo: {amount}",
       "splitHint": "El resto se paga en efectivo.",
       "splitCancel": "Todo en efectivo",
-      "chargeSplit": "Cobrar: {card} con tarjeta y el resto en efectivo"
+      "chargeSplit": "Cobrar: {card} con tarjeta y el resto en efectivo",
+      "all": "Todo",
+      "favourites": "Lo más pedido · un toque",
+      "callName": "Nombre para llamar",
+      "callNameHint": "Opcional",
+      "backToMenu": "Volver a la carta",
+      "drinkPicture": "Así queda la bebida",
+      "oneTap": "Un toque",
+      "lineOptions": "Cambiar {name}"
     },
     "kds": {
       "title": "Barra",

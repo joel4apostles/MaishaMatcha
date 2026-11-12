@@ -11,6 +11,8 @@ export type CatalogOption = {
   label: string;
   priceDeltaCents: number;
   available: boolean;
+  /** The option's colour in the drink (milk, purée), for the till's picture. */
+  hue?: string | null;
 };
 
 export type CatalogGroup = {

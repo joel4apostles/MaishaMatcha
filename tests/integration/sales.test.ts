@@ -6,6 +6,8 @@ import {
   closeShift,
   createOrder,
   kitchenQueue,
+  loadCatalog,
+  topCounterLines,
   openShift,
   payOrder,
   type Actor,
@@ -210,5 +212,42 @@ describe("refunds and voids", () => {
     if (!closed.ok) throw new Error(closed.error);
     expect(closed.report.refundsByMethod.cash).toBe(880);
     expect(closed.report.expectedCashCents).toBe(5000 + 2 * 880 - 880);
+  });
+});
+
+describe("Barra v2 (2026-11-12)", () => {
+  beforeAll(async () => {
+    await openShift(payload, actor, 0);
+  });
+
+  it("calls a counter order by the name the customer gave, beside the barista", async () => {
+    const o = await createOrder(payload, actor, { lines: [usucha()], service: "takeaway", idempotencyKey: randomUUID(), customerName: "  Ana " });
+    if (!o.ok) throw new Error(o.error);
+    const k = (await kitchenQueue(payload)).find((x) => x.id === o.orderId);
+    expect(k).toMatchObject({ callName: "Ana", staffName: "Lucía" });
+    const plain = await createOrder(payload, actor, { lines: [usucha()], service: "here", idempotencyKey: randomUUID() });
+    if (!plain.ok) throw new Error(plain.error);
+    expect((await kitchenQueue(payload)).find((x) => x.id === plain.orderId)?.callName).toBeNull();
+  });
+
+  it("offers the most ordered drinks, exact options, from paid orders only", async () => {
+    const latte = (keys: string[]) => ({ menuItemId: ujiId, quantity: 1, modifierKeys: keys });
+    for (const keys of [["prep.latte", "leche.avena"], ["leche.avena", "prep.latte"], ["prep.latte", "leche.avena"]]) {
+      const o = await createOrder(payload, actor, { lines: [latte(keys)], service: "here", idempotencyKey: randomUUID() });
+      if (!o.ok) throw new Error(o.error);
+      await payOrder(payload, actor, { orderId: o.orderId, method: "card_terminal" });
+    }
+    // Unpaid orders never count.
+    for (let i = 0; i < 4; i++) await createOrder(payload, actor, { lines: [latte(["prep.latte", "leche.vaca"])], service: "here", idempotencyKey: randomUUID() });
+    const top = await topCounterLines(payload, 10);
+    expect(top).toContainEqual({ menuItemId: ujiId, modifierKeys: ["leche.avena", "prep.latte"], sold: 3 });
+    expect(top.some((f) => f.modifierKeys.includes("leche.vaca"))).toBe(false);
+  });
+
+  it("gives the till the colours of milks and purées, for the drink picture", async () => {
+    const uji = (await loadCatalog(payload)).find((i) => i.id === ujiId)!;
+    const hue = (key: string) => uji.groups.flatMap((g) => g.options).find((o) => o.key === key)?.hue;
+    expect(hue("leche.avena")).toMatch(/^#[0-9A-F]{6}$/i);
+    expect(hue("extra.ube")).toMatch(/^#[0-9A-F]{6}$/i);
   });
 });

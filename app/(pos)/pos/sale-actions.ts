@@ -54,6 +54,8 @@ const chargeSchema = z.object({
   service: z.enum(["here", "takeaway"]),
   lines: z.array(lineSchema).min(1).max(40),
   note: z.string().max(MAX_NOTE).nullable().optional(),
+  // Optional first name to call the order out; letters, spaces and . ' - only.
+  customerName: z.string().trim().max(40).regex(/^[\p{L} .'-]*$/u).nullable().optional(),
   method: z.enum(["cash", "card_terminal", "split"]),
   tenderedCents: cents.optional(),
   cardCents: cents.optional(),

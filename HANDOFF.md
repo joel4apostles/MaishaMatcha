@@ -41,6 +41,9 @@ Last updated: 2026-11-12, night (Opus 5.5 session). main = origin/main, everythi
   now stored as members (tier waitlist, consent) first. Admin: Atajos → Lista
   de espera. Sign-ups before this fix are lost (only a log line). Joel to
   test once: sign up with his own email, check the list.
+- **Barra v2 (till) built 2026-11-12** like mock 5 (canvas "maisha barra mocks"):
+  most-ordered row, tabs, coloured cards, options beside the order with the
+  drink picture, name to call (on the KDS). Cash and card screens unchanged.
 - **Subscriber welcome email** (2026-11-12, `premiumWelcomeEmail`): once per
   subscription when it turns active; sends only once Resend is set.
 - **Security audit 2026-11-09**: three reviewers + mechanical checks; every

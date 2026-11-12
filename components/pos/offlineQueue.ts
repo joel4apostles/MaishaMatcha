@@ -9,6 +9,7 @@
 export type QueuedSale = {
   idempotencyKey: string;
   service: "here" | "takeaway";
+  customerName?: string | null;
   tenderedCents: number;
   totalCents: number;
   queuedAt: string;

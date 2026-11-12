@@ -88,7 +88,10 @@ export function KitchenDisplay({ initial }: { initial: Order[] }) {
                     className={`flex flex-col gap-3 rounded-[2px] border px-5 py-4 ${late ? "border-sumi" : "border-wood/50"} ${col.status === "ready" ? "bg-matcha/10" : ""}`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-serif text-[1.6rem] font-light">{o.label}</span>
+                      <span className="font-serif text-[1.6rem] font-light">
+                        {o.label}
+                        {o.callName ? <span className="ml-3">{o.callName}</span> : null}
+                      </span>
                       <span
                         className={`rounded-[2px] px-2 py-0.5 text-[15px] tabular-nums ${late ? "bg-sumi text-washi" : ""}`}
                       >

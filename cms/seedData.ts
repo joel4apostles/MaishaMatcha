@@ -101,6 +101,7 @@ export async function seedDatabase(payload: Payload, log: Log = console.log) {
           label: o.label.es,
           note: o.note?.es,
           priceDeltaCents: o.priceDeltaCents,
+          hue: o.hue,
           allergens: o.allergens ?? [],
           available: true,
           order: i,

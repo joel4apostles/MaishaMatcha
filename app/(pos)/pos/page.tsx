@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { PinLogin } from "@/components/pos/PinLogin";
 import { PosEyebrow, PosFrame } from "@/components/pos/PosFrame";
 import { currentDevice, currentPosSession, payloadClient, pinStaff } from "@/lib/pos/server";
-import { currentShift, loadCatalog } from "@/lib/pos/sales";
+import { currentShift, loadCatalog, topCounterLines } from "@/lib/pos/sales";
 import { Till } from "@/components/pos/Till";
 import { OpenShiftForm } from "@/components/pos/ShiftForms";
 import { logoutAction } from "./actions";
@@ -95,7 +95,7 @@ export default async function PosPage() {
 
   return (
     <PosFrame aside={aside} wide>
-      <Till catalog={await loadCatalog(payload)} />
+      <Till catalog={await loadCatalog(payload)} favourites={await topCounterLines(payload)} />
     </PosFrame>
   );
 }

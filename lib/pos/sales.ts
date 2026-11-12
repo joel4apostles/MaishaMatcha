@@ -1,3 +1,4 @@
+import { cartaGroups } from "@/content/carta";
 import {
   commitTransaction,
   createLocalReq,
@@ -103,6 +104,8 @@ async function setSequenceHash(req: PayloadRequest, key: string, hash: string) {
 
 const id = (v: unknown): number => (typeof v === "object" && v ? (v as { id: number }).id : (v as number));
 
+const CARTA_HUE = new Map(cartaGroups.flatMap((g) => g.options.filter((o) => o.hue).map((o) => [o.key, o.hue as string])));
+
 export async function loadCatalog(
   payload: Payload,
   locale: "es" | "en" = "es",
@@ -131,6 +134,8 @@ export async function loadCatalog(
       label: o.label,
       priceDeltaCents: o.priceDeltaCents ?? 0,
       available: o.available !== false,
+      // The owner's colour, else the carta's (options seeded before hues existed).
+      hue: o.hue || CARTA_HUE.get(o.key) || null,
     });
   }
   return items.docs
@@ -206,12 +211,47 @@ export async function openShift(payload: Payload, actor: Actor, floatCents: numb
   return { ok: true, shiftId: shift.id };
 }
 
+// -------------------------------------------------------------- favourites
+
+export type Favourite = { menuItemId: number; modifierKeys: string[]; sold: number };
+
+/**
+ * The till's "most ordered" row: the counter drinks (item plus its exact
+ * options) sold most in the last 30 days, from paid orders. Nothing is
+ * invented: with no history the row is empty. At least 3 sold to count.
+ */
+export async function topCounterLines(payload: Payload, limit = 4, days = 30): Promise<Favourite[]> {
+  const since = new Date(Date.now() - days * 86400_000).toISOString();
+  const { docs } = await payload.find({
+    collection: "orders",
+    overrideAccess: true,
+    depth: 0,
+    limit: 3000,
+    pagination: false,
+    select: { lines: true },
+    where: { and: [{ channel: { equals: "counter" } }, { paymentStatus: { equals: "paid" } }, { createdAt: { greater_than: since } }] },
+  });
+  const tally = new Map<string, Favourite>();
+  for (const o of docs) {
+    for (const l of o.lines ?? []) {
+      const menuItemId = l.menuItem == null ? null : typeof l.menuItem === "object" ? l.menuItem.id : l.menuItem;
+      if (!menuItemId) continue;
+      const modifierKeys = ((l.modifiers as { key?: string }[] | null) ?? []).map((m) => m.key).filter((k): k is string => Boolean(k)).sort();
+      const key = `${menuItemId}|${modifierKeys.join(",")}`;
+      const f = tally.get(key) ?? { menuItemId, modifierKeys, sold: 0 };
+      f.sold += l.quantity ?? 1;
+      tally.set(key, f);
+    }
+  }
+  return [...tally.values()].filter((f) => f.sold >= 3).sort((a, b) => b.sold - a.sold).slice(0, limit);
+}
+
 // ----------------------------------------------------------------- orders
 
 export async function createOrder(
   payload: Payload,
   actor: Actor,
-  input: { lines: LineInput[]; service: "here" | "takeaway"; note?: string | null; idempotencyKey: string },
+  input: { lines: LineInput[]; service: "here" | "takeaway"; note?: string | null; idempotencyKey: string; customerName?: string | null },
 ): Promise<Result<{ orderId: number; label: string; totalCents: number; duplicate: boolean }>> {
   // A retried submission (offline queue, double tap) returns the first order.
   const existing = await payload.find({
@@ -252,6 +292,8 @@ export async function createOrder(
         totalCents: priced.totalCents,
         taxBreakdown: priced.taxBreakdown,
         note: input.note?.trim() || undefined,
+        // Optional first name to call the order out (the barista asks).
+        customerName: input.customerName?.trim() || undefined,
         staff: actor.staffId,
         device: actor.deviceId,
         shift: shift.id,
@@ -566,6 +608,8 @@ export async function kitchenQueue(payload: Payload) {
     createdAt: o.createdAt,
     statusChangedAt: o.statusChangedAt ?? o.createdAt,
     staffName: typeof o.staff === "object" && o.staff ? o.staff.name : (o.customerName ?? null),
+    // A counter order's name to call out (web orders already show theirs as staffName).
+    callName: o.staff && o.customerName ? o.customerName : null,
     pickupAt: o.pickupAt ?? null,
     table: o.table ?? null,
     paid: o.paymentStatus === "paid",
