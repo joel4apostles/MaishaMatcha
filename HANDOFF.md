@@ -10,9 +10,9 @@ Last updated: 2026-11-10 (Opus 5.5 session). main = origin/main, everything push
 ## Where things stand
 
 - **Production live** on Supabase (EU) + Vercel at https://www.maishamatcha.es
-  (use www: the apex still had GoDaddy parking A records 76.223.105.230 and
-  13.248.243.5 on 2026-11-07; Joel removes them, then apex → www redirect
-  in Vercel; check `dig +short maishamatcha.es A` = only 216.198.79.1).
+  (2026-11-12: GoDaddy "WebsiteBuilder Site" A record + Coming Soon page
+  removed; apex = only 216.198.79.1, Vercel 308 apex → www. Keep the mail
+  A/MX/SPF/DKIM/DMARC records at GoDaddy.)
   anon/authenticated have no usage on the `payload` schema (2026-11-07).
 - **Design** live and founder-led (see CLAUDE.md imagery + brand skill). Home
   carta section: words LEFT, pour video RIGHT at 15rem, top-aligned (founder
@@ -50,7 +50,7 @@ Last updated: 2026-11-10 (Opus 5.5 session). main = origin/main, everything push
 - **REMIND JOEL FIRST (asked 2026-11-10): Turnstile keys.** Steps in auto-memory
   `turnstile-setup.md` (Cloudflare widget → 2 Vercel env vars, Production →
   redeploy → test waitlist + sign-in). Drop this line once he confirms.
-- Joel (setup): GoDaddy DNS cleanup; Turnstile keys (Cloudflare → Turnstile
+- Joel (setup): Turnstile keys (Cloudflare → Turnstile
   → Add widget, hostname www.maishamatcha.es, Managed → Vercel
   NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY, Production,
   redeploy); invite his real owner account; Stripe in TEST mode first
