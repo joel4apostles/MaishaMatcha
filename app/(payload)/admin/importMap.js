@@ -1,6 +1,6 @@
-import { PoPdfLink as PoPdfLink_8033211cbfcc58ba3f6707dfc92d26d5 } from '../../../cms/components/PoPdfLink'
 import { TOTPField as TOTPField_4eaf6cb33cfb75be01716613e3c9a512 } from 'payload-totp/rsc'
 import { InviteLink as InviteLink_7a23368bb17271c2eb7f7f24a7017a77 } from '../../../cms/components/InviteLink'
+import { PoPdfLink as PoPdfLink_8033211cbfcc58ba3f6707dfc92d26d5 } from '../../../cms/components/PoPdfLink'
 import { AdminIcon as AdminIcon_c7fdbd615166afffd15ee81a874b56b9 } from '../../../cms/components/AdminIcon'
 import { AdminLogo as AdminLogo_97f5c82efe5ea508e03c7ffe61b5f830 } from '../../../cms/components/AdminLogo'
 import { NavShortcuts as NavShortcuts_0d277c0b8a9da534dc48552459e07683 } from '../../../cms/components/NavShortcuts'
@@ -14,9 +14,9 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
-  "/cms/components/PoPdfLink#PoPdfLink": PoPdfLink_8033211cbfcc58ba3f6707dfc92d26d5,
   "payload-totp/rsc#TOTPField": TOTPField_4eaf6cb33cfb75be01716613e3c9a512,
   "/cms/components/InviteLink#InviteLink": InviteLink_7a23368bb17271c2eb7f7f24a7017a77,
+  "/cms/components/PoPdfLink#PoPdfLink": PoPdfLink_8033211cbfcc58ba3f6707dfc92d26d5,
   "/cms/components/AdminIcon#AdminIcon": AdminIcon_c7fdbd615166afffd15ee81a874b56b9,
   "/cms/components/AdminLogo#AdminLogo": AdminLogo_97f5c82efe5ea508e03c7ffe61b5f830,
   "/cms/components/NavShortcuts#NavShortcuts": NavShortcuts_0d277c0b8a9da534dc48552459e07683,

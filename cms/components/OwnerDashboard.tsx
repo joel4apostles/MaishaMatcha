@@ -8,9 +8,10 @@ import { madridDay, today } from "@/lib/reports";
 import { COLLECTION_NOTES, COLLECTION_NOTES_EN, DASH, SECONDARY, setupSteps } from "@/lib/dashboard";
 
 /**
- * The admin home (replaces Payload's tile grid): today at a glance, the
- * launch checklist until everything is set, what is waiting on the owner,
- * quick actions, and every collection as a compact list with counts.
+ * The admin home (replaces Payload's tile grid), in the order of the day
+ * (2026-11-13): the date and the till, today's figures on frosted glass
+ * over the matcha band, what needs the owner, today's sales, the launch
+ * checklist folded, then every collection by group with icons and counts.
  * Server component; the admin is owner/manager only.
  */
 
@@ -134,7 +135,7 @@ export async function OwnerDashboardView({
 
   const entityLink = (e: NavGroup["entities"][number]) => (
     <li key={e.slug}>
-      <Link href={e.type === "globals" ? `/admin/globals/${e.slug}` : `/admin/collections/${e.slug}`}>
+      <Link href={e.type === "globals" ? `/admin/globals/${e.slug}` : `/admin/collections/${e.slug}`} data-ico={e.slug}>
         <span className="md-row">
           <span>{text(e.label, lang)}</span>
           {counts.get(e.slug) != null ? <span className="md-count">{counts.get(e.slug)}</span> : null}
@@ -146,14 +147,15 @@ export async function OwnerDashboardView({
 
   return (
     <Gutter className="maisha-dash">
+      <div className="md-band">
       <header className="md-head">
         <h1>{T.today} · {dateLine}</h1>
         <nav aria-label={T.quick} className="md-actions">
-          <Link href="/pos" className="md-primary">{T.openBar}</Link>
-          <Link href="/admin/collections/menu-items/create">{T.newProduct}</Link>
-          <Link href="/admin/collections/events/create">{T.newEvent}</Link>
-          <Link href="/admin/collections/campaigns/create">{T.newLetter}</Link>
-          <Link href="/es" target="_blank" rel="noreferrer">{T.seeSite}</Link>
+          <Link href="/pos" className="md-primary" data-ico="pos" target="_blank" rel="noreferrer">{T.openBar}</Link>
+          <Link href="/admin/collections/menu-items/create" data-ico="menu-items">{T.newProduct}</Link>
+          <Link href="/admin/collections/events/create" data-ico="events">{T.newEvent}</Link>
+          <Link href="/admin/collections/campaigns/create" data-ico="campaigns">{T.newLetter}</Link>
+          <Link href="/es" target="_blank" rel="noreferrer" data-ico="web">{T.seeSite}</Link>
         </nav>
       </header>
 
@@ -178,30 +180,10 @@ export async function OwnerDashboardView({
           <p className="md-mid">{t.onShift.length ? t.onShift.map((s) => s.name).join(", ") : T.nobody}</p>
         </div>
       </section>
+      </div>
 
       <div className="md-two">
-        {done < steps.length ? (
-          <section aria-labelledby="md-setup" className="md-box">
-            <h2 id="md-setup" className="md-eyebrow">{T.setup} · {done} {T.of} {steps.length}</h2>
-            <div className="md-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={done} aria-label={T.stepsDone}>
-              <span style={{ width: `${(done / steps.length) * 100}%` }} />
-            </div>
-            <ol className="md-steps">
-              {steps.map((s) => (
-                <li key={s.key} data-done={s.done}>
-                  <span aria-hidden="true" className="md-tick">{s.done ? "✓" : ""}</span>
-                  <span>
-                    {s.href && !s.done ? <Link href={s.href}>{s.label}</Link> : <span>{s.label}</span>}
-                    <span className="sr-only">{s.done ? ` (${T.done})` : ` (${T.todo})`}</span>
-                    {!s.done ? <span className="md-note">{s.hint}</span> : null}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ) : null}
-
-        <section aria-labelledby="md-pending" className="md-box">
+        <section aria-labelledby="md-pending" className="md-box md-attention" data-empty={pending.length === 0}>
           <h2 id="md-pending" className="md-eyebrow">{T.pending} · {pending.length}</h2>
           {pending.length ? (
             <ul className="md-list">
@@ -246,13 +228,36 @@ export async function OwnerDashboardView({
         </section>
       </div>
 
+      {done < steps.length ? (
+        <details className="md-box md-setup">
+          <summary>
+            <span id="md-setup" className="md-eyebrow">{T.setup} · {done} {T.of} {steps.length}</span>
+            <span className="md-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={done} aria-label={T.stepsDone}>
+              <span style={{ width: `${(done / steps.length) * 100}%` }} />
+            </span>
+          </summary>
+          <ol className="md-steps">
+            {steps.map((s) => (
+              <li key={s.key} data-done={s.done}>
+                <span aria-hidden="true" className="md-tick">{s.done ? "✓" : ""}</span>
+                <span>
+                  {s.href && !s.done ? <Link href={s.href}>{s.label}</Link> : <span>{s.label}</span>}
+                  <span className="sr-only">{s.done ? ` (${T.done})` : ` (${T.todo})`}</span>
+                  {!s.done ? <span className="md-note">{s.hint}</span> : null}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </details>
+      ) : null}
+
       <section aria-label={T.all} className="md-groups">
         {navGroups.map((g) => {
           const main = g.entities.filter((e) => !SECONDARY.has(e.slug));
           const more = g.entities.filter((e) => SECONDARY.has(e.slug));
           return (
             <div key={g.label} className="md-group">
-              <h2>{g.label}</h2>
+              <h2 data-ico={g.entities[0]?.slug}>{g.label}</h2>
               <ul>{main.map(entityLink)}</ul>
               {more.length ? (
                 <details>

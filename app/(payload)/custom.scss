@@ -402,3 +402,171 @@ body {
   .maisha-nav-label { margin: 0 0 5px; color: var(--theme-elevation-400); }
   .nav__link { min-height: 32px; }
 }
+
+/* ======================================================================
+ * Admin v2 (2026-11-13): icons, the sidebar in the order of the day, and
+ * frosted glass over the matcha band. Flat colour and blur only (no
+ * gradients); the matcha powder sits under its green veil, as on the site.
+ * ==================================================================== */
+
+/* One line icon per screen: 24px grid, 1.5 stroke, drawn as a CSS mask so
+   it takes the text colour. Used by the sidebar (#nav-<slug>) and the
+   dashboard ([data-ico=<slug>]). */
+@function ico($inner) {
+  @return url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'>#{$inner}</svg>");
+}
+$md-icons: (
+  "pos": "<rect x='3' y='4' width='18' height='12' rx='1.5'/><path d='M8 20h8M12 16v4M7 8h4'/>",
+  "waitlist": "<path d='M4 6h11M4 12h11M4 18h6'/><circle cx='18' cy='17' r='3'/><path d='M18 15.5V17l1 .8'/>",
+  "boxes": "<path d='M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z'/><path d='m3 7.5 9 4.5 9-4.5M12 12v9'/>",
+  "invite": "<circle cx='10' cy='8' r='4'/><path d='M3 21a7 7 0 0 1 14 0M19 7v6M16 10h6'/>",
+  "web": "<circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18'/>",
+  "orders": "<path d='M6 3h12v18l-3-2-3 2-3-2-3 2z'/><path d='M9 8h6M9 12h6M9 16h3'/>",
+  "shifts": "<circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/>",
+  "refunds": "<path d='M9 14 4 9l5-5'/><path d='M4 9h10a6 6 0 0 1 0 12h-3'/>",
+  "payments": "<circle cx='9' cy='9' r='5.5'/><path d='M14.6 9.6A5.5 5.5 0 1 1 9.6 14.6'/>",
+  "pos-devices": "<rect x='5' y='3' width='14' height='18' rx='2'/><path d='M11 18h2'/>",
+  "menu-items": "<path d='M5 9h12v4a6 6 0 0 1-12 0z'/><path d='M17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 3.5v2.5M12 3.5v2.5'/>",
+  "menu-categories": "<rect x='4' y='4' width='7' height='7' rx='1'/><rect x='13' y='4' width='7' height='7' rx='1'/><rect x='4' y='13' width='7' height='7' rx='1'/><rect x='13' y='13' width='7' height='7' rx='1'/>",
+  "modifier-groups": "<path d='M4 7h9M17 7h3M4 17h3M11 17h9'/><circle cx='15' cy='7' r='2'/><circle cx='9' cy='17' r='2'/>",
+  "modifiers": "<circle cx='5.5' cy='7' r='1.5'/><circle cx='5.5' cy='12' r='1.5'/><circle cx='5.5' cy='17' r='1.5'/><path d='M10 7h10M10 12h10M10 17h10'/>",
+  "tax-rates": "<path d='M5 19 19 5'/><circle cx='7' cy='7' r='2'/><circle cx='17' cy='17' r='2'/>",
+  "members": "<circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/>",
+  "rsvps": "<rect x='3' y='5' width='18' height='16' rx='2'/><path d='M8 3v4M16 3v4M3 10h18M9 15.5l2 2 4-4'/>",
+  "users": "<circle cx='9' cy='8' r='3.5'/><path d='M2.5 20a6.5 6.5 0 0 1 13 0M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6 6 0 0 1 3.5 6'/>",
+  "events": "<rect x='3' y='5' width='18' height='16' rx='2'/><path d='M8 3v4M16 3v4M3 10h18M8 14h2M8 17h2M12 14h2'/>",
+  "campaigns": "<rect x='3' y='5' width='18' height='14' rx='2'/><path d='m3 7 9 6 9-6'/>",
+  "media": "<rect x='3' y='4' width='18' height='16' rx='2'/><circle cx='9' cy='10' r='2'/><path d='m21 16-5-5-9 9'/>",
+  "story-chapters": "<path d='M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13'/>",
+  "inventory-items": "<path d='M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z'/><path d='m3 7.5 9 4.5 9-4.5M12 12v9'/>",
+  "stock-counts": "<rect x='5' y='4' width='14' height='17' rx='2'/><path d='M9 4V3h6v1M9 13l2 2 4-4'/>",
+  "batches": "<path d='m12 3 9 5-9 5-9-5z'/><path d='m3 13 9 5 9-5'/>",
+  "recipe-lines": "<path d='M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3'/>",
+  "stock-movements": "<path d='M7 20V4M3 8l4-4 4 4M17 4v16M13 16l4 4 4-4'/>",
+  "purchase-orders": "<path d='M3 4h2l2.2 11h11l2-8H6'/><circle cx='9' cy='19.5' r='1.5'/><circle cx='17' cy='19.5' r='1.5'/>",
+  "suppliers": "<path d='M3 6h11v10H3zM14 10h4l3 3v3h-7'/><circle cx='7' cy='18' r='2'/><circle cx='17' cy='18' r='2'/>",
+  "supplier-products": "<path d='M3 12V4h8l10 10-8 8z'/><circle cx='7.5' cy='8.5' r='1.5'/>",
+  "invoices": "<path d='M6 3h9l4 4v14H6z'/><path d='M14 3v5h5M9 13h6M9 17h6'/>",
+  "audit-log": "<path d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/><circle cx='12' cy='12' r='3'/>",
+  "sequences": "<path d='M5 9h14M5 15h14M10 4 8 20M16 4l-2 16'/>",
+  "business": "<path d='M4 9 5.5 4h13L20 9M4 9h16v11H4zM9 20v-6h6v6'/>",
+);
+@each $key, $inner in $md-icons {
+  #nav-#{$key}, [data-ico="#{$key}"] { --md-ico: #{ico($inner)}; }
+}
+#nav-global-business { --md-ico: #{ico(map-get($md-icons, "business"))}; }
+
+/* ---------- Sidebar ---------- */
+html[data-theme="light"] .nav {
+  background: rgba(245, 241, 232, 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  backdrop-filter: blur(18px) saturate(1.1);
+  border-right: 1px solid rgba(176, 141, 87, 0.28);
+}
+.nav .nav__link {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 34px; padding-inline: 8px; margin-inline: -8px; border-radius: 2px;
+  color: rgba(28, 27, 24, 0.82);
+  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+}
+.nav .nav__link::before {
+  content: ""; flex: 0 0 18px; width: 18px; height: 18px; background: currentColor; opacity: 0.8;
+  -webkit-mask: var(--md-ico, none) center / contain no-repeat; mask: var(--md-ico, none) center / contain no-repeat;
+}
+.nav a.nav__link:hover { background: rgba(28, 27, 24, 0.05); color: #1c1b18; }
+/* The page you are on: a quiet filled row instead of Payload's thin bar. */
+.nav div.nav__link { background: rgba(155, 171, 55, 0.16); color: #1c1b18; font-weight: 500; }
+.nav .nav__link-indicator { display: none; }
+/* Group labels: an eyebrow with a hairline above, readable, not grey. */
+.nav-group { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(176, 141, 87, 0.22); }
+.nav-group__toggle { min-height: 32px; }
+.nav-group__label {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(28, 27, 24, 0.68) !important;
+}
+.nav-group__content { padding-top: 2px; }
+
+/* "Hoy": the first block of the sidebar. */
+.maisha-nav-shortcuts {
+  margin: 4px 0 2px;
+  .maisha-nav-label {
+    margin: 0 0 6px; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(28, 27, 24, 0.68);
+  }
+  .maisha-nav-link { text-decoration: none; }
+  .maisha-nav-link[data-ico="pos"] { background: #1c1b18; color: #f5f1e8; margin-bottom: 4px; }
+  .maisha-nav-link[data-ico="pos"]:hover { background: #1c1b18; color: #f5f1e8; opacity: 0.9; }
+}
+
+/* The top bar floats over the page as frosted washi. */
+html[data-theme="light"] .app-header {
+  background: rgba(245, 241, 232, 0.7);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* ---------- Dashboard ---------- */
+.maisha-dash {
+  position: relative;
+  isolation: isolate;
+
+  /* The matcha band behind the date, the actions and today's figures:
+     real powder under a flat green veil (sumi text stays AA). */
+  .md-band { position: relative; padding: 28px 0 32px; margin-bottom: 8px; }
+  .md-band::before, .md-band::after {
+    content: ""; position: absolute; z-index: -1; top: 0; bottom: 0;
+    left: calc(-1 * var(--gutter-h, 60px)); right: calc(-1 * var(--gutter-h, 60px));
+  }
+  .md-band::before { background: url("/_next/image?url=%2Fimages%2Fmatcha-powder.jpg&w=1920&q=60") center / cover; }
+  .md-band::after { background: rgba(155, 171, 55, 0.86); }
+  .md-head h1 { color: #1c1b18; }
+
+  /* Frosted glass cards: translucent washi, blur, one light edge. */
+  .md-box {
+    background: rgba(245, 241, 232, 0.66);
+    -webkit-backdrop-filter: blur(16px) saturate(1.15);
+    backdrop-filter: blur(16px) saturate(1.15);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 10px 30px rgba(28, 27, 24, 0.06);
+  }
+  /* Side by side cards share their height (founder checks shared edges). */
+  .md-two { margin-top: 20px; align-items: stretch; }
+  @media (min-width: 900px) { .md-two { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+
+  /* What needs the owner leads: a firmer edge when something waits. */
+  .md-attention[data-empty="false"] { border-left: 3px solid #1c1b18; }
+  .md-attention .md-list li { padding: 6px 0; border-bottom: 1px solid rgba(176, 141, 87, 0.2); }
+  .md-attention .md-list li:last-child { border-bottom: 0; }
+
+  /* Quick actions with icons; the till is the one filled button. */
+  .md-actions a { display: inline-flex; align-items: center; gap: 8px; background: rgba(245, 241, 232, 0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .md-actions a[data-ico]::before, .md-group h2[data-ico]::before, .md-group li a[data-ico] .md-row > span:first-child::before {
+    content: ""; display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; background: currentColor;
+    -webkit-mask: var(--md-ico, none) center / contain no-repeat; mask: var(--md-ico, none) center / contain no-repeat;
+  }
+  .md-actions .md-primary { background: #1c1b18; }
+
+  /* The launch checklist folds away: one line with its progress. */
+  .md-setup { margin-top: 12px; }
+  .md-setup summary {
+    list-style: none; cursor: pointer; min-height: 44px;
+    display: grid; grid-template-columns: auto minmax(80px, 240px) auto; align-items: center; gap: 16px;
+  }
+  .md-setup summary::-webkit-details-marker { display: none; }
+  .md-setup summary::after { content: "+"; font-size: 18px; color: rgba(28, 27, 24, 0.7); justify-self: end; }
+  .md-setup[open] summary::after { content: "−"; }
+  .md-setup .md-progress { margin-top: 0; display: block; }
+
+  /* Every screen, by group, each with its icon. */
+  .md-group h2 { display: flex; align-items: center; gap: 10px; }
+  .md-group h2[data-ico]::before { width: 20px; height: 20px; opacity: 0.85; }
+  .md-group li a[data-ico] .md-row > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
+  .md-group li a[data-ico] .md-row > span:first-child::before { width: 16px; height: 16px; opacity: 0.7; }
+  .md-group .md-note { padding-left: 24px; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-theme="light"] .nav, html[data-theme="light"] .app-header, .maisha-dash .md-box, .maisha-dash .md-actions a {
+    background: #f5f1e8; -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
