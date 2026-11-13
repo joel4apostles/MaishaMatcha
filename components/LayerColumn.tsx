@@ -11,7 +11,7 @@ import type { Locale } from "@/i18n/routing";
  */
 type Band = { id: string; color: string; grow: number; label: string };
 
-export function layerBands(recipe: Recipe, locale: Locale): Band[] {
+function layerBands(recipe: Recipe, locale: Locale): Band[] {
   const bands: Band[] = [];
   const cloud = recipe.extras.find((e) => e.key === "extra.coconut-cloud");
   if (cloud) bands.push({ id: cloud.key, color: cloud.hue ?? "#F4EFE3", grow: 1, label: cloud.label[locale] });

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { SESSION_DAYS, memberFromSession, sessionToken } from "@/lib/members";
+import { SESSION_DAYS, memberFromSession } from "@/lib/members";
 
 /** Cookie layer for member sessions (server components, actions, routes). */
 export const MEMBER_COOKIE = "maisha_member";
@@ -22,10 +22,6 @@ export async function currentMember() {
   } catch {
     return null;
   }
-}
-
-export async function setMemberSession(member: { id: number; sessionVersion?: number | null }) {
-  (await cookies()).set(MEMBER_COOKIE, sessionToken(member), memberCookieOptions());
 }
 
 export async function clearMemberSession() {

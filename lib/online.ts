@@ -34,7 +34,7 @@ export async function onlineSettings(payload: Payload) {
 }
 
 /** An unpaid card checkout stops holding its slot after this long. */
-export const CHECKOUT_HOLD_MINUTES = 30;
+const CHECKOUT_HOLD_MINUTES = 30;
 /** The salon is open at this instant (an open day, between opening and closing). */
 export function openNow(s: SlotSettings, now: Date) {
   const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(now);
@@ -45,9 +45,9 @@ export function openNow(s: SlotSettings, now: Date) {
 }
 
 /** Most units of one shop product per order. */
-export const MAX_SHOP_UNITS = 5;
+const MAX_SHOP_UNITS = 5;
 /** Most open web orders one email may hold at once. */
-export const MAX_OPEN_PER_EMAIL = 3;
+const MAX_OPEN_PER_EMAIL = 3;
 
 export async function takenSlots(payload: Payload, now = new Date()) {
   const holdCutoff = new Date(now.getTime() - CHECKOUT_HOLD_MINUTES * 60000).toISOString();

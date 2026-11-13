@@ -75,7 +75,7 @@ export function clientIp(h: Pick<Headers, "get"> | null | undefined) {
  * set; once on, a missing or bad token fails. Fails closed if Cloudflare
  * cannot be reached, so a bot cannot get through by timing out the check.
  */
-export const turnstileEnabled = () => Boolean(process.env.TURNSTILE_SECRET_KEY && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+const turnstileEnabled = () => Boolean(process.env.TURNSTILE_SECRET_KEY && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 export async function humanCheck(token: unknown, ip?: string) {
   if (!turnstileEnabled()) return true;

@@ -75,7 +75,7 @@ export function OpenShiftForm() {
   );
 }
 
-export function ZReportView({ report }: { report: ZReport }) {
+function ZReportView({ report }: { report: ZReport }) {
   const t = useTranslations("pos.shift");
   const row = "flex items-baseline justify-between gap-6 border-b border-wood/25 py-2.5";
   return (

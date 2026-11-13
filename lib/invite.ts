@@ -12,7 +12,7 @@ import { emailFrame, escapeHtml, sendEmail } from "@/lib/email";
 export const INVITE_DAYS = 7;
 export type InviteRole = "owner" | "manager";
 
-export const siteOrigin = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+const siteOrigin = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 
 export async function inviteStaff(payload: Payload, input: { name: string; email: string; role: InviteRole }) {
   const email = input.email.trim().toLowerCase();

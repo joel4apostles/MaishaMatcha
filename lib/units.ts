@@ -32,7 +32,7 @@ export async function takeUnits(req: PayloadRequest, catalog: Map<number, Catalo
   return true;
 }
 
-export async function returnUnits(payload: Payload, lines: Line[], req?: PayloadRequest) {
+async function returnUnits(payload: Payload, lines: Line[], req?: PayloadRequest) {
   const items = table(payload, "menu_items");
   for (const [id, q] of units(lines, () => true)) {
     await query(payload, sql`update ${items} set stock = stock + ${q} where id = ${id} and stock is not null`, req);

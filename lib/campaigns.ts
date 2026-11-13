@@ -1,6 +1,6 @@
 import type { Payload, PayloadRequest } from "payload";
 import { emailFrame, escapeHtml } from "@/lib/email";
-import { unsubscribeToken } from "@/lib/members";
+import { unsubscribeUrl } from "@/lib/members";
 
 /**
  * Sending email letters. Only to members who opted in, in the letter's
@@ -12,7 +12,7 @@ type CampaignDoc = { id: number; subject: string; title: string; body: string; a
 
 const site = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-export function campaignHtml(c: Pick<CampaignDoc, "title" | "body" | "locale">, unsubscribeUrl: string) {
+function campaignHtml(c: Pick<CampaignDoc, "title" | "body" | "locale">, unsubscribeUrl: string) {
   const paragraphs = c.body
     .split(/\n\s*\n/)
     .map((p) => p.trim())
@@ -80,7 +80,7 @@ export async function sendCampaign(payload: Payload, c: CampaignDoc, req?: Paylo
   let sent = 0;
   for (let i = 0; i < people.length; i += 100) {
     const chunk = people.slice(i, i + 100).map((m) => {
-      const unsub = `${site()}/api/members/unsubscribe?t=${encodeURIComponent(unsubscribeToken(m.id))}`;
+      const unsub = unsubscribeUrl(m.id);
       return { to: m.email, subject: c.subject, html: campaignHtml(c, unsub), unsub };
     });
     sent += await sendBatch(chunk);

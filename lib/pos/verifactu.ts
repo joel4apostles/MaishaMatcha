@@ -28,7 +28,7 @@ export type FingerprintInput = {
 
 const TZ = "Europe/Madrid";
 
-export const euroAmount = (cents: number) => (cents / 100).toFixed(2);
+const euroAmount = (cents: number) => (cents / 100).toFixed(2);
 
 /** dd-mm-yyyy in Spanish local time. */
 export function aeatDate(d: Date): string {

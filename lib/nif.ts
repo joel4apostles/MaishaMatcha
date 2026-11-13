@@ -5,7 +5,7 @@
  */
 const DNI_LETTERS = "TRWAGMYFPDXBNJZSQVHLCKE";
 
-export function normalizeTaxId(raw: string) {
+function normalizeTaxId(raw: string) {
   return raw.toUpperCase().replace(/[\s.\-/]/g, "");
 }
 
