@@ -313,7 +313,6 @@
       "invalid": "The PIN must have 4 to 6 digits."
     },
     "home": {
-      "greeting": "Hello, {name}",
       "device": "Tablet: {device}",
       "role": {
         "owner": "Owner",
@@ -321,7 +320,6 @@
         "barista": "Barista"
       },
       "next": "The order screen arrives in phase 2.",
-      "nextBody": "Sign-in, permissions and the activity log already work. Once you approve the design, this screen becomes the till.",
       "backOffice": "Open the back office",
       "logout": "Sign out"
     },
@@ -383,18 +381,14 @@
       "note": "Note",
       "notePlaceholder": "No ice, less sweet...",
       "add": "Add · {price}",
-      "close": "Close",
       "chooseRequired": "Choose {group}.",
-      "cashTitle": "Cash payment",
       "tendered": "Tendered",
       "change": "Change",
       "exact": "Exact",
       "charge": "Take cash",
-      "cardTitle": "Card payment",
       "cardBody": "Charge {total} on the card terminal. When it approves, confirm here.",
       "cardConfirm": "Paid on the terminal",
       "backToOrder": "Back to the order",
-      "short": "Not enough: the cash tendered does not cover the total.",
       "clear": "Clear",
       "paidTitle": "Paid",
       "paidLine": "Order {label} · Ticket {invoice}",
@@ -686,7 +680,6 @@
     "sent": "If the address is right, a sign-in link is on its way. It expires in 20 minutes.",
     "expired": "That link has expired or is not valid. Ask for another.",
     "hello": "Hello, {name}",
-    "tierCustomer": "Customer",
     "tierFounding": "Founding member no. {number}",
     "foundingTitle": "Founding member",
     "foundingBody": "The first {cap}. {remaining} places left.",
@@ -779,9 +772,7 @@
     "intro": "What we use at the bar, for your home. Collected at the salon.",
     "soon": "The shop opens soon.",
     "soonBody": "Meanwhile, the menu is waiting at the bar.",
-    "fromOrder": "There is also a shop: matcha and tools for home.",
     "photoAlt": "Two maisha matcha tins on a stone shelf, in side light.",
-    "phrase": "Chadogu: the tools of tea.",
     "addToBasket": "Add to basket",
     "backToShop": "Shop",
     "ritualTitle": "How to use it",

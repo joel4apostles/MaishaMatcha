@@ -313,7 +313,6 @@
       "invalid": "El PIN debe tener de 4 a 6 cifras."
     },
     "home": {
-      "greeting": "Hola, {name}",
       "device": "Tablet: {device}",
       "role": {
         "owner": "Propietario",
@@ -321,7 +320,6 @@
         "barista": "Barista"
       },
       "next": "La pantalla de pedidos llega en la fase 2.",
-      "nextBody": "El acceso, los permisos y el registro de actividad ya funcionan. Cuando apruebes el diseño, esta pantalla se convierte en la caja.",
       "backOffice": "Abrir la administración",
       "logout": "Salir"
     },
@@ -383,18 +381,14 @@
       "note": "Nota",
       "notePlaceholder": "Sin hielo, poco dulce...",
       "add": "Añadir · {price}",
-      "close": "Cerrar",
       "chooseRequired": "Elige {group}.",
-      "cashTitle": "Cobro en efectivo",
       "tendered": "Entregado",
       "change": "Cambio",
       "exact": "Exacto",
       "charge": "Cobrar en efectivo",
-      "cardTitle": "Cobro con tarjeta",
       "cardBody": "Cobra {total} en el datáfono. Cuando apruebe, confirma aquí.",
       "cardConfirm": "Cobrado en el datáfono",
       "backToOrder": "Volver al pedido",
-      "short": "Falta dinero: el importe entregado no cubre el total.",
       "clear": "Borrar",
       "paidTitle": "Cobrado",
       "paidLine": "Pedido {label} · Ticket {invoice}",
@@ -686,7 +680,6 @@
     "sent": "Si el email es correcto, te llega un enlace para entrar. Caduca en 20 minutos.",
     "expired": "Ese enlace ha caducado o no es válido. Pide otro.",
     "hello": "Hola, {name}",
-    "tierCustomer": "Cliente",
     "tierFounding": "Socio fundador nº {number}",
     "foundingTitle": "Socio fundador",
     "foundingBody": "Los primeros {cap}. Quedan {remaining} plazas.",
@@ -779,9 +772,7 @@
     "intro": "Lo que usamos en la barra, para tu casa. Se recoge en el salón.",
     "soon": "La tienda abre pronto.",
     "soonBody": "Mientras tanto, la carta te espera en la barra.",
-    "fromOrder": "También hay tienda: matcha y utensilios para casa.",
     "photoAlt": "Dos latas de matcha maisha sobre una repisa de piedra, con luz de lado.",
-    "phrase": "Chadogu: los utensilios del té.",
     "addToBasket": "Añadir a la cesta",
     "backToShop": "Tienda",
     "ritualTitle": "Cómo se usa",
