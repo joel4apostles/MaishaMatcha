@@ -225,6 +225,9 @@ describe("Barra v2 (2026-11-12)", () => {
     if (!o.ok) throw new Error(o.error);
     const k = (await kitchenQueue(payload)).find((x) => x.id === o.orderId);
     expect(k).toMatchObject({ callName: "Ana", staffName: "Lucía" });
+    // Handed over: the name goes; the order keeps no personal data.
+    await advanceOrder(payload, actor, o.orderId, "collected");
+    expect((await payload.findByID({ collection: "orders", id: o.orderId, overrideAccess: true })).customerName ?? null).toBeNull();
     const plain = await createOrder(payload, actor, { lines: [usucha()], service: "here", idempotencyKey: randomUUID() });
     if (!plain.ok) throw new Error(plain.error);
     expect((await kitchenQueue(payload)).find((x) => x.id === plain.orderId)?.callName).toBeNull();

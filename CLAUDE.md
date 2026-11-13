@@ -72,7 +72,7 @@ OG, admin) inherits them.
   web orders and the founding fee; `/api/stripe/webhook` (signature +
   timestamp + amount checked) is the ONLY place anything becomes paid.
   Public server code: `/api/waitlist`, `/api/og`, `/api/order-status/[token]`,
-  `/api/stripe/webhook`, `/api/members/{sign-in,unsubscribe}`, the server
+  `/api/stripe/webhook`, `/api/members/{sign-in,unsubscribe,confirm}`, the server
   actions in `pedir/` and `cuenta/`, and Payload's `/api/[...slug]`.
 - **Customer accounts are optional** (guest ordering always works). Members
   sign in with an emailed signed link (`lib/members.ts`, 20 min, no
@@ -205,9 +205,10 @@ restart dev. And after ANY `npm install`, repair the lockfile:
    public URL. `usePathname()` returns the internal (locale-agnostic) pathname.
 4. **The waitlist is stored in our database first** (2026-11-12: before
    this, with no Resend env, sign-ups were thanked and dropped). `lib/waitlist.ts`
-   creates a member with tier `waitlist` + `emailOptIn` (the form's consent box),
-   so the owner reaches them through Campaigns (one-click unsubscribe); admin
-   sidebar Atajos → Lista de espera. An EXISTING address is never changed by
+   creates a member with tier `waitlist` and letters OFF; the confirmation
+   email's link (`/api/members/confirm`, signed, GET page + POST) switches
+   them on and stamps `emailOptInAt` (double opt-in). The consent box is
+   required on every path. Admin sidebar Hoy → Lista de espera. An EXISTING address is never changed by
    the public form (it must not re-subscribe someone who unsubscribed). Resend
    (audience + confirmation) is extra: missing or failing, the sign-up still
    succeeds; stored nowhere → an error, never a false "thanks". Tests share one
@@ -294,10 +295,13 @@ if needed, fixed search_path, revoke from PUBLIC and Supabase roles). Same 5 low
 advisories as accepted above. Live Supabase SQL not re-run (needs the prod
 password; schema-level "no USAGE" from 2026-11-07 covers new tables).
 
-Waitlist in the database 2026-11-12: accepted single opt-in (anyone can
-type a NEW address; rate limits + Turnstile per IP and email, letters need
-the owner's approval and carry one-click unsubscribe). Add a confirm link
-(double opt-in) once Resend is live.
+Audit 2026-11-13 (hygiene + two security reviewers): no BLOCKERs. FIXED:
+waitlist double opt-in (letters only after the inbox owner confirms;
+consent required on the JSON path too; `members.emailOptInAt` keeps when),
+counter call names cleared at handover/void and at shift close (privacy
+notice says so), failed welcome email logged (no PII). Same 5 low + 5
+moderate advisories. Accepted: until Resend is set no confirmation email
+goes out, so waitlist members cannot be written to (by design).
 
 Live Supabase check 2026-11-07: anon and authenticated have NO usage on
 the `payload` schema (has_schema_privilege false/false); "Automatically

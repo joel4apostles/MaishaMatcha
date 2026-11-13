@@ -18,6 +18,7 @@ import * as migration_20261109_104251_subscription_box from './20261109_104251_s
 import * as migration_20261109_110329_founding_order from './20261109_110329_founding_order';
 import * as migration_20261109_120000_rate_limits from './20261109_120000_rate_limits';
 import * as migration_20261112_182940_welcome_email from './20261112_182940_welcome_email';
+import * as migration_20261113_173257_consent_time from './20261113_173257_consent_time';
 
 export const migrations = [
   {
@@ -118,6 +119,11 @@ export const migrations = [
   {
     up: migration_20261112_182940_welcome_email.up,
     down: migration_20261112_182940_welcome_email.down,
-    name: '20261112_182940_welcome_email'
+    name: '20261112_182940_welcome_email',
+  },
+  {
+    up: migration_20261113_173257_consent_time.up,
+    down: migration_20261113_173257_consent_time.down,
+    name: '20261113_173257_consent_time'
   },
 ];

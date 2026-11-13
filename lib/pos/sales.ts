@@ -501,6 +501,13 @@ export async function closeShift(
       report: { ...report, countedCashCents, differenceCents: difference } as never,
     },
   });
+  // Names to call out that were never cleared at handover go with the shift.
+  await payload.update({
+    collection: "orders",
+    overrideAccess: true,
+    where: { and: [{ shift: { equals: shift.id } }, { channel: { equals: "counter" } }, { customerName: { exists: true } }] },
+    data: { customerName: null },
+  });
   if (difference !== 0) {
     await writeAudit({ payload }, {
       action: "shift.cash-difference",
@@ -638,6 +645,11 @@ export async function advanceOrder(payload: Payload, actor: Actor, orderId: numb
       overrideAccess: true,
       data: { status: to, statusChangedAt: new Date().toISOString() },
     });
+  }
+  // The name to call out is needed only until the drink is handed over (or
+  // the order is voided); a counter order then keeps no personal data.
+  if ((to === "collected" || to === "cancelled") && order.channel === "counter" && order.customerName) {
+    await payload.update({ collection: "orders", id: orderId, overrideAccess: true, data: { customerName: null } });
   }
   if (to === "cancelled") {
     await writeAudit({ payload }, { action: "order.void", entity: "orders", entityId: orderId, actorId: actor.staffId, deviceId: actor.deviceId });

@@ -61,7 +61,9 @@ export async function updatePrefsAction(input: z.infer<typeof prefsSchema>) {
   if (!m) return { ok: false, error: "signed-out" };
   const p = prefsSchema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
-  await (await getPayload({ config })).update({ collection: "members", id: m.id, overrideAccess: true, data: p.data });
+  // Consent time recorded when letters are switched on, cleared when off.
+  const consentAt = p.data.emailOptIn ? (m.emailOptIn ? undefined : new Date().toISOString()) : null;
+  await (await getPayload({ config })).update({ collection: "members", id: m.id, overrideAccess: true, data: { ...p.data, ...(consentAt !== undefined ? { emailOptInAt: consentAt } : {}) } });
   return { ok: true };
 }
 

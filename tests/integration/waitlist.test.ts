@@ -1,7 +1,8 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { Payload } from "payload";
 import { joinWaitlist } from "@/lib/waitlist";
 import { campaignRecipients } from "@/lib/campaigns";
+import { confirmOptIn, confirmToken, unsubscribeToken } from "@/lib/members";
 import { POST } from "@/app/api/waitlist/route";
 import { boot } from "./harness";
 
@@ -18,6 +19,10 @@ const find = async (email: string) =>
 beforeAll(async () => {
   payload = await boot();
 });
+// Files share one database: leave no members behind for the others' counts.
+afterAll(async () => {
+  await payload.delete({ collection: "members", overrideAccess: true, where: { email: { like: "wl" } } });
+});
 afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.RESEND_API_KEY;
@@ -25,32 +30,44 @@ afterEach(() => {
 });
 
 const post = (body: unknown, ip = `10.9.${n}.${n++ % 250}`) =>
-  POST(new Request("http://localhost/api/waitlist", { method: "POST", headers: { "content-type": "application/json", "x-real-ip": ip }, body: JSON.stringify(body) }));
+  POST(new Request("http://localhost/api/waitlist", { method: "POST", headers: { "content-type": "application/json", "x-real-ip": ip }, body: JSON.stringify({ consent: true, ...(body as object) }) }));
 
 describe("waiting list", () => {
-  it("stores a sign-up as a waiting-list member with the email consent, once", async () => {
+  it("stores a sign-up once, letters OFF until the inbox owner confirms (double opt-in)", async () => {
     const email = unique();
-    expect(await joinWaitlist(payload, { name: "Ana", email: email.toUpperCase(), locale: "es" })).toBe("created");
-    expect(await joinWaitlist(payload, { name: "Ana", email, locale: "es" })).toBe("exists");
+    const first = await joinWaitlist(payload, { name: "Ana", email: email.toUpperCase(), locale: "es" });
+    expect(first.status).toBe("created");
+    expect((await joinWaitlist(payload, { name: "Ana", email, locale: "es" })).status).toBe("exists");
     const docs = await find(email);
     expect(docs).toHaveLength(1);
-    expect(docs[0]).toMatchObject({ tier: "waitlist", status: "active", emailOptIn: true, locale: "es", name: "Ana" });
-    // The owner can write to them later through the email letters.
-    const to = await campaignRecipients(payload, { audience: "all", locale: "es" } as never);
-    expect(to.some((m) => m.email === email)).toBe(true);
+    expect(docs[0]).toMatchObject({ tier: "waitlist", status: "active", emailOptIn: false, locale: "es", name: "Ana" });
+    const letters = async () => (await campaignRecipients(payload, { audience: "all", locale: "es" } as never)).some((m) => m.email === email);
+    // Anyone could have typed the address: no letters yet.
+    expect(await letters()).toBe(false);
+    // A forged or wrong-purpose token does nothing.
+    expect(await confirmOptIn(payload, "x.y")).toBe(false);
+    expect(await confirmOptIn(payload, unsubscribeToken(first.id))).toBe(false);
+    const [body] = confirmToken(first.id).split(".");
+    expect(await confirmOptIn(payload, `${body}.${"A".repeat(43)}`)).toBe(false);
+    // The link in the confirmation email switches letters on, with the time.
+    expect(await confirmOptIn(payload, confirmToken(first.id))).toBe(true);
+    const after = (await find(email))[0];
+    expect(after.emailOptIn).toBe(true);
+    expect(after.emailOptInAt).toBeTruthy();
+    expect(await letters()).toBe(true);
   });
 
   it("never touches an existing member: anyone can type an address, so no letters switched back on", async () => {
     const email = unique();
     await payload.create({ collection: "members", overrideAccess: true, data: { name: "Founder", email, tier: "founding", status: "active", locale: "en", emailOptIn: false } });
-    expect(await joinWaitlist(payload, { name: "Other", email, locale: "es" })).toBe("exists");
+    expect((await joinWaitlist(payload, { name: "Other", email, locale: "es" })).status).toBe("exists");
     expect((await find(email))[0]).toMatchObject({ tier: "founding", name: "Founder", locale: "en", emailOptIn: false });
   });
 
   it("never re-subscribes a member who left", async () => {
     const email = unique();
     await payload.create({ collection: "members", overrideAccess: true, data: { name: "Gone", email, tier: "customer", status: "cancelled", emailOptIn: false } });
-    expect(await joinWaitlist(payload, { name: "Gone", email, locale: "es" })).toBe("exists");
+    expect((await joinWaitlist(payload, { name: "Gone", email, locale: "es" })).status).toBe("exists");
     expect((await find(email))[0].emailOptIn).toBe(false);
   });
 
@@ -65,7 +82,14 @@ describe("waiting list", () => {
     const res = await post({ name: "Lucía", email, locale: "es" });
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({ ok: true, degraded: true });
-    expect((await find(email))[0]).toMatchObject({ tier: "waitlist", emailOptIn: true });
+    expect((await find(email))[0]).toMatchObject({ tier: "waitlist", emailOptIn: false });
+  });
+
+  it("refuses a sign-up without the consent box", async () => {
+    const email = unique();
+    const res = await POST(new Request("http://localhost/api/waitlist", { method: "POST", headers: { "content-type": "application/json", "x-real-ip": "10.8.0.1" }, body: JSON.stringify({ name: "Sin", email, locale: "es" }) }));
+    expect(res.status).toBe(400);
+    expect(await find(email)).toHaveLength(0);
   });
 
   it("an email service failure does not lose a stored sign-up", async () => {

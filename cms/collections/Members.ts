@@ -139,6 +139,15 @@ export const Members: CollectionConfig = {
       admin: { description: { es: "Solo lo cambia el socio. Las campañas se envían únicamente a quien lo aceptó.", en: "Only the member changes it. Campaigns go only to those who accepted." } },
     },
     {
+      // Proof of consent: when the person said yes (account page or the
+      // confirm link of the waiting list). Cleared when they say no.
+      name: "emailOptInAt",
+      type: "date",
+      label: { es: "Aceptó las cartas el", en: "Accepted letters on" },
+      access: { create: hiddenField, update: hiddenField },
+      admin: { readOnly: true },
+    },
+    {
       name: "locale",
       type: "select",
       defaultValue: "es",

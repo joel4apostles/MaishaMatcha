@@ -77,12 +77,13 @@
     "submit": "Unirse",
     "submitting": "Enviando…",
     "successTitle": "Gracias.",
-    "successLine": "Te escribiremos una sola vez, antes de la apertura.",
+    "successLine": "Tu nombre ya está en la lista.",
     "errorName": "Escribe tu nombre.",
     "errorEmail": "Revisa el correo.",
     "errorConsent": "Marca la casilla para continuar.",
     "errorRate": "Demasiados intentos. Prueba en un minuto.",
-    "errorGeneric": "Algo no ha ido bien. Inténtalo de nuevo."
+    "errorGeneric": "Algo no ha ido bien. Inténtalo de nuevo.",
+    "successConfirm": "Te hemos enviado un correo. Confírmalo para recibir noticias de la apertura."
   },
   "menu": {
     "eyebrow": "La carta",
@@ -143,7 +144,7 @@
         },
         {
           "title": "Lista de espera",
-          "body": "Tu nombre y tu correo, para avisarte antes de la apertura y, si lo aceptaste, enviarte noticias ocasionales. Base: tu consentimiento. Puedes retirarlo cuando quieras."
+          "body": "Tu nombre y tu correo, para avisarte antes de la apertura. Solo te escribimos si confirmas tu correo con el enlace que te enviamos; guardamos cuándo lo confirmaste. Base: tu consentimiento. Puedes retirarlo cuando quieras."
         },
         {
           "title": "Pedidos por la web",
@@ -171,7 +172,7 @@
         },
         {
           "title": "En la barra",
-          "body": "Los tickets de la barra no guardan datos personales salvo, si quieres, el nombre que das para que te llamemos (solo eso, con el pedido) o tus datos fiscales si pides factura completa."
+          "body": "Los tickets de la barra no guardan datos personales salvo, si quieres, el nombre que das para que te llamemos (solo eso, y se borra al entregarte el pedido) o tus datos fiscales si pides factura completa."
         },
         {
           "title": "Con quién trabajamos",

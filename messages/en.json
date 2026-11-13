@@ -77,12 +77,13 @@
     "submit": "Join",
     "submitting": "Sending…",
     "successTitle": "Thank you.",
-    "successLine": "We will write once, before the opening.",
+    "successLine": "Your name is on the list.",
     "errorName": "Please enter your name.",
     "errorEmail": "Please check the email.",
     "errorConsent": "Tick the box to continue.",
     "errorRate": "Too many attempts. Try again in a minute.",
-    "errorGeneric": "Something went wrong. Please try again."
+    "errorGeneric": "Something went wrong. Please try again.",
+    "successConfirm": "We have sent you an email. Confirm it to hear about the opening."
   },
   "menu": {
     "eyebrow": "The menu",
@@ -143,7 +144,7 @@
         },
         {
           "title": "Waiting list",
-          "body": "Your name and email, to tell you before the opening and, if you agreed, to send occasional news. Basis: your consent. You can withdraw it at any time."
+          "body": "Your name and email, to tell you before the opening. We only write once you confirm your email with the link we send; we keep when you confirmed. Basis: your consent. You can withdraw it at any time."
         },
         {
           "title": "Web orders",
@@ -171,7 +172,7 @@
         },
         {
           "title": "At the bar",
-          "body": "Bar receipts keep no personal data except, if you like, the name you give so we can call you (only that, with the order) or your tax details if you ask for a full invoice."
+          "body": "Bar receipts keep no personal data except, if you like, the name you give so we can call you (only that, deleted when your order is handed over) or your tax details if you ask for a full invoice."
         },
         {
           "title": "Who we work with",

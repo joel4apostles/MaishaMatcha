@@ -47,8 +47,6 @@ export async function premiumSettings(payload: Payload, locale: "es" | "en" = "e
   };
 }
 
-export const isPremium = (m: { subscriptionStatus?: string | null }) => m.subscriptionStatus === "active";
-
 export function monthlyPriceFor(member: { tier: string }, s: { monthlyCents: number | null; foundingMonthlyCents: number | null }) {
   return member.tier === "founding" && s.foundingMonthlyCents ? s.foundingMonthlyCents : s.monthlyCents;
 }
@@ -118,7 +116,7 @@ type StripeAddress = { line1?: string | null; line2?: string | null; postal_code
 type ShippingDetails = { name?: string | null; address?: StripeAddress | null } | null | undefined;
 
 /** Stripe's shipping details as our address group (Spain only, by Checkout's own rule). */
-export function shipToFrom(details: ShippingDetails, phone?: string | null) {
+function shipToFrom(details: ShippingDetails, phone?: string | null) {
   const a = details?.address;
   if (!a?.line1 || !a.postal_code) return null;
   return {
@@ -180,7 +178,7 @@ export async function onPremiumCheckout(
 }
 
 /** The order lines of one paid month: the box (or the plain fee) and, if posted, the shipping. */
-export function boxLines(input: {
+function boxLines(input: {
   amountPaid: number;
   rateBasisPoints: number;
   shipCents: number;
@@ -299,7 +297,7 @@ const monthName = (iso: string, locale: "es" | "en") =>
   new Date(iso).toLocaleDateString(locale === "en" ? "en-GB" : "es-ES", { timeZone: "Europe/Madrid", month: "long" });
 
 /** "Your box is waiting" (pickup) or "we are preparing it" (post). Once per box. */
-export async function sendBoxReady(payload: Payload, orderId: number) {
+async function sendBoxReady(payload: Payload, orderId: number) {
   const o = await payload.findByID({ collection: "orders", id: orderId, depth: 0, overrideAccess: true });
   if (o.kind !== "subscription" || !o.customerEmail || o.readyNotifiedAt || o.status !== "ready") return;
   const month = monthName(o.createdAt, "es");
@@ -449,7 +447,7 @@ export async function onPremiumSubscription(payload: Payload, sub: StripeSubscri
  * Stripe's repeated or concurrent events send it once). Built from what the
  * owner set in Empresa: the box product, the perks list; nothing invented.
  */
-export async function sendPremiumWelcome(payload: Payload, memberId: number, subscriptionId: string) {
+async function sendPremiumWelcome(payload: Payload, memberId: number, subscriptionId: string) {
   const members = table(payload, "members");
   const claimed = await query(
     payload,
@@ -468,7 +466,9 @@ export async function sendPremiumWelcome(payload: Payload, memberId: number, sub
     perks: s.perks,
     shippingCents: m.boxDelivery === "shipping" ? s.shippingCents : null,
   });
-  await sendEmail(m.email, subject, html);
+  const sent = await sendEmail(m.email, subject, html);
+  // No personal data in the log: the member id and the outcome only.
+  if (!sent.sent) console.warn("[premium] welcome email not sent", { memberId, status: sent.status });
   return true;
 }
 

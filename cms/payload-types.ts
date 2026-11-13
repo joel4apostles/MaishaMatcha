@@ -461,6 +461,7 @@ export interface Member {
    * Only the member changes it. Campaigns go only to those who accepted.
    */
   emailOptIn?: boolean | null;
+  emailOptInAt?: string | null;
   locale?: ('es' | 'en') | null;
   favoriteRecipeCode?: string | null;
   notes?: string | null;
@@ -1379,6 +1380,7 @@ export interface MembersSelect<T extends boolean = true> {
   subscriptionEventAt?: T;
   welcomedSubscription?: T;
   emailOptIn?: T;
+  emailOptInAt?: T;
   locale?: T;
   favoriteRecipeCode?: T;
   notes?: T;

@@ -10,7 +10,7 @@ import { priceLine, type CatalogItem, type LineInput } from "@/lib/pos/pricing";
  * is opened (so typing someone else's address creates nothing). Sessions
  * are signed cookies bound to the member's sessionVersion.
  */
-export const LINK_MINUTES = 20;
+const LINK_MINUTES = 20;
 export const SESSION_DAYS = 60;
 const UNSUB_DAYS = 800;
 
@@ -18,10 +18,12 @@ type Loc = "es" | "en";
 type LinkPayload = { exp: number; p: "signin"; e: string; n?: string; l: Loc; next?: string };
 type SessionPayload = { exp: number; p: "member"; mid: number; v: number };
 type UnsubPayload = { exp: number; p: "unsub"; mid: number };
+type ConfirmPayload = { exp: number; p: "optin"; mid: number };
+const CONFIRM_DAYS = 30;
 
 const nowS = () => Math.floor(Date.now() / 1000);
 const site = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-export const normEmail = (e: string) => e.trim().toLowerCase();
+const normEmail = (e: string) => e.trim().toLowerCase();
 
 /** Only same-site relative paths survive as "come back here" targets. */
 export function safeNext(next: string | null | undefined): string | undefined {
@@ -95,10 +97,32 @@ export function unsubscribeUrl(memberId: number) {
   return `${site()}/api/members/unsubscribe?t=${encodeURIComponent(unsubscribeToken(memberId))}`;
 }
 
+/**
+ * Double opt-in for the waiting list (security review 2026-11-13): a sign-up
+ * is stored with letters OFF; only the owner of the inbox, clicking the link
+ * in the confirmation email, switches them on (and the time is kept).
+ */
+export function confirmToken(memberId: number, now = nowS()) {
+  return signToken({ exp: now + CONFIRM_DAYS * 86400, p: "optin", mid: memberId }, membersKey());
+}
+
+export function confirmUrl(memberId: number) {
+  return `${site()}/api/members/confirm?t=${encodeURIComponent(confirmToken(memberId))}`;
+}
+
+export async function confirmOptIn(payload: Payload, token: string | null | undefined) {
+  const p = verifyToken<ConfirmPayload>(token, membersKey());
+  if (!p || p.p !== "optin") return false;
+  const m = await payload.findByID({ collection: "members", id: p.mid, depth: 0, overrideAccess: true }).catch(() => null);
+  if (!m || m.status === "cancelled") return false;
+  if (!m.emailOptIn) await payload.update({ collection: "members", id: m.id, overrideAccess: true, data: { emailOptIn: true, emailOptInAt: new Date().toISOString() } });
+  return true;
+}
+
 export async function unsubscribe(payload: Payload, token: string | null | undefined) {
   const p = verifyToken<UnsubPayload>(token, membersKey());
   if (!p || p.p !== "unsub") return false;
-  await payload.update({ collection: "members", id: p.mid, overrideAccess: true, data: { emailOptIn: false } }).catch(() => null);
+  await payload.update({ collection: "members", id: p.mid, overrideAccess: true, data: { emailOptIn: false, emailOptInAt: null } }).catch(() => null);
   return true;
 }
 

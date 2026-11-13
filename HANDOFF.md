@@ -46,6 +46,8 @@ Last updated: 2026-11-13 (Opus 5.5 session).
   drink picture, name to call (on the KDS). Cash and card screens unchanged.
 - **Admin v2 (2026-11-13)**: sidebar in the order of the day (Hoy: Abrir la caja,
   Lista de espera, Cajas del mes, Invitar), icons, "Más herramientas" folded;
+  audit 2026-11-13: waitlist is double opt-in now (confirm link in the email),
+  counter names cleared after handover;
   dashboard in paper and ink (founder chose it over frosted glass on the
   "maisha admin v2" canvas).
 - **Subscriber welcome email** (2026-11-12, `premiumWelcomeEmail`): once per

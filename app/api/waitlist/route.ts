@@ -7,6 +7,7 @@ import config from "@payload-config";
 import { rateLimit } from "@/lib/rateLimit";
 import { LIMITS, allowed, humanCheck } from "@/lib/limits";
 import { joinWaitlist } from "@/lib/waitlist";
+import { confirmUrl } from "@/lib/members";
 import { WaitlistConfirmation } from "@/emails/waitlist-confirmation";
 
 export const runtime = "nodejs";
@@ -23,6 +24,8 @@ const schema = z.object({
     .refine((s) => !CONTROL_CHARS.test(s), "invalid characters"),
   email: z.email().max(254),
   locale: z.enum(["es", "en"]),
+  // The "Acepto recibir noticias" box, on every path (review 2026-11-13).
+  consent: z.literal(true),
 });
 
 const FROM = process.env.RESEND_FROM ?? "maisha matcha <hola@maishamatcha.es>";
@@ -68,7 +71,7 @@ export async function POST(request: Request) {
       const form = await request.formData();
       formLocale = form.get("locale") === "en" ? "en" : "es";
       if (form.get("consent") !== "on") return reply({ error: "consent_required" }, 400);
-      json = { name: form.get("name"), email: form.get("email"), locale: formLocale };
+      json = { name: form.get("name"), email: form.get("email"), locale: formLocale, consent: true };
       token = form.get("cf-turnstile-response");
     } else {
       json = await request.json();
@@ -91,9 +94,10 @@ export async function POST(request: Request) {
 
   // Our own record first: the sign-up is kept even with no email service.
   let stored = false;
+  let memberId: number | null = null;
   if (payload) {
     try {
-      await joinWaitlist(payload, { name, email, locale });
+      memberId = (await joinWaitlist(payload, { name, email, locale })).id;
       stored = true;
     } catch (error) {
       console.error("[waitlist] could not store the sign-up:", error instanceof Error ? error.message : "unknown");
@@ -125,10 +129,11 @@ export async function POST(request: Request) {
       from: FROM,
       to: email,
       subject: subjects[locale],
-      react: createElement(WaitlistConfirmation, { locale, name }),
+      react: createElement(WaitlistConfirmation, { locale, name, confirmUrl: memberId ? confirmUrl(memberId) : undefined }),
     });
 
-    return reply({ ok: true });
+    // A confirm link went out: the form asks them to open it.
+    return reply({ ok: true, confirm: Boolean(memberId) });
   } catch (error) {
     console.error("[waitlist] Resend error:", error);
     // Stored with us: the place is kept even if the email did not go out.

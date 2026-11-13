@@ -58,6 +58,7 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
   const successRef = useRef<HTMLParagraphElement>(null);
   // Pressing "send" on a phone keyboard with only the box unticked: guide
   // to the box first instead of greeting the visitor with an error.
+  const [confirmSent, setConfirmSent] = useState(false);
   const consentNudged = useRef(false);
 
   // Back from a no-JavaScript submission (?waitlist=ok): show the thanks.
@@ -105,7 +106,7 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, locale, turnstile: human.token }),
+        body: JSON.stringify({ name, email, locale, consent: true, turnstile: human.token }),
       });
       human.reset();
       if (res.status === 429) {
@@ -118,6 +119,9 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
         setErrors({ form: t("errorGeneric") });
         return;
       }
+      // A confirmation email went out: ask them to confirm (double opt-in).
+      const body = (await res.json().catch(() => ({}))) as { confirm?: boolean };
+      setConfirmSent(Boolean(body.confirm));
       setStatus("success");
       requestAnimationFrame(() => successRef.current?.focus());
     } catch {
@@ -136,7 +140,7 @@ export function WaitlistForm({ dark = false }: { dark?: boolean }) {
         >
           {t("successTitle")}
         </p>
-        <p className={s.successLine}>{t("successLine")}</p>
+        <p className={s.successLine}>{confirmSent ? t("successConfirm") : t("successLine")}</p>
       </div>
     );
   }

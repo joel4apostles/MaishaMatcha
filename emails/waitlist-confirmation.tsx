@@ -1,5 +1,6 @@
 import {
   Body,
+  Button,
   Container,
   Head,
   Hr,
@@ -17,6 +18,9 @@ const copy = {
     heading: "Te damos la bienvenida a maisha matcha",
     line: "Hoja molida en piedra, agua a su punto, una pausa larga.",
     next: "Tu nombre está en la lista de los socios fundadores. Te escribiremos una sola vez, antes de la apertura.",
+    confirm: "Tu nombre está en la lista de los socios fundadores. Para recibir noticias de la apertura y de las plazas, confirma que este correo es tuyo.",
+    button: "Confirmar mi correo",
+    ignore: "Si no te apuntaste tú, no hagas nada: no te escribiremos.",
     signature: "maisha matcha · Murcia",
   },
   en: {
@@ -24,6 +28,9 @@ const copy = {
     heading: "Welcome to maisha matcha",
     line: "Leaf ground on stone, water at the right heat, a long pause.",
     next: "Your name is on the founding members list. We will write once, before the opening.",
+    confirm: "Your name is on the founding members list. To hear about the opening and the places, confirm that this address is yours.",
+    button: "Confirm my email",
+    ignore: "If you did not sign up, do nothing: we will not write to you.",
     signature: "maisha matcha · Murcia",
   },
 } as const;
@@ -41,9 +48,12 @@ const sansStack =
 export function WaitlistConfirmation({
   locale = "es",
   name,
+  confirmUrl,
 }: {
   locale?: Locale;
   name?: string;
+  /** Double opt-in: letters start only once this link is used. */
+  confirmUrl?: string;
 }) {
   const t = copy[locale];
   const greeting = name ? `${name},` : undefined;
@@ -108,8 +118,31 @@ export function WaitlistConfirmation({
                 margin: "24px 0 0",
               }}
             >
-              {t.next}
+              {confirmUrl ? t.confirm : t.next}
             </Text>
+            {confirmUrl ? (
+              <>
+                <Button
+                  href={confirmUrl}
+                  style={{
+                    display: "inline-block",
+                    marginTop: "20px",
+                    padding: "14px 24px",
+                    backgroundColor: sumi,
+                    color: washi,
+                    fontFamily: sansStack,
+                    fontSize: "15px",
+                    borderRadius: "2px",
+                    textDecoration: "none",
+                  }}
+                >
+                  {t.button}
+                </Button>
+                <Text style={{ fontFamily: sansStack, fontSize: "13px", lineHeight: 1.6, color: sumi, opacity: 0.7, margin: "16px 0 0" }}>
+                  {t.ignore}
+                </Text>
+              </>
+            ) : null}
           </Section>
           <Hr style={{ borderColor: wood, opacity: 0.4, margin: "32px 0 16px" }} />
           <Text
