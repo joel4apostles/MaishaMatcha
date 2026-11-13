@@ -160,22 +160,22 @@ export async function OwnerDashboardView({
       </header>
 
       <section aria-label={T.salesToday} className="md-kpis">
-        <div className="md-box">
+        <div className="md-figure">
           <p className="md-eyebrow">{T.sales}</p>
           <p className="md-big">{euro(t.salesCents)}</p>
           <p className="md-sub">{T.weekAgo}: {euro(before.salesCents)}</p>
         </div>
-        <div className="md-box">
+        <div className="md-figure">
           <p className="md-eyebrow">{T.orders}</p>
           <p className="md-big">{t.orders}</p>
           <p className="md-sub">{T.weekAgo}: {before.orders}</p>
         </div>
-        <div className="md-box">
+        <div className="md-figure">
           <p className="md-eyebrow">{T.avg}</p>
           <p className="md-big">{euro(t.averageTicketCents)}</p>
           {t.refundsCents ? <p className="md-sub">{T.refunds} {euro(t.refundsCents)}</p> : null}
         </div>
-        <div className="md-box">
+        <div className="md-figure">
           <p className="md-eyebrow">{T.onShift}</p>
           <p className="md-mid">{t.onShift.length ? t.onShift.map((s) => s.name).join(", ") : T.nobody}</p>
         </div>
@@ -183,8 +183,8 @@ export async function OwnerDashboardView({
       </div>
 
       <div className="md-two">
-        <section aria-labelledby="md-pending" className="md-box md-attention" data-empty={pending.length === 0}>
-          <h2 id="md-pending" className="md-eyebrow">{T.pending} · {pending.length}</h2>
+        <section aria-labelledby="md-pending" className="md-ledger md-attention" data-empty={pending.length === 0}>
+          <h2 id="md-pending" className="md-eyebrow md-ledger-head"><span>{T.pending}</span><span>{pending.length}</span></h2>
           {pending.length ? (
             <ul className="md-list">
               {pending.map((p) => (
@@ -198,8 +198,8 @@ export async function OwnerDashboardView({
           )}
         </section>
 
-        <section aria-labelledby="md-sales" className="md-box">
-          <h2 id="md-sales" className="md-eyebrow">{T.salesToday}</h2>
+        <section aria-labelledby="md-sales" className="md-ledger">
+          <h2 id="md-sales" className="md-eyebrow md-ledger-head"><span>{T.salesToday}</span></h2>
           {hasSales ? (
             <div className="md-split">
               <ol className="md-list">
@@ -229,12 +229,13 @@ export async function OwnerDashboardView({
       </div>
 
       {done < steps.length ? (
-        <details className="md-box md-setup">
+        <details className="md-setup">
           <summary>
             <span id="md-setup" className="md-eyebrow">{T.setup} · {done} {T.of} {steps.length}</span>
             <span className="md-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={done} aria-label={T.stepsDone}>
               <span style={{ width: `${(done / steps.length) * 100}%` }} />
             </span>
+            <span className="md-sub md-next">{T.next}: {steps.find((x) => !x.done)?.label}</span>
           </summary>
           <ol className="md-steps">
             {steps.map((s) => (

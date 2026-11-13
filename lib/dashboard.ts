@@ -118,7 +118,7 @@ export const DASH = {
   es: {
     today: "Hoy", quick: "Accesos rápidos", openBar: "Abrir la caja", newProduct: "Nuevo producto", newEvent: "Nuevo evento", newLetter: "Nueva carta", seeSite: "Ver la web",
     sales: "Ventas", orders: "Pedidos", avg: "Ticket medio", onShift: "En turno", nobody: "Nadie", weekAgo: "Hace una semana", refunds: "Devoluciones",
-    setup: "Para abrir", of: "de", stepsDone: "Pasos hechos", done: "hecho", todo: "pendiente",
+    setup: "Para abrir", next: "Siguiente", of: "de", stepsDone: "Pasos hechos", done: "hecho", todo: "pendiente",
     pending: "Necesita tu atención", nothing: "Nada pendiente. Todo en orden.", salesToday: "Ventas de hoy", noSales: "Sin ventas todavía.",
     accountant: "Para la gestoría", invoicesCsv: "facturas del mes (CSV)", vatCsv: "IVA del mes (CSV)", all: "Todo", more: "Más",
     webOrders: (n: number) => `${n} ${n === 1 ? "pedido web o de mesa" : "pedidos web o de mesa"} por preparar`,
@@ -135,7 +135,7 @@ export const DASH = {
   en: {
     today: "Today", quick: "Quick actions", openBar: "Open the till", newProduct: "New product", newEvent: "New event", newLetter: "New letter", seeSite: "See the website",
     sales: "Sales", orders: "Orders", avg: "Average ticket", onShift: "On shift", nobody: "Nobody", weekAgo: "A week ago", refunds: "Refunds",
-    setup: "Before opening", of: "of", stepsDone: "Steps done", done: "done", todo: "to do",
+    setup: "Before opening", next: "Next", of: "of", stepsDone: "Steps done", done: "done", todo: "to do",
     pending: "Waiting on you", nothing: "Nothing waiting. All in order.", salesToday: "Sales today", noSales: "No sales yet.",
     accountant: "For the accountant", invoicesCsv: "this month's invoices (CSV)", vatCsv: "this month's VAT (CSV)", all: "Everything", more: "More",
     webOrders: (n: number) => `${n} web or table ${n === 1 ? "order" : "orders"} to prepare`,

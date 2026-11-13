@@ -5,7 +5,7 @@ hook). Update it with the `handoff` skill before ending any session that
 changed something. Keep it short: state, next steps, blockers. History
 belongs in git, plans in `POS-PLAN.md`, rules in `CLAUDE.md`.
 
-Last updated: 2026-11-12, night (Opus 5.5 session). main = origin/main, everything pushed and live.
+Last updated: 2026-11-13 (Opus 5.5 session).
 
 ## Where things stand
 
@@ -44,6 +44,10 @@ Last updated: 2026-11-12, night (Opus 5.5 session). main = origin/main, everythi
 - **Barra v2 (till) built 2026-11-12** like mock 5 (canvas "maisha barra mocks"):
   most-ordered row, tabs, coloured cards, options beside the order with the
   drink picture, name to call (on the KDS). Cash and card screens unchanged.
+- **Admin v2 (2026-11-13)**: sidebar in the order of the day (Hoy: Abrir la caja,
+  Lista de espera, Cajas del mes, Invitar), icons, "Más herramientas" folded;
+  dashboard in paper and ink (founder chose it over frosted glass on the
+  "maisha admin v2" canvas).
 - **Subscriber welcome email** (2026-11-12, `premiumWelcomeEmail`): once per
   subscription when it turns active; sends only once Resend is set.
 - **Security audit 2026-11-09**: three reviewers + mechanical checks; every

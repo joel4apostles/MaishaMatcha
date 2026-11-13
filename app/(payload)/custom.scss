@@ -404,9 +404,9 @@ body {
 }
 
 /* ======================================================================
- * Admin v2 (2026-11-13): icons, the sidebar in the order of the day, and
- * frosted glass over the matcha band. Flat colour and blur only (no
- * gradients); the matcha powder sits under its green veil, as on the site.
+ * Admin v2 (2026-11-13, founder chose "paper and ink" over frosted glass):
+ * icons, the sidebar in the order of the day, figures printed on the matcha
+ * band, ledgers on hairlines. Flat colour only; no glass, no shadows.
  * ==================================================================== */
 
 /* One line icon per screen: 24px grid, 1.5 stroke, drawn as a CSS mask so
@@ -456,117 +456,122 @@ $md-icons: (
 }
 #nav-global-business { --md-ico: #{ico(map-get($md-icons, "business"))}; }
 
-/* ---------- Sidebar ---------- */
+/* ---------- Sidebar: solid washi, timber hairlines ---------- */
 html[data-theme="light"] .nav {
-  background: rgba(245, 241, 232, 0.72);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
-  backdrop-filter: blur(18px) saturate(1.1);
-  border-right: 1px solid rgba(176, 141, 87, 0.28);
+  background: #f5f1e8;
+  border-right: 1px solid rgba(176, 141, 87, 0.35);
 }
 .nav .nav__link {
   display: flex; align-items: center; gap: 10px;
   min-height: 34px; padding-inline: 8px; margin-inline: -8px; border-radius: 2px;
-  color: rgba(28, 27, 24, 0.82);
+  color: rgba(28, 27, 24, 0.85);
   transition: background-color 0.15s ease-out, color 0.15s ease-out;
 }
 .nav .nav__link::before {
-  content: ""; flex: 0 0 18px; width: 18px; height: 18px; background: currentColor; opacity: 0.8;
+  content: ""; flex: 0 0 18px; width: 18px; height: 18px; background: currentColor; opacity: 0.85;
   -webkit-mask: var(--md-ico, none) center / contain no-repeat; mask: var(--md-ico, none) center / contain no-repeat;
 }
 .nav a.nav__link:hover { background: rgba(28, 27, 24, 0.05); color: #1c1b18; }
-/* The page you are on: a quiet filled row instead of Payload's thin bar. */
-.nav div.nav__link { background: rgba(155, 171, 55, 0.16); color: #1c1b18; font-weight: 500; }
+/* The page you are on: a quiet green row instead of Payload's thin bar. */
+.nav div.nav__link { background: rgba(155, 171, 55, 0.18); color: #1c1b18; font-weight: 500; }
 .nav .nav__link-indicator { display: none; }
-/* Group labels: an eyebrow with a hairline above, readable, not grey. */
-.nav-group { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(176, 141, 87, 0.22); }
+/* Group labels: small capitals under a hairline, readable, not grey. */
+.nav-group { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(176, 141, 87, 0.3); }
 .nav-group__toggle { min-height: 32px; }
 .nav-group__label {
   font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(28, 27, 24, 0.68) !important;
+  color: rgba(28, 27, 24, 0.7) !important;
 }
 .nav-group__content { padding-top: 2px; }
 
-/* "Hoy": the first block of the sidebar. */
+/* "Hoy": the first block of the sidebar; the till is its one filled row. */
 .maisha-nav-shortcuts {
   margin: 4px 0 2px;
   .maisha-nav-label {
     margin: 0 0 6px; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-    color: rgba(28, 27, 24, 0.68);
+    color: rgba(28, 27, 24, 0.7);
   }
   .maisha-nav-link { text-decoration: none; }
-  .maisha-nav-link[data-ico="pos"] { background: #1c1b18; color: #f5f1e8; margin-bottom: 4px; }
-  .maisha-nav-link[data-ico="pos"]:hover { background: #1c1b18; color: #f5f1e8; opacity: 0.9; }
+  .maisha-nav-link[data-ico="pos"], .maisha-nav-link[data-ico="pos"]:hover { background: #1c1b18; color: #f5f1e8; margin-bottom: 4px; }
 }
 
-/* The top bar floats over the page as frosted washi. */
-html[data-theme="light"] .app-header {
-  background: rgba(245, 241, 232, 0.7);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-}
+/* The top bar: solid washi over one timber hairline. */
+html[data-theme="light"] .app-header { background: #f5f1e8; border-bottom: 1px solid rgba(176, 141, 87, 0.3); }
 
-/* ---------- Dashboard ---------- */
+/* ---------- Dashboard: paper and ink ---------- */
 .maisha-dash {
   position: relative;
   isolation: isolate;
 
-  /* The matcha band behind the date, the actions and today's figures:
-     real powder under a flat green veil (sumi text stays AA). */
-  .md-band { position: relative; padding: 28px 0 32px; margin-bottom: 8px; }
+  /* The matcha band: real powder under a flat green veil, edge to edge. */
+  .md-band { position: relative; padding: 40px 0; margin: -8px 0 8px; }
   .md-band::before, .md-band::after {
     content: ""; position: absolute; z-index: -1; top: 0; bottom: 0;
     left: calc(-1 * var(--gutter-h, 60px)); right: calc(-1 * var(--gutter-h, 60px));
   }
   .md-band::before { background: url("/_next/image?url=%2Fimages%2Fmatcha-powder.jpg&w=1920&q=60") center / cover; }
   .md-band::after { background: rgba(155, 171, 55, 0.86); }
-  .md-head h1 { color: #1c1b18; }
+  .md-head { margin-bottom: 28px; }
+  .md-head h1 { color: #1c1b18; font-weight: 300; font-size: 36px; }
 
-  /* Frosted glass cards: translucent washi, blur, one light edge. */
-  .md-box {
-    background: rgba(245, 241, 232, 0.66);
-    -webkit-backdrop-filter: blur(16px) saturate(1.15);
-    backdrop-filter: blur(16px) saturate(1.15);
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 10px 30px rgba(28, 27, 24, 0.06);
+  /* Today's figures printed on the band: no boxes, ink rules between. */
+  .md-kpis { gap: 0; border-top: 1px solid rgba(28, 27, 24, 0.22); }
+  .md-figure { padding: 20px 24px 0; border-left: 1px solid rgba(28, 27, 24, 0.22); }
+  .md-figure:first-child { padding-left: 0; border-left: 0; }
+  @media (max-width: 899px) {
+    .md-figure:nth-child(odd) { padding-left: 0; border-left: 0; }
+    .md-figure:nth-child(n + 3) { border-top: 1px solid rgba(28, 27, 24, 0.22); margin-top: 20px; }
   }
-  /* Side by side cards share their height (founder checks shared edges). */
-  .md-two { margin-top: 20px; align-items: stretch; }
-  @media (min-width: 900px) { .md-two { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+  .md-figure .md-eyebrow { color: rgba(28, 27, 24, 0.82); }
+  .md-figure .md-big { font-size: 44px; font-weight: 300; line-height: 1.05; }
+  .md-figure .md-mid { font-family: var(--md-serif); font-weight: 300; font-size: 28px; margin-top: 8px; }
+  .md-figure .md-sub { color: rgba(28, 27, 24, 0.85); }
 
-  /* What needs the owner leads: a firmer edge when something waits. */
-  .md-attention[data-empty="false"] { border-left: 3px solid #1c1b18; }
-  .md-attention .md-list li { padding: 6px 0; border-bottom: 1px solid rgba(176, 141, 87, 0.2); }
-  .md-attention .md-list li:last-child { border-bottom: 0; }
-
-  /* Quick actions with icons; the till is the one filled button. */
-  .md-actions a { display: inline-flex; align-items: center; gap: 8px; background: rgba(245, 241, 232, 0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  /* Quick actions: ink outlines on the green; the till filled. */
+  .md-actions a { display: inline-flex; align-items: center; gap: 8px; background: transparent; border-color: rgba(28, 27, 24, 0.45); }
+  .md-actions a:hover { border-color: #1c1b18; }
+  .md-actions .md-primary { background: #1c1b18; color: #f5f1e8; }
   .md-actions a[data-ico]::before, .md-group h2[data-ico]::before, .md-group li a[data-ico] .md-row > span:first-child::before {
     content: ""; display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; background: currentColor;
     -webkit-mask: var(--md-ico, none) center / contain no-repeat; mask: var(--md-ico, none) center / contain no-repeat;
   }
-  .md-actions .md-primary { background: #1c1b18; }
 
-  /* The launch checklist folds away: one line with its progress. */
-  .md-setup { margin-top: 12px; }
+  /* Ledgers below the band: a heading over a rule, rows on hairlines. */
+  .md-two { margin-top: 40px; gap: 56px; align-items: start; }
+  @media (min-width: 900px) { .md-two { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+  .md-ledger-head {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(176, 141, 87, 0.55);
+  }
+  .md-attention .md-ledger-head { border-bottom-color: #1c1b18; color: #1c1b18; }
+  .md-attention .md-list { margin-top: 0; }
+  .md-attention .md-list li { margin: 0; border-bottom: 1px solid rgba(176, 141, 87, 0.3); }
+  .md-attention .md-list li a {
+    display: flex; align-items: center; gap: 14px; min-height: 52px; text-decoration: none;
+  }
+  .md-attention .md-list li a::before { content: ""; width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: #1c1b18; }
+  .md-attention .md-list li a:hover { text-decoration: underline; text-decoration-color: rgba(176, 141, 87, 0.7); }
+  .md-ledger .md-empty { margin-top: 14px; }
+
+  /* The launch checklist: one line on lighter paper, opens on demand. */
+  .md-setup { margin-top: 40px; background: #fbf9f3; border: 1px solid rgba(176, 141, 87, 0.35); border-radius: 2px; }
   .md-setup summary {
-    list-style: none; cursor: pointer; min-height: 44px;
-    display: grid; grid-template-columns: auto minmax(80px, 240px) auto; align-items: center; gap: 16px;
+    list-style: none; cursor: pointer; min-height: 56px; padding: 0 24px;
+    display: grid; grid-template-columns: auto minmax(80px, 240px) minmax(0, 1fr) auto; align-items: center; gap: 20px;
   }
   .md-setup summary::-webkit-details-marker { display: none; }
-  .md-setup summary::after { content: "+"; font-size: 18px; color: rgba(28, 27, 24, 0.7); justify-self: end; }
-  .md-setup[open] summary::after { content: "−"; }
-  .md-setup .md-progress { margin-top: 0; display: block; }
+  .md-setup summary::after { content: "+"; font-size: 18px; color: rgba(28, 27, 24, 0.75); }
+  .md-setup[open] summary::after { content: "\2212"; }
+  .md-setup .md-progress { margin-top: 0; display: block; height: 3px; }
+  .md-setup .md-next { margin-top: 0; }
+  .md-setup .md-steps { padding: 0 24px 20px; }
+  @media (max-width: 699px) { .md-setup summary { grid-template-columns: minmax(0, 1fr) auto; } .md-setup .md-progress, .md-setup .md-next { display: none; } }
 
   /* Every screen, by group, each with its icon. */
-  .md-group h2 { display: flex; align-items: center; gap: 10px; }
+  .md-groups { margin-top: 48px; padding-top: 0; border-top: 0; gap: 44px 40px; }
+  .md-group h2 { display: flex; align-items: center; gap: 10px; font-weight: 300; font-size: 24px; }
   .md-group h2[data-ico]::before { width: 20px; height: 20px; opacity: 0.85; }
   .md-group li a[data-ico] .md-row > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
-  .md-group li a[data-ico] .md-row > span:first-child::before { width: 16px; height: 16px; opacity: 0.7; }
+  .md-group li a[data-ico] .md-row > span:first-child::before { width: 16px; height: 16px; opacity: 0.75; }
   .md-group .md-note { padding-left: 24px; }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  html[data-theme="light"] .nav, html[data-theme="light"] .app-header, .maisha-dash .md-box, .maisha-dash .md-actions a {
-    background: #f5f1e8; -webkit-backdrop-filter: none; backdrop-filter: none;
-  }
 }
